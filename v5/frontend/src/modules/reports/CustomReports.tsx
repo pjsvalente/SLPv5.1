@@ -355,13 +355,13 @@ export default function CustomReportsModule() {
 
   // Render template card
   const renderTemplateCard = (template: ReportTemplate) => {
-    const typeIcons = {
-      assets: Package,
-      interventions: Wrench,
-      technicians: Users,
-      mixed: Layers
+    const typeIcons: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
+      assets: IconPackage,
+      interventions: IconWrench,
+      technicians: IconUsers,
+      mixed: IconLayers
     }
-    const Icon = typeIcons[template.type] || FileText
+    const Icon = typeIcons[template.type] || IconFileText
 
     return (
       <div
@@ -399,21 +399,21 @@ export default function CustomReportsModule() {
               className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
               title={t('customReports.generate')}
             >
-              <Play className="w-4 h-4" />
+              <IconPlay className="w-4 h-4" />
             </button>
             <button
               onClick={() => loadTemplateToBuilder(template)}
               className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
               title={t('common.edit')}
             >
-              <Edit2 className="w-4 h-4" />
+              <IconEdit className="w-4 h-4" />
             </button>
             <button
               onClick={() => deleteTemplate(template.id)}
               className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
               title={t('common.delete')}
             >
-              <Trash2 className="w-4 h-4" />
+              <IconTrash2 className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -437,7 +437,7 @@ export default function CustomReportsModule() {
             }}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5" />
+            <IconX className="w-5 h-5" />
           </button>
         </div>
 
@@ -481,7 +481,7 @@ export default function CustomReportsModule() {
           {/* Column Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              <Columns className="w-4 h-4 inline-block mr-2" />
+              <IconColumns className="w-4 h-4 inline-block mr-2" />
               {t('customReports.selectColumns')} *
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -512,14 +512,14 @@ export default function CustomReportsModule() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                <Filter className="w-4 h-4 inline-block mr-2" />
+                <IconFilter className="w-4 h-4 inline-block mr-2" />
                 {t('customReports.filters')}
               </label>
               <button
                 onClick={addFilter}
                 className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
               >
-                <Plus className="w-4 h-4" />
+                <IconPlus className="w-4 h-4" />
                 {t('customReports.addFilter')}
               </button>
             </div>
@@ -559,7 +559,7 @@ export default function CustomReportsModule() {
                       onClick={() => removeFilter(index)}
                       className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
                     >
-                      <X className="w-4 h-4" />
+                      <IconX className="w-4 h-4" />
                     </button>
                   </div>
                 ))}
@@ -574,7 +574,7 @@ export default function CustomReportsModule() {
           {/* Date Range */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              <Calendar className="w-4 h-4 inline-block mr-2" />
+              <IconCalendar className="w-4 h-4 inline-block mr-2" />
               {t('customReports.dateRange')}
             </label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -686,7 +686,7 @@ export default function CustomReportsModule() {
             disabled={loading || builderColumns.length === 0}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <Eye className="w-4 h-4" />
+            <IconEye className="w-4 h-4" />
             {t('customReports.preview')}
           </button>
           <div className="flex items-center gap-2">
@@ -704,7 +704,7 @@ export default function CustomReportsModule() {
               disabled={loading || !builderName.trim() || builderColumns.length === 0}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {loading ? <IconRefreshCw className="w-4 h-4 animate-spin" /> : <IconSave className="w-4 h-4" />}
               {t('common.save')}
             </button>
           </div>
@@ -735,21 +735,21 @@ export default function CustomReportsModule() {
                 onClick={() => exportReport('csv')}
                 className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                <Download className="w-4 h-4" />
+                <IconDownload className="w-4 h-4" />
                 CSV
               </button>
               <button
                 onClick={() => exportReport('excel')}
                 className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                <FileSpreadsheet className="w-4 h-4" />
+                <IconFileSpreadsheet className="w-4 h-4" />
                 Excel
               </button>
               <button
                 onClick={() => setShowPreview(false)}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5" />
+                <IconX className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -828,7 +828,7 @@ export default function CustomReportsModule() {
           }}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          <Plus className="w-5 h-5" />
+          <IconPlus className="w-5 h-5" />
           {t('customReports.newTemplate')}
         </button>
       </div>
@@ -838,7 +838,7 @@ export default function CustomReportsModule() {
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <IconFileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <p className="text-sm text-gray-500">{t('customReports.totalTemplates')}</p>
@@ -849,7 +849,7 @@ export default function CustomReportsModule() {
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <Package className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <IconPackage className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
               <p className="text-sm text-gray-500">{t('customReports.assetReports')}</p>
@@ -862,7 +862,7 @@ export default function CustomReportsModule() {
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <Wrench className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              <IconWrench className="w-5 h-5 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
               <p className="text-sm text-gray-500">{t('customReports.interventionReports')}</p>
@@ -875,7 +875,7 @@ export default function CustomReportsModule() {
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <IconUsers className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
               <p className="text-sm text-gray-500">{t('customReports.technicianReports')}</p>
@@ -898,7 +898,7 @@ export default function CustomReportsModule() {
           </div>
         ) : (
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-8 text-center">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <IconFileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400">{t('customReports.noTemplates')}</p>
             <button
               onClick={() => {

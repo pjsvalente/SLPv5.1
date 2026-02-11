@@ -45,7 +45,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 }
 
 // Plan icons
-const planIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+const planIcons: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
   base: IconShield,
   pro: IconZap,
   premium: IconCrown,
@@ -258,7 +258,7 @@ export default function PlansConfigModule() {
                   {t('plans.module')}
                 </th>
                 {sortedPlans.map(plan => {
-                  const PlanIcon = planIcons[plan.id] || Shield
+                  const PlanIcon = planIcons[plan.id] || IconShield
                   return (
                     <th key={plan.id} className="px-4 py-3 text-center min-w-[140px]">
                       <div className={`inline-flex flex-col items-center gap-1 px-3 py-2 rounded-lg border ${planColors[plan.id]}`}>
@@ -272,7 +272,7 @@ export default function PlansConfigModule() {
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {moduleList.map(module => {
-                const ModuleIcon = iconMap[module.icon] || Package
+                const ModuleIcon = iconMap[module.icon] || IconPackage
                 return (
                   <tr key={module.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                     <td className="px-4 py-3">
@@ -341,7 +341,7 @@ export default function PlansConfigModule() {
       {/* Plan limits info */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {sortedPlans.map(plan => {
-          const PlanIcon = planIcons[plan.id] || Shield
+          const PlanIcon = planIcons[plan.id] || IconShield
           const limits = plan.limits || {}
           return (
             <div key={plan.id} className={`p-4 rounded-lg border ${planColors[plan.id]}`}>
