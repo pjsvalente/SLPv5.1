@@ -67,7 +67,7 @@ export const LoginPage: React.FC = () => {
           <img
             src="/api/tenants/smartlamppost/logo"
             alt="SmartLamppost"
-            className="h-16 mx-auto mb-4"
+            className="h-16 mx-auto mb-4 brightness-0 invert"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none'
             }}

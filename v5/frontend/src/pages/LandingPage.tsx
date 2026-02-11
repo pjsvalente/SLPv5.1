@@ -50,7 +50,7 @@ export const LandingPage: React.FC = () => {
               <img
                 src="/api/tenants/smartlamppost/logo"
                 alt="Logo"
-                className="h-10 w-10 object-contain"
+                className="h-10 w-10 object-contain brightness-0 invert"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
               />
               <span className="text-xl font-bold text-slp-text-primary">
@@ -376,7 +376,7 @@ export const LandingPage: React.FC = () => {
                 <img
                   src="/api/tenants/smartlamppost/logo"
                   alt="Logo"
-                  className="h-10 w-10 object-contain"
+                  className="h-10 w-10 object-contain brightness-0 invert"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                 />
                 <span className="text-lg font-bold">
