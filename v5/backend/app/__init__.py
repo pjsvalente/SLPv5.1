@@ -86,6 +86,12 @@ def create_app(config_class=Config):
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
     def serve_frontend(path):
+        # Log static folder for debugging
+        index_path = os.path.join(app.static_folder, 'index.html')
+        logger.info(f"Static folder: {app.static_folder}")
+        logger.info(f"Index exists: {os.path.exists(index_path)}")
+        if os.path.exists(index_path):
+            logger.info(f"Index size: {os.path.getsize(index_path)} bytes")
         # Serve static files if they exist
         if path and os.path.exists(os.path.join(app.static_folder, path)):
             return app.send_static_file(path)
