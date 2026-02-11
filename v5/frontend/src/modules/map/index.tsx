@@ -157,6 +157,9 @@ function MapView() {
   const [municipalities, setMunicipalities] = useState<string[]>([])
   const [statistics, setStatistics] = useState<any>(null)
 
+  // Mobile sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   // Route planning state
   const [routePlanningMode, setRoutePlanningMode] = useState(false)
   const [selectedInterventions, setSelectedInterventions] = useState<number[]>([])
@@ -267,16 +270,24 @@ function MapView() {
   return (
     <div className="h-[calc(100vh-120px)] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+      <div className="flex items-center justify-between mb-2 sm:mb-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">
             {t('map.title') || 'Mapa'}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">
             {t('map.subtitle') || 'Visualizacao geografica de ativos e intervencoes'}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+          {/* Mobile sidebar toggle */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="lg:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+            title={t('common.filters') || 'Filtros'}
+          >
+            <IconFilter className="h-5 w-5" />
+          </button>
           <button
             onClick={loadData}
             className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
@@ -286,14 +297,14 @@ function MapView() {
           </button>
           <button
             onClick={() => setRoutePlanningMode(!routePlanningMode)}
-            className={`inline-flex items-center px-3 py-2 rounded-lg ${
+            className={`inline-flex items-center px-2 sm:px-3 py-2 rounded-lg text-sm ${
               routePlanningMode
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
             }`}
           >
-            <IconRoute className="h-4 w-4 mr-2" />
-            {t('map.planRoute') || 'Planear Rota'}
+            <IconRoute className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">{t('map.planRoute') || 'Planear Rota'}</span>
           </button>
         </div>
       </div>
@@ -305,9 +316,35 @@ function MapView() {
         </div>
       )}
 
-      <div className="flex-1 flex gap-4">
+      <div className="flex-1 flex gap-2 sm:gap-4 relative">
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div
+            className="lg:hidden fixed inset-0 bg-black/50 z-40"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Sidebar */}
-        <div className="w-72 bg-white dark:bg-gray-800 rounded-lg shadow p-4 overflow-y-auto">
+        <div className={`
+          lg:w-72 lg:relative lg:translate-x-0 lg:block
+          fixed top-0 left-0 h-full w-72 z-50 transform transition-transform duration-300
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          bg-white dark:bg-gray-800 rounded-r-lg lg:rounded-lg shadow-lg lg:shadow p-4 overflow-y-auto
+        `}>
+          {/* Mobile close button */}
+          <div className="lg:hidden flex items-center justify-between mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="font-semibold text-gray-900 dark:text-white">
+              {t('common.filters') || 'Filtros'}
+            </h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            >
+              <IconX className="h-5 w-5" />
+            </button>
+          </div>
+
           {/* Statistics */}
           {statistics && (
             <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">

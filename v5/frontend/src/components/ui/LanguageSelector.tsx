@@ -16,7 +16,9 @@ interface LanguageSelectorProps {
 export function LanguageSelector({ variant = 'icon', className = '' }: LanguageSelectorProps) {
   const { i18n } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState<'right' | 'left'>('right')
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const currentLang = SUPPORTED_LANGUAGES.find(l => l.code === i18n.language?.substring(0, 2)) || SUPPORTED_LANGUAGES[0]
 
@@ -25,6 +27,22 @@ export function LanguageSelector({ variant = 'icon', className = '' }: LanguageS
     i18n.changeLanguage(langCode)
     localStorage.setItem('language', langCode)
     setIsOpen(false)
+  }
+
+  // Calculate dropdown position to prevent overflow
+  const calculatePosition = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      const dropdownWidth = 160 // w-40 = 10rem = 160px
+      const spaceOnRight = window.innerWidth - rect.right
+
+      // If not enough space on the right, position to the left
+      if (spaceOnRight < dropdownWidth + 8) {
+        setDropdownPosition('left')
+      } else {
+        setDropdownPosition('right')
+      }
+    }
   }
 
   // Close dropdown when clicking outside
@@ -38,11 +56,28 @@ export function LanguageSelector({ variant = 'icon', className = '' }: LanguageS
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Recalculate position on resize
+  useEffect(() => {
+    if (isOpen) {
+      calculatePosition()
+    }
+    window.addEventListener('resize', calculatePosition)
+    return () => window.removeEventListener('resize', calculatePosition)
+  }, [isOpen])
+
+  const handleToggle = () => {
+    if (!isOpen) {
+      calculatePosition()
+    }
+    setIsOpen(!isOpen)
+  }
+
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
+        ref={buttonRef}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none"
         title={currentLang.name}
       >
@@ -65,7 +100,11 @@ export function LanguageSelector({ variant = 'icon', className = '' }: LanguageS
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+        <div
+          className={`absolute mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden ${
+            dropdownPosition === 'right' ? 'right-0' : 'left-0'
+          }`}
+        >
           {SUPPORTED_LANGUAGES.map((lang) => (
             <button
               key={lang.code}

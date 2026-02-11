@@ -256,21 +256,21 @@ export function AssetForm({ mode }: AssetFormProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+          className="p-1.5 sm:p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg flex-shrink-0"
         >
-          <IconArrowLeft className="h-5 w-5" />
+          <IconArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
         </button>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">
             {mode === 'create' ? t('assets.newAsset') : t('assets.editAsset')}
           </h1>
           {mode === 'edit' && (
-            <p className="text-gray-500 dark:text-gray-400">{serialNumber}</p>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{serialNumber}</p>
           )}
         </div>
 
@@ -278,43 +278,44 @@ export function AssetForm({ mode }: AssetFormProps) {
         <button
           type="button"
           onClick={() => setShowConfigurator(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-xs sm:text-sm flex-shrink-0"
         >
-          <IconSettings className="h-4 w-4" />
-          {t('configurator.openConfigurator')}
+          <IconSettings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">{t('configurator.openConfigurator')}</span>
+          <span className="sm:hidden">{t('configurator.title')}</span>
         </button>
       </div>
 
       {/* Configuration Applied Banner */}
       {configurationApplied && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <IconCheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-            <div className="flex-1">
-              <h3 className="font-medium text-green-800 dark:text-green-200">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 sm:p-4">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <IconCheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 mt-0.5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium text-sm sm:text-base text-green-800 dark:text-green-200 truncate">
                 {t('configurator.title')} - {configurationApplied.column_reference}
               </h3>
-              <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+              <p className="text-xs sm:text-sm text-green-700 dark:text-green-300 mt-1">
                 Pack: {configurationApplied.pack} • {configurationApplied.height_m}m
               </p>
 
               {/* Electrical Balance Summary */}
               {configurationApplied.power_calculation && (
-                <div className="mt-3 flex items-center gap-4 text-sm">
+                <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
                   <div className="flex items-center gap-1">
-                    <IconZap className="w-4 h-4 text-yellow-600" />
+                    <IconZap className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-600" />
                     <span>{configurationApplied.power_calculation.max_power}W max</span>
                   </div>
-                  <span className="text-gray-400">→</span>
+                  <span className="text-gray-400 hidden sm:inline">→</span>
                   <span>{configurationApplied.power_calculation.installed_power}W {t('configurator.installedPower')}</span>
-                  <span className="text-gray-400">→</span>
+                  <span className="text-gray-400 hidden sm:inline">→</span>
                   <span className={configurationApplied.power_calculation.is_valid ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
                     {configurationApplied.power_calculation.remaining_power}W {t('configurator.remainingPower')}
                   </span>
                   {configurationApplied.power_calculation.is_valid ? (
-                    <IconCheckCircle className="w-4 h-4 text-green-600" />
+                    <IconCheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                   ) : (
-                    <IconXCircle className="w-4 h-4 text-red-600" />
+                    <IconXCircle className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
                   )}
                 </div>
               )}
@@ -322,7 +323,7 @@ export function AssetForm({ mode }: AssetFormProps) {
             <button
               type="button"
               onClick={() => setShowConfigurator(true)}
-              className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+              className="text-xs sm:text-sm text-purple-600 hover:text-purple-700 font-medium flex-shrink-0"
             >
               {t('common.edit')}
             </button>
@@ -338,10 +339,10 @@ export function AssetForm({ mode }: AssetFormProps) {
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-8">
         {/* Serial Number - always first */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
             {t('assets.serialNumber')}
           </h2>
           <FormField
@@ -362,11 +363,11 @@ export function AssetForm({ mode }: AssetFormProps) {
           if (!fields || fields.length === 0) return null
 
           return (
-            <div key={catKey} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            <div key={catKey} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
                 {categoryLabels[catKey] || catKey}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 {fields
                   .sort((a, b) => a.field_order - b.field_order)
                   // Hide separate lat/lng fields since gps_coordinates handles both
@@ -415,18 +416,18 @@ export function AssetForm({ mode }: AssetFormProps) {
         })}
 
         {/* Actions */}
-        <div className="flex justify-end gap-4">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+            className="w-full sm:w-auto px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-sm sm:text-base order-2 sm:order-1"
           >
             {t('common.cancel')}
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base order-1 sm:order-2"
           >
             {saving ? (
               <>
