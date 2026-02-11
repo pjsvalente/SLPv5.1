@@ -121,13 +121,14 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slp-text-secondary hover:text-slp-blue-bright transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-1"
                   tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
-                    <IconEyeOff size={20} />
+                    <IconEyeOff size={20} color="#9CA3AF" />
                   ) : (
-                    <IconEye size={20} />
+                    <IconEye size={20} color="#9CA3AF" />
                   )}
                 </button>
               </div>
