@@ -1,0 +1,32 @@
+# SmartLamppost v5.0 - Backend Dependencies
+
+# Core
+Flask>=3.0.0
+Werkzeug>=3.0.0
+flask-cors>=4.0.0
+
+# Database
+# SQLite is built-in, no extra package needed
+
+# Excel support
+openpyxl>=3.1.0
+
+# HTTP requests (for weather API)
+requests>=2.31.0
+
+# Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Production
+gunicorn>=21.0.0
+
+# Scheduler
+schedule>=1.2.0
+
+# Optional: Email
+# For production, configure SMTP or use a service like SendGrid
+# sendgrid>=6.0.0
+
+# Optional: Image processing
+# Pillow>=10.0.0

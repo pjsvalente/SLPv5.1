@@ -1,0 +1,86 @@
+/**
+ * SmartLamppost v5.0 - Language Selector Component
+ * Dropdown to switch between supported languages
+ */
+
+import React, { useState, useRef, useEffect } from 'react'
+import { Globe, ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { SUPPORTED_LANGUAGES, type LanguageCode } from '@/i18n'
+
+interface LanguageSelectorProps {
+  variant?: 'icon' | 'full' | 'compact'
+  className?: string
+}
+
+export function LanguageSelector({ variant = 'icon', className = '' }: LanguageSelectorProps) {
+  const { i18n } = useTranslation()
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const currentLang = SUPPORTED_LANGUAGES.find(l => l.code === i18n.language?.substring(0, 2)) || SUPPORTED_LANGUAGES[0]
+
+  const handleLanguageChange = (langCode: LanguageCode) => {
+    console.log('Changing language to:', langCode)
+    i18n.changeLanguage(langCode)
+    localStorage.setItem('language', langCode)
+    setIsOpen(false)
+  }
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  return (
+    <div className={`relative ${className}`} ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none"
+        title={currentLang.name}
+      >
+        {variant === 'icon' && (
+          <>
+            <Globe className="w-5 h-5" />
+            <span className="text-lg">{currentLang.flag}</span>
+          </>
+        )}
+        {variant === 'full' && (
+          <>
+            <span className="text-lg">{currentLang.flag}</span>
+            <span className="text-sm font-medium">{currentLang.name}</span>
+            <ChevronDown className="w-4 h-4" />
+          </>
+        )}
+        {variant === 'compact' && (
+          <span className="text-lg">{currentLang.flag}</span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
+          {SUPPORTED_LANGUAGES.map((lang) => (
+            <button
+              key={lang.code}
+              type="button"
+              onClick={() => handleLanguageChange(lang.code)}
+              className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                i18n.language?.substring(0, 2) === lang.code ? 'bg-blue-50 dark:bg-blue-900/30 font-medium' : ''
+              }`}
+            >
+              <span className="text-lg">{lang.flag}</span>
+              <span>{lang.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

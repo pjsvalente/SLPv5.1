@@ -1,0 +1,132 @@
+{
+  "modules": {
+    "dashboard": {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "description": "Painel principal com estatisticas e mapa",
+      "icon": "LayoutDashboard",
+      "order": 1,
+      "min_plan": "base",
+      "routes_prefix": "/api/dashboard",
+      "menu": {
+        "label": "Dashboard",
+        "path": "/dashboard"
+      },
+      "permissions": ["dashboard.view"]
+    },
+    "assets": {
+      "id": "assets",
+      "name": "Ativos",
+      "description": "Gestao de ativos e inventario",
+      "icon": "Package",
+      "order": 2,
+      "min_plan": "base",
+      "routes_prefix": "/api/assets",
+      "menu": {
+        "label": "Ativos",
+        "path": "/assets"
+      },
+      "permissions": ["assets.view", "assets.create", "assets.edit", "assets.delete", "assets.export"]
+    },
+    "users": {
+      "id": "users",
+      "name": "Utilizadores",
+      "description": "Gestao de utilizadores e permissoes",
+      "icon": "Users",
+      "order": 3,
+      "min_plan": "base",
+      "routes_prefix": "/api/users",
+      "menu": {
+        "label": "Utilizadores",
+        "path": "/users"
+      },
+      "permissions": ["users.view", "users.create", "users.edit", "users.delete"],
+      "admin_only": true
+    },
+    "interventions": {
+      "id": "interventions",
+      "name": "Intervencoes",
+      "description": "Registo e gestao de intervencoes",
+      "icon": "Wrench",
+      "order": 4,
+      "min_plan": "pro",
+      "routes_prefix": "/api/interventions",
+      "menu": {
+        "label": "Intervencoes",
+        "path": "/interventions"
+      },
+      "permissions": ["interventions.view", "interventions.create", "interventions.edit", "interventions.delete"]
+    },
+    "catalog": {
+      "id": "catalog",
+      "name": "Catalogo",
+      "description": "Catalogo de referencias e produtos",
+      "icon": "BookOpen",
+      "order": 5,
+      "min_plan": "pro",
+      "routes_prefix": "/api/catalog",
+      "menu": {
+        "label": "Catalogo",
+        "path": "/catalog"
+      },
+      "permissions": ["catalog.view", "catalog.create", "catalog.edit", "catalog.delete"]
+    },
+    "technicians": {
+      "id": "technicians",
+      "name": "Tecnicos",
+      "description": "Gestao de tecnicos externos",
+      "icon": "HardHat",
+      "order": 6,
+      "min_plan": "pro",
+      "routes_prefix": "/api/technicians",
+      "menu": {
+        "label": "Tecnicos",
+        "path": "/technicians"
+      },
+      "permissions": ["technicians.view", "technicians.create", "technicians.edit", "technicians.delete"]
+    },
+    "reports": {
+      "id": "reports",
+      "name": "Relatorios",
+      "description": "Geracao de relatorios e exportacoes",
+      "icon": "FileText",
+      "order": 7,
+      "min_plan": "pro",
+      "routes_prefix": "/api/reports",
+      "menu": {
+        "label": "Relatorios",
+        "path": "/reports"
+      },
+      "permissions": ["reports.view", "reports.generate", "reports.export"]
+    },
+    "analytics": {
+      "id": "analytics",
+      "name": "Analytics",
+      "description": "Analise avancada e KPIs",
+      "icon": "BarChart3",
+      "order": 8,
+      "min_plan": "premium",
+      "routes_prefix": "/api/analytics",
+      "menu": {
+        "label": "Analytics",
+        "path": "/analytics"
+      },
+      "permissions": ["analytics.view", "analytics.configure"]
+    },
+    "settings": {
+      "id": "settings",
+      "name": "Definicoes",
+      "description": "Configuracoes do sistema",
+      "icon": "Settings",
+      "order": 99,
+      "min_plan": "base",
+      "routes_prefix": "/api/settings",
+      "menu": {
+        "label": "Definicoes",
+        "path": "/settings"
+      },
+      "permissions": ["settings.view", "settings.edit"],
+      "admin_only": true
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "tenants": [
+    {
+      "id": "smartlamppost",
+      "name": "SmartLamppost",
+      "short_name": "SLP",
+      "is_master": true,
+      "active": true,
+      "plan": "enterprise",
+      "domain": "smartlamppost.local",
+      "created_at": "2024-01-01T00:00:00",
+      "settings": {},
+      "branding": {}
+    }
+  ]
+}

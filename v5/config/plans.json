@@ -1,0 +1,145 @@
+{
+  "plans": {
+    "base": {
+      "id": "base",
+      "name": "Base",
+      "description": "Plano essencial para gestao de ativos",
+      "modules": ["dashboard", "assets"],
+      "limits": {
+        "max_users": 3,
+        "max_assets": 100,
+        "max_storage_mb": 50
+      },
+      "features": {
+        "2fa": false,
+        "api_access": false,
+        "export_excel": true,
+        "export_pdf": false,
+        "custom_branding": false,
+        "route_planner": false,
+        "analytics": false,
+        "priority_support": false
+      }
+    },
+    "pro": {
+      "id": "pro",
+      "name": "Pro",
+      "description": "Plano profissional com funcionalidades avancadas",
+      "modules": ["dashboard", "assets", "users", "interventions", "technicians", "catalog"],
+      "limits": {
+        "max_users": 10,
+        "max_assets": 1000,
+        "max_storage_mb": 500
+      },
+      "features": {
+        "2fa": true,
+        "api_access": false,
+        "export_excel": true,
+        "export_pdf": true,
+        "custom_branding": false,
+        "route_planner": false,
+        "analytics": false,
+        "priority_support": false
+      }
+    },
+    "premium": {
+      "id": "premium",
+      "name": "Premium",
+      "description": "Plano completo com todas as funcionalidades",
+      "modules": ["dashboard", "assets", "users", "interventions", "technicians", "catalog", "reports", "data"],
+      "limits": {
+        "max_users": 50,
+        "max_assets": 10000,
+        "max_storage_mb": 5000
+      },
+      "features": {
+        "2fa": true,
+        "api_access": true,
+        "export_excel": true,
+        "export_pdf": true,
+        "custom_branding": true,
+        "route_planner": true,
+        "analytics": true,
+        "priority_support": false
+      }
+    },
+    "enterprise": {
+      "id": "enterprise",
+      "name": "Enterprise",
+      "description": "Plano empresarial com personalizacao total",
+      "modules": ["*"],
+      "limits": {
+        "max_users": -1,
+        "max_assets": -1,
+        "max_storage_mb": -1
+      },
+      "features": {
+        "2fa": true,
+        "api_access": true,
+        "export_excel": true,
+        "export_pdf": true,
+        "custom_branding": true,
+        "route_planner": true,
+        "analytics": true,
+        "priority_support": true
+      }
+    }
+  },
+  "modules": {
+    "dashboard": {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "description": "Painel principal com estatisticas",
+      "icon": "LayoutDashboard"
+    },
+    "assets": {
+      "id": "assets",
+      "name": "Ativos",
+      "description": "Gestao de ativos e inventario",
+      "icon": "Package"
+    },
+    "users": {
+      "id": "users",
+      "name": "Utilizadores",
+      "description": "Gestao de utilizadores e permissoes",
+      "icon": "Users"
+    },
+    "interventions": {
+      "id": "interventions",
+      "name": "Intervencoes",
+      "description": "Registo de intervencoes e manutencao",
+      "icon": "Wrench"
+    },
+    "technicians": {
+      "id": "technicians",
+      "name": "Tecnicos",
+      "description": "Gestao de tecnicos internos e externos",
+      "icon": "HardHat"
+    },
+    "catalog": {
+      "id": "catalog",
+      "name": "Catalogo",
+      "description": "Catalogo de produtos e referencias",
+      "icon": "BookOpen"
+    },
+    "reports": {
+      "id": "reports",
+      "name": "Relatorios",
+      "description": "Relatorios e estatisticas avancadas",
+      "icon": "FileText"
+    },
+    "data": {
+      "id": "data",
+      "name": "Dados",
+      "description": "Import/Export de dados",
+      "icon": "Database"
+    },
+    "settings": {
+      "id": "settings",
+      "name": "Definicoes",
+      "description": "Configuracoes do sistema",
+      "icon": "Settings"
+    }
+  },
+  "default_plan": "base"
+}
