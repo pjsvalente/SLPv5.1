@@ -4,12 +4,14 @@ import { useAuth } from '@/hooks/useAuth'
 import { useTranslation } from 'react-i18next'
 import { LoadingSpinner } from '@/core/common/LoadingSpinner'
 import { LanguageSelector } from '@/components/ui/LanguageSelector'
+import { IconEye, IconEyeOff } from '@/components/icons'
 
 export const LoginPage: React.FC = () => {
   const { t } = useTranslation()
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -105,16 +107,30 @@ export const LoginPage: React.FC = () => {
               <label htmlFor="password" className="block text-sm font-medium text-slp-text-secondary mb-2">
                 {t('auth.password')}
               </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="w-full px-4 py-3 border border-[var(--slp-border)] rounded-lg bg-slp-navy-deep text-slp-text-primary placeholder-slp-text-muted focus:ring-2 focus:ring-slp-blue-bright focus:border-slp-blue-bright outline-none transition-all"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  className="w-full px-4 py-3 pr-12 border border-[var(--slp-border)] rounded-lg bg-slp-navy-deep text-slp-text-primary placeholder-slp-text-muted focus:ring-2 focus:ring-slp-blue-bright focus:border-slp-blue-bright outline-none transition-all"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slp-text-muted hover:text-slp-text-primary transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <IconEyeOff size={20} className="text-slp-text-muted" />
+                  ) : (
+                    <IconEye size={20} className="text-slp-text-muted" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <button

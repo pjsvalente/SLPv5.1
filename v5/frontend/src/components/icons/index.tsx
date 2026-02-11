@@ -830,6 +830,18 @@ export const IconEye: React.FC<IconProps> = ({ size = 24, className, gradient, c
   )
 }
 
+export const IconEyeOff: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <path d="M4 24C4 24 12 8 24 8C36 8 44 24 44 24" stroke={stroke} strokeWidth="2" fill="none" strokeLinecap="round"/>
+      <path d="M44 24C44 24 36 40 24 40C12 40 4 24 4 24" stroke={stroke} strokeWidth="2" fill="none" strokeLinecap="round" strokeOpacity="0.3"/>
+      <circle cx="24" cy="24" r="8" stroke={stroke} strokeWidth="2" fill="none" strokeOpacity="0.3"/>
+      <path d="M6 6L42 42" stroke={stroke} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
 // ============================================================================
 // CATEGORIA 8: EQUIPAMENTOS (10)
 // ============================================================================
@@ -1544,6 +1556,7 @@ export const Icons = {
   key: IconKey,
   crown: IconCrown,
   eye: IconEye,
+  eyeOff: IconEyeOff,
 
   // Equipment
   lightbulb: IconLightbulb,
