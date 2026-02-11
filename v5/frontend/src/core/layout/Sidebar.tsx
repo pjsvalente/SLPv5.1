@@ -179,27 +179,36 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onClose
         })}
       </nav>
 
-      {/* User info section at bottom */}
+      {/* Footer - Solutions by Smartlamppost */}
       <div className="p-4 bg-slp-navy border-t border-white/10">
         <div className={cn(
-          'flex items-center',
-          (collapsed && !isMobile) ? 'justify-center' : 'space-x-3'
+          'flex flex-col items-center',
+          (collapsed && !isMobile) ? 'gap-1' : 'gap-2'
         )}>
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-slp-cyan to-slp-blue-bright flex items-center justify-center shadow-lg">
-            <span className="text-white font-bold text-sm">
-              {(user?.first_name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
-            </span>
-          </div>
           {(!collapsed || isMobile) && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {user?.first_name || user?.email?.split('@')[0]}
-              </p>
-              <p className="text-xs text-white/50 truncate">
-                {user?.tenant_name || user?.tenant_id}
-              </p>
-            </div>
+            <p className="text-xs text-white/50 tracking-wide">Solutions by</p>
           )}
+          <img
+            src="/api/tenants/smartlamppost/logo"
+            alt="Smartlamppost"
+            className={cn(
+              'object-contain brightness-0 invert opacity-70 hover:opacity-100 transition-opacity',
+              (collapsed && !isMobile) ? 'h-6 w-6' : 'h-8 max-w-[140px]'
+            )}
+            onError={(e) => {
+              // Fallback to text if logo fails
+              const target = e.target as HTMLImageElement
+              target.style.display = 'none'
+              const fallback = target.nextElementSibling as HTMLElement
+              if (fallback) fallback.style.display = 'block'
+            }}
+          />
+          <span
+            className="text-white/70 font-semibold text-sm hidden"
+            style={{ display: 'none' }}
+          >
+            Smartlamppost
+          </span>
         </div>
       </div>
     </>
