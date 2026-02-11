@@ -22,11 +22,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Mobile menu backdrop */}
       {mobileMenuOpen && (
         <div
-          className="mobile-backdrop"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden transition-opacity"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
@@ -41,8 +41,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       {/* Main content area */}
       <div
         className={cn(
-          'transition-all duration-300 ease-in-out',
-          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+          'transition-all duration-300 ease-in-out min-h-screen',
+          sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'
         )}
       >
         {/* Header */}

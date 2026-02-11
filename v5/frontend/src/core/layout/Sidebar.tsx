@@ -4,23 +4,23 @@ import { useAuth } from '@/hooks/useAuth'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import {
-  LayoutDashboard,
-  Package,
-  Users,
-  Wrench,
-  BookOpen,
-  HardHat,
-  FileText,
-  BarChart3,
-  Settings,
-  Database,
-  Building2,
-  MapPin,
-  ScanLine,
-  X,
-  ChevronLeft,
-  FileSpreadsheet
-} from 'lucide-react'
+  IconGradientDefs,
+  IconDashboard,
+  IconPackage,
+  IconUsers,
+  IconWrench,
+  IconBookOpen,
+  IconHardHat,
+  IconFileText,
+  IconBarChart3,
+  IconSettings,
+  IconDatabase,
+  IconBuilding,
+  IconMapPin,
+  IconScanLine,
+  IconClose,
+  IconFileSpreadsheet
+} from '@/components/icons'
 
 // Default tenant ID for logo fallback
 const DEFAULT_TENANT_ID = 'smartlamppost'
@@ -31,21 +31,22 @@ interface SidebarProps {
   onClose: () => void
 }
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  LayoutDashboard,
-  Package,
-  Users,
-  Wrench,
-  BookOpen,
-  HardHat,
-  FileText,
-  BarChart3,
-  Settings,
-  Database,
-  Building2,
-  MapPin,
-  ScanLine,
-  FileSpreadsheet
+// Icon map using our custom icons
+const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string; gradient?: boolean }>> = {
+  LayoutDashboard: IconDashboard,
+  Package: IconPackage,
+  Users: IconUsers,
+  Wrench: IconWrench,
+  BookOpen: IconBookOpen,
+  HardHat: IconHardHat,
+  FileText: IconFileText,
+  BarChart3: IconBarChart3,
+  Settings: IconSettings,
+  Database: IconDatabase,
+  Building2: IconBuilding,
+  MapPin: IconMapPin,
+  ScanLine: IconScanLine,
+  FileSpreadsheet: IconFileSpreadsheet
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onClose }) => {
@@ -62,7 +63,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onClose
   }, [user?.tenant_id])
 
   // Build menu items dynamically based on user role
-  // Using useMemo-like pattern inside render to ensure labels update when language changes
   const buildMenuItems = () => {
     const items = [
       { id: 'dashboard', label: t('navigation.dashboard'), path: '/dashboard', icon: 'LayoutDashboard', order: 1 },
@@ -97,96 +97,32 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onClose
   }
 
   const defaultMenuItems = buildMenuItems()
-  // Always use defaultMenuItems to include new modules like map
-  // User menu_items may be outdated from older sessions
   const sortedItems = [...defaultMenuItems].sort((a, b) => a.order - b.order)
 
-  return (
+  // Sidebar content component to avoid duplication
+  const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <>
-      {/* Desktop sidebar */}
-      <aside
-        className={cn(
-          'fixed top-0 left-0 z-40 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out hidden lg:block',
-          collapsed ? 'w-16' : 'w-64'
-        )}
-      >
-        {/* Logo area */}
-        <div className="h-16 flex items-center justify-center border-b border-gray-200 dark:border-gray-700 px-4">
-          {collapsed ? (
+      {/* Logo area - Navy gradient background */}
+      <div className="h-20 flex items-center justify-center px-4 bg-gradient-to-r from-slp-navy via-slp-navy-light to-slp-blue-deep">
+        {collapsed && !isMobile ? (
+          <div className="flex items-center justify-center">
             <img
               src={`/api/tenants/${user?.tenant_id || DEFAULT_TENANT_ID}/logo?t=${logoKey}`}
               alt="Logo"
-              className="h-8 w-8 object-contain dark:invert"
+              className="h-10 w-10 object-contain brightness-0 invert"
               onLoad={() => setTenantLogoLoaded(true)}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none'
                 setTenantLogoLoaded(false)
               }}
             />
-          ) : (
-            <div className="flex items-center justify-center w-full">
-              <img
-                src={`/api/tenants/${user?.tenant_id || DEFAULT_TENANT_ID}/logo?t=${logoKey}`}
-                alt="Logo"
-                className="h-10 max-w-[180px] object-contain dark:invert"
-                onLoad={() => setTenantLogoLoaded(true)}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none'
-                  setTenantLogoLoaded(false)
-                }}
-              />
-              {/* Show tenant name only if no logo loaded */}
-              {!tenantLogoLoaded && (
-                <span className="font-semibold text-gray-900 dark:text-gray-100 truncate">
-                  {user?.tenant_name || 'Smartlamppost'}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Navigation */}
-        <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100vh-4rem)]">
-          {sortedItems.map((item) => {
-            const Icon = iconMap[item.icon] || Package
-            return (
-              <NavLink
-                key={item.id}
-                to={item.path}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100',
-                    collapsed && 'justify-center'
-                  )
-                }
-                title={collapsed ? t(`navigation.${item.id}`) : undefined}
-              >
-                <Icon className={cn('h-5 w-5 flex-shrink-0', !collapsed && 'mr-3')} />
-                {!collapsed && <span className="truncate">{t(`navigation.${item.id}`)}</span>}
-              </NavLink>
-            )
-          })}
-        </nav>
-
-      </aside>
-
-      {/* Mobile sidebar */}
-      <aside
-        className={cn(
-          'fixed top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out lg:hidden',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        {/* Mobile header */}
-        <div className="h-16 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4">
-          <div className="flex items-center justify-center flex-1">
+          </div>
+        ) : (
+          <div className="flex items-center justify-center w-full">
             <img
               src={`/api/tenants/${user?.tenant_id || DEFAULT_TENANT_ID}/logo?t=${logoKey}`}
               alt="Logo"
-              className="h-10 max-w-[150px] object-contain dark:invert"
+              className="h-12 max-w-[180px] object-contain brightness-0 invert"
               onLoad={() => setTenantLogoLoaded(true)}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none'
@@ -194,44 +130,114 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onClose
               }}
             />
             {!tenantLogoLoaded && (
-              <span className="font-semibold text-gray-900 dark:text-gray-100 truncate">
-                {user?.tenant_name || 'Smartlamppost'}
+              <span className="font-bold text-xl text-white tracking-tight">
+                {user?.tenant_name || 'SmartLamppost'}
               </span>
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
-          >
-            <X className="h-5 w-5" />
-          </button>
+        )}
+      </div>
+
+      {/* Navigation - Navy background */}
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto bg-slp-navy">
+        {sortedItems.map((item) => {
+          const Icon = iconMap[item.icon] || IconPackage
+          return (
+            <NavLink
+              key={item.id}
+              to={item.path}
+              onClick={isMobile ? onClose : undefined}
+              className={({ isActive }) =>
+                cn(
+                  'group flex items-center px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200',
+                  isActive
+                    ? 'bg-white/15 text-white shadow-lg shadow-black/10 border border-white/10'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white',
+                  (collapsed && !isMobile) && 'justify-center px-2'
+                )
+              }
+              title={(collapsed && !isMobile) ? t(`navigation.${item.id}`) : undefined}
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon
+                    size={22}
+                    gradient={isActive}
+                    className={cn(
+                      'flex-shrink-0 transition-transform duration-200',
+                      !isActive && 'group-hover:scale-110',
+                      (!collapsed || isMobile) && 'mr-3'
+                    )}
+                  />
+                  {(!collapsed || isMobile) && (
+                    <span className="truncate">{t(`navigation.${item.id}`)}</span>
+                  )}
+                </>
+              )}
+            </NavLink>
+          )
+        })}
+      </nav>
+
+      {/* User info section at bottom */}
+      <div className="p-4 bg-slp-navy border-t border-white/10">
+        <div className={cn(
+          'flex items-center',
+          (collapsed && !isMobile) ? 'justify-center' : 'space-x-3'
+        )}>
+          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-slp-cyan to-slp-blue-bright flex items-center justify-center shadow-lg">
+            <span className="text-white font-bold text-sm">
+              {(user?.first_name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+            </span>
+          </div>
+          {(!collapsed || isMobile) && (
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {user?.first_name || user?.email?.split('@')[0]}
+              </p>
+              <p className="text-xs text-white/50 truncate">
+                {user?.tenant_name || user?.tenant_id}
+              </p>
+            </div>
+          )}
         </div>
+      </div>
+    </>
+  )
 
-        {/* Mobile navigation */}
-        <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100vh-4rem)]">
-          {sortedItems.map((item) => {
-            const Icon = iconMap[item.icon] || Package
-            return (
-              <NavLink
-                key={item.id}
-                to={item.path}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
-                  )
-                }
-              >
-                <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
-                <span className="truncate">{t(`navigation.${item.id}`)}</span>
-              </NavLink>
-            )
-          })}
-        </nav>
+  return (
+    <>
+      {/* SVG Gradient Definitions */}
+      <IconGradientDefs />
 
+      {/* Desktop sidebar */}
+      <aside
+        className={cn(
+          'fixed top-0 left-0 z-40 h-screen flex flex-col transition-all duration-300 ease-in-out hidden lg:flex',
+          'shadow-2xl shadow-black/30',
+          collapsed ? 'w-20' : 'w-72'
+        )}
+      >
+        <SidebarContent />
+      </aside>
+
+      {/* Mobile sidebar */}
+      <aside
+        className={cn(
+          'fixed top-0 left-0 z-50 h-screen w-72 flex flex-col transition-transform duration-300 ease-in-out lg:hidden',
+          'shadow-2xl shadow-black/50',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        {/* Mobile close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-4 z-10 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+        >
+          <IconClose size={20} />
+        </button>
+
+        <SidebarContent isMobile />
       </aside>
     </>
   )

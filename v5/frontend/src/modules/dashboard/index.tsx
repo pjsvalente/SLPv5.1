@@ -3,7 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/services/api'
 import { LoadingSpinner } from '@/core/common/LoadingSpinner'
-import { Package, Users, Wrench, TrendingUp, MapPin, Plus, ClipboardList } from 'lucide-react'
+import {
+  IconPackage,
+  IconUsers,
+  IconWrench,
+  IconTrendingUp,
+  IconMapPin,
+  IconPlus,
+  IconClipboardList,
+  IconGradientDefs,
+  IconScanLine,
+  IconBarChart3
+} from '@/components/icons'
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, Legend
@@ -21,21 +32,21 @@ interface Stats {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  'Operacional': '#22c55e',
-  'Manutencao Necessaria': '#f59e0b',
-  'Manutencao': '#f59e0b',
-  'Em Reparação': '#f97316',
-  'Avariado': '#ef4444',
-  'Desativado': '#6b7280',
-  'em_curso': '#3b82f6',
-  'concluida': '#22c55e',
-  'cancelada': '#ef4444',
-  'pendente': '#f59e0b',
-  'preventiva': '#22c55e',
-  'corretiva': '#f59e0b',
-  'substituicao': '#3b82f6',
-  'inspecao': '#8b5cf6',
-  'default': '#94a3b8'
+  'Operacional': '#00C853',
+  'Manutencao Necessaria': '#FFB300',
+  'Manutencao': '#FFB300',
+  'Em Reparação': '#FF9100',
+  'Avariado': '#FF5252',
+  'Desativado': '#78909C',
+  'em_curso': '#00A0DC',
+  'concluida': '#00C853',
+  'cancelada': '#FF5252',
+  'pendente': '#FFB300',
+  'preventiva': '#00C853',
+  'corretiva': '#FFB300',
+  'substituicao': '#00A0DC',
+  'inspecao': '#7C4DFF',
+  'default': '#90A4AE'
 }
 
 const getColor = (key: string) => STATUS_COLORS[key] || STATUS_COLORS.default
@@ -72,7 +83,7 @@ const Dashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg">
+      <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-2xl">
         {error}
       </div>
     )
@@ -82,29 +93,33 @@ const Dashboard: React.FC = () => {
     {
       label: t('dashboard.totalAssets'),
       value: stats?.total_assets || 0,
-      icon: Package,
-      color: 'bg-blue-500',
+      icon: IconPackage,
+      gradient: 'from-slp-cyan to-slp-blue-bright',
+      bgLight: 'bg-slp-cyan/10',
       link: '/assets'
     },
     {
       label: t('dashboard.thisMonth'),
       value: stats?.recent_assets || 0,
-      icon: TrendingUp,
-      color: 'bg-green-500',
+      icon: IconTrendingUp,
+      gradient: 'from-emerald-400 to-emerald-600',
+      bgLight: 'bg-emerald-500/10',
       link: '/assets'
     },
     {
       label: t('navigation.users'),
       value: stats?.total_users || 0,
-      icon: Users,
-      color: 'bg-purple-500',
+      icon: IconUsers,
+      gradient: 'from-violet-400 to-violet-600',
+      bgLight: 'bg-violet-500/10',
       link: '/users'
     },
     {
       label: t('dashboard.pendingInterventions'),
       value: stats?.open_interventions || 0,
-      icon: Wrench,
-      color: 'bg-orange-500',
+      icon: IconWrench,
+      gradient: 'from-amber-400 to-orange-500',
+      bgLight: 'bg-amber-500/10',
       link: '/interventions'
     }
   ]
@@ -134,9 +149,9 @@ const Dashboard: React.FC = () => {
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3">
-          <p className="font-medium text-gray-900 dark:text-gray-100">{payload[0].name}</p>
-          <p className="text-gray-600 dark:text-gray-400">{payload[0].value}</p>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4">
+          <p className="font-semibold text-gray-900 dark:text-gray-100">{payload[0].name}</p>
+          <p className="text-2xl font-bold text-slp-blue-bright">{payload[0].value}</p>
         </div>
       )
     }
@@ -144,190 +159,244 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('dashboard.title')}</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">{t('dashboard.overview')}</p>
+    <>
+      <IconGradientDefs />
+      <div className="space-y-6">
+        {/* Page header with gradient accent */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slp-navy dark:text-white flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-slp-cyan to-slp-blue-bright">
+                <IconBarChart3 size={24} className="text-white" />
+              </div>
+              {t('dashboard.title')}
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{t('dashboard.overview')}</p>
+          </div>
         </div>
-      </div>
 
-      {/* Stats cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat, index) => {
-          const Icon = stat.icon
-          return (
-            <div
-              key={index}
-              onClick={() => navigate(stat.link)}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 cursor-pointer hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-                    {stat.value.toLocaleString()}
-                  </p>
+        {/* Stats cards with gradient icons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {statCards.map((stat, index) => {
+            const Icon = stat.icon
+            return (
+              <div
+                key={index}
+                onClick={() => navigate(stat.link)}
+                className="group bg-white dark:bg-gray-800/80 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 p-6 cursor-pointer hover:shadow-xl hover:shadow-slp-navy/5 dark:hover:shadow-black/20 transition-all duration-300 hover:-translate-y-1"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{stat.label}</p>
+                    <p className="text-3xl font-bold text-slp-navy dark:text-white">
+                      {stat.value.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon size={24} className="text-white" />
+                  </div>
                 </div>
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <Icon className="h-6 w-6 text-white" />
+                {/* Progress bar decoration */}
+                <div className="mt-4 h-1 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full bg-gradient-to-r ${stat.gradient} rounded-full transition-all duration-500`}
+                    style={{ width: `${Math.min(100, (stat.value / (stats?.total_assets || 1)) * 100)}%` }}
+                  />
                 </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Assets by Status - Pie Chart */}
-        {assetStatusData.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              {t('reports.assetsByStatus')}
-            </h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={assetStatusData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={2}
-                    dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}`}
-                    labelLine={false}
-                  >
-                    {assetStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
-              {assetStatusData.map((item, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{item.name}</span>
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Assets by Status - Pie Chart */}
+          {assetStatusData.length > 0 && (
+            <div className="bg-white dark:bg-gray-800/80 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-slp-navy/10 dark:bg-slp-cyan/20">
+                  <IconPackage size={20} gradient className="text-slp-navy dark:text-slp-cyan" />
                 </div>
-              ))}
+                <h2 className="text-lg font-semibold text-slp-navy dark:text-white">
+                  {t('reports.assetsByStatus')}
+                </h2>
+              </div>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={assetStatusData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={3}
+                      dataKey="value"
+                      strokeWidth={0}
+                    >
+                      {assetStatusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex flex-wrap justify-center gap-4 mt-4">
+                {assetStatusData.map((item, index) => (
+                  <div key={index} className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: item.fill }} />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.name}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">({item.value})</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Interventions by Type - Bar Chart */}
-        {interventionTypeData.length > 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              {t('reports.interventionsByType')}
-            </h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={interventionTypeData} layout="vertical">
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 12 }} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                    {interventionTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        ) : interventionStatusData.length > 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              {t('reports.interventionsByStatus')}
-            </h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={interventionStatusData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={2}
-                    dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}`}
-                    labelLine={false}
-                  >
-                    {interventionStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
-              {interventionStatusData.map((item, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.fill }} />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{item.name}</span>
+          {/* Interventions by Type - Bar Chart */}
+          {interventionTypeData.length > 0 ? (
+            <div className="bg-white dark:bg-gray-800/80 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-amber-500/10 dark:bg-amber-500/20">
+                  <IconWrench size={20} className="text-amber-600 dark:text-amber-400" />
                 </div>
-              ))}
+                <h2 className="text-lg font-semibold text-slp-navy dark:text-white">
+                  {t('reports.interventionsByType')}
+                </h2>
+              </div>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={interventionTypeData} layout="vertical">
+                    <XAxis type="number" axisLine={false} tickLine={false} />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      width={100}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="value" radius={[0, 8, 8, 0]}>
+                      {interventionTypeData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
+          ) : interventionStatusData.length > 0 ? (
+            <div className="bg-white dark:bg-gray-800/80 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-amber-500/10 dark:bg-amber-500/20">
+                  <IconWrench size={20} className="text-amber-600 dark:text-amber-400" />
+                </div>
+                <h2 className="text-lg font-semibold text-slp-navy dark:text-white">
+                  {t('reports.interventionsByStatus')}
+                </h2>
+              </div>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={interventionStatusData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={3}
+                      dataKey="value"
+                      strokeWidth={0}
+                    >
+                      {interventionStatusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex flex-wrap justify-center gap-4 mt-4">
+                {interventionStatusData.map((item, index) => (
+                  <div key={index} className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: item.fill }} />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.name}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">({item.value})</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+
+        {/* Quick Actions - Modern Card Grid */}
+        <div className="bg-white dark:bg-gray-800/80 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-slp-navy/10 dark:bg-slp-cyan/20">
+              <IconScanLine size={20} gradient />
+            </div>
+            <h2 className="text-lg font-semibold text-slp-navy dark:text-white">
+              {t('dashboard.quickActions')}
+            </h2>
           </div>
-        ) : null}
-      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button
+              onClick={() => navigate('/assets/new')}
+              className="group flex items-center gap-4 p-5 bg-gradient-to-br from-slp-cyan/5 to-slp-blue-bright/10 dark:from-slp-cyan/10 dark:to-slp-blue-bright/20 hover:from-slp-cyan/10 hover:to-slp-blue-bright/20 dark:hover:from-slp-cyan/20 dark:hover:to-slp-blue-bright/30 rounded-xl border border-slp-cyan/20 dark:border-slp-cyan/30 transition-all duration-300"
+            >
+              <div className="p-3 bg-gradient-to-br from-slp-cyan to-slp-blue-bright rounded-xl shadow-lg shadow-slp-cyan/30 group-hover:scale-110 transition-transform">
+                <IconPlus size={20} className="text-white" />
+              </div>
+              <div className="text-left">
+                <span className="font-semibold text-slp-navy dark:text-white block">{t('assets.newAsset')}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('assets.create')}</span>
+              </div>
+            </button>
 
-      {/* Quick Actions */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          {t('dashboard.quickActions')}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button
-            onClick={() => navigate('/assets/new')}
-            className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
-          >
-            <div className="p-2 bg-blue-500 rounded-lg">
-              <Plus className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-medium text-blue-700 dark:text-blue-300">{t('assets.newAsset')}</span>
-          </button>
+            <button
+              onClick={() => navigate('/interventions/new')}
+              className="group flex items-center gap-4 p-5 bg-gradient-to-br from-amber-500/5 to-orange-500/10 dark:from-amber-500/10 dark:to-orange-500/20 hover:from-amber-500/10 hover:to-orange-500/20 dark:hover:from-amber-500/20 dark:hover:to-orange-500/30 rounded-xl border border-amber-500/20 dark:border-amber-500/30 transition-all duration-300"
+            >
+              <div className="p-3 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
+                <IconWrench size={20} className="text-white" />
+              </div>
+              <div className="text-left">
+                <span className="font-semibold text-slp-navy dark:text-white block">{t('interventions.newIntervention')}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('interventions.create')}</span>
+              </div>
+            </button>
 
-          <button
-            onClick={() => navigate('/interventions/new')}
-            className="flex items-center gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-lg transition-colors"
-          >
-            <div className="p-2 bg-orange-500 rounded-lg">
-              <Wrench className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-medium text-orange-700 dark:text-orange-300">{t('interventions.newIntervention')}</span>
-          </button>
+            <button
+              onClick={() => navigate('/map')}
+              className="group flex items-center gap-4 p-5 bg-gradient-to-br from-emerald-500/5 to-emerald-600/10 dark:from-emerald-500/10 dark:to-emerald-600/20 hover:from-emerald-500/10 hover:to-emerald-600/20 dark:hover:from-emerald-500/20 dark:hover:to-emerald-600/30 rounded-xl border border-emerald-500/20 dark:border-emerald-500/30 transition-all duration-300"
+            >
+              <div className="p-3 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+                <IconMapPin size={20} className="text-white" />
+              </div>
+              <div className="text-left">
+                <span className="font-semibold text-slp-navy dark:text-white block">{t('navigation.map')}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('map.viewAssets')}</span>
+              </div>
+            </button>
 
-          <button
-            onClick={() => navigate('/map')}
-            className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
-          >
-            <div className="p-2 bg-green-500 rounded-lg">
-              <MapPin className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-medium text-green-700 dark:text-green-300">{t('navigation.map')}</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/reports')}
-            className="flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
-          >
-            <div className="p-2 bg-purple-500 rounded-lg">
-              <ClipboardList className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-medium text-purple-700 dark:text-purple-300">{t('navigation.reports')}</span>
-          </button>
+            <button
+              onClick={() => navigate('/reports')}
+              className="group flex items-center gap-4 p-5 bg-gradient-to-br from-violet-500/5 to-violet-600/10 dark:from-violet-500/10 dark:to-violet-600/20 hover:from-violet-500/10 hover:to-violet-600/20 dark:hover:from-violet-500/20 dark:hover:to-violet-600/30 rounded-xl border border-violet-500/20 dark:border-violet-500/30 transition-all duration-300"
+            >
+              <div className="p-3 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl shadow-lg shadow-violet-500/30 group-hover:scale-110 transition-transform">
+                <IconClipboardList size={20} className="text-white" />
+              </div>
+              <div className="text-left">
+                <span className="font-semibold text-slp-navy dark:text-white block">{t('navigation.reports')}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('reports.view')}</span>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

@@ -31,19 +31,30 @@
     --tenant-accent: #f59e0b;
 
     /* Landing Page / SmartLamppost Brand Colors */
+    /* Navy palette */
     --slp-navy: #003366;
+    --slp-navy-light: #004488;
     --slp-navy-deep: #002244;
     --slp-navy-darker: #001a33;
+    /* Blue palette */
     --slp-blue-bright: #00A0DC;
     --slp-blue-light: #4FC3F7;
+    --slp-blue-deep: #0066AA;
+    /* Cyan accent */
+    --slp-cyan: #00D4FF;
+    --slp-cyan-light: #66E5FF;
+    /* Backgrounds */
     --slp-bg-dark: #001122;
     --slp-bg-card: #002244;
     --slp-bg-elevated: #003355;
+    /* Text */
     --slp-text-primary: #FFFFFF;
     --slp-text-secondary: #B0C4DE;
     --slp-text-muted: #7A9CC6;
+    /* Borders */
     --slp-border: rgba(0, 160, 220, 0.2);
     --slp-border-hover: rgba(0, 160, 220, 0.4);
+    /* Status colors */
     --slp-success: #00C853;
     --slp-warning: #FFB300;
     --slp-error: #FF5252;

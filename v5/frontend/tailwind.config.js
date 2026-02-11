@@ -56,17 +56,26 @@ export default {
         },
         // SmartLamppost Landing Page colors
         slp: {
-          navy: "var(--slp-navy)",
-          "navy-deep": "var(--slp-navy-deep)",
-          "navy-darker": "var(--slp-navy-darker)",
-          "blue-bright": "var(--slp-blue-bright)",
-          "blue-light": "var(--slp-blue-light)",
-          "bg-dark": "var(--slp-bg-dark)",
-          "bg-card": "var(--slp-bg-card)",
-          "bg-elevated": "var(--slp-bg-elevated)",
-          "text-primary": "var(--slp-text-primary)",
-          "text-secondary": "var(--slp-text-secondary)",
-          "text-muted": "var(--slp-text-muted)",
+          // Navy palette
+          navy: "var(--slp-navy, #003366)",
+          "navy-light": "var(--slp-navy-light, #004488)",
+          "navy-deep": "var(--slp-navy-deep, #002244)",
+          "navy-darker": "var(--slp-navy-darker, #001a33)",
+          // Blue palette
+          "blue-bright": "var(--slp-blue-bright, #00A0DC)",
+          "blue-light": "var(--slp-blue-light, #33B5E5)",
+          "blue-deep": "var(--slp-blue-deep, #0066AA)",
+          // Cyan accent
+          cyan: "var(--slp-cyan, #00D4FF)",
+          "cyan-light": "var(--slp-cyan-light, #66E5FF)",
+          // Background variants
+          "bg-dark": "var(--slp-bg-dark, #0a0f1a)",
+          "bg-card": "var(--slp-bg-card, #111827)",
+          "bg-elevated": "var(--slp-bg-elevated, #1f2937)",
+          // Text variants
+          "text-primary": "var(--slp-text-primary, #ffffff)",
+          "text-secondary": "var(--slp-text-secondary, #94a3b8)",
+          "text-muted": "var(--slp-text-muted, #64748b)",
         },
       },
       borderRadius: {

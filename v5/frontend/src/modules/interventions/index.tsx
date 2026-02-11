@@ -11,10 +11,13 @@ import { FilterBar } from '@/components/ui/FilterBar'
 import { useToastActions } from '@/components/ui/Toast'
 import { useLanguage } from '@/hooks/useLanguage'
 import {
-  Plus, ArrowLeft, Save, Loader2, CheckCircle, XCircle, Clock,
-  FileText, Upload, Trash2, Edit2, Download, FolderOpen, Image, FileSpreadsheet,
-  BarChart3, Calendar, User
+  ArrowLeft, Loader2, Download
 } from 'lucide-react'
+import {
+  IconPlus, IconSave, IconCheckCircle, IconXCircle, IconClock,
+  IconFileText, IconUpload, IconTrash2, IconEdit, IconFolderOpen, IconImage, IconFileSpreadsheet,
+  IconBarChart3, IconCalendar, IconUser, IconWrench, IconGradientDefs
+} from '@/components/icons'
 
 interface Intervention {
   id: number
@@ -54,11 +57,11 @@ interface InterventionFile {
 }
 
 const FILE_CATEGORIES = [
-  { value: 'documento', label: 'documents', icon: FileText },
-  { value: 'foto_antes', label: 'photosBefore', icon: Image },
-  { value: 'foto_depois', label: 'photosAfter', icon: Image },
-  { value: 'relatorio', label: 'reports', icon: FileSpreadsheet },
-  { value: 'outros', label: 'others', icon: FolderOpen }
+  { value: 'documento', label: 'documents', icon: IconFileText },
+  { value: 'foto_antes', label: 'photosBefore', icon: IconImage },
+  { value: 'foto_depois', label: 'photosAfter', icon: IconImage },
+  { value: 'relatorio', label: 'reports', icon: IconFileSpreadsheet },
+  { value: 'outros', label: 'others', icon: IconFolderOpen }
 ]
 
 // Intervention List
@@ -136,18 +139,25 @@ const InterventionsList: React.FC = () => {
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('interventions.title')}</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            {pagination?.total || 0} {t('interventions.title').toLowerCase()}
-          </p>
+    <>
+      <IconGradientDefs />
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slp-navy dark:text-white flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
+                <IconWrench size={24} className="text-white" />
+              </div>
+              {t('interventions.title')}
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">
+              {pagination?.total || 0} {t('interventions.title').toLowerCase()} {t('common.registered').toLowerCase()}
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Filters */}
-      <FilterBar
+        {/* Filters */}
+        <FilterBar
         filters={[
           {
             name: 'status',
@@ -199,14 +209,15 @@ const InterventionsList: React.FC = () => {
         actions={
           <button
             onClick={() => navigate('/interventions/new')}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700"
+            className="group inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all duration-300"
           >
-            <Plus className="h-5 w-5 mr-2" />
+            <IconPlus size={20} className="mr-2 group-hover:scale-110 transition-transform" />
             {t('interventions.newIntervention')}
           </button>
         }
       />
-    </div>
+      </div>
+    </>
   )
 }
 

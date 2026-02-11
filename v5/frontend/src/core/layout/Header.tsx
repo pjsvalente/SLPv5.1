@@ -4,15 +4,16 @@ import { useTheme } from '@/hooks/useTheme'
 import { useTranslation } from 'react-i18next'
 import { LanguageSelector } from '@/components/ui/LanguageSelector'
 import {
-  Menu,
-  ChevronLeft,
-  ChevronRight,
-  Sun,
-  Moon,
-  LogOut,
-  User,
-  Bell
-} from 'lucide-react'
+  IconMenu,
+  IconChevronLeft,
+  IconChevronRight,
+  IconSun,
+  IconMoon,
+  IconLogout,
+  IconUser,
+  IconBell,
+  IconGradientDefs
+} from '@/components/icons'
 
 interface HeaderProps {
   sidebarCollapsed: boolean
@@ -38,129 +39,163 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 lg:px-6">
-      <div className="h-full flex items-center justify-between">
-        {/* Left side */}
-        <div className="flex items-center space-x-4">
-          {/* Mobile menu button */}
-          <button
-            onClick={onToggleMobileMenu}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-
-          {/* Desktop sidebar toggle */}
-          <button
-            onClick={onToggleSidebar}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 hidden lg:block"
-            title={sidebarCollapsed ? t('common.view') : t('common.close')}
-          >
-            {sidebarCollapsed ? (
-              <ChevronRight className="h-5 w-5" />
-            ) : (
-              <ChevronLeft className="h-5 w-5" />
-            )}
-          </button>
-        </div>
-
-        {/* Right side */}
-        <div className="flex items-center space-x-2 lg:space-x-4">
-          {/* Powered by badge - for non-master tenants */}
-          {user?.tenant_id && user.tenant_id !== 'smartlamppost' && (
-            <div className="hidden md:flex items-center space-x-1 text-xs text-gray-400 border-r dark:border-gray-600 pr-4 mr-2">
-              <span>powered by</span>
-              <img
-                src="/api/tenants/smartlamppost/logo"
-                alt="Smartlamppost"
-                className="h-5 object-contain dark:invert"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none'
-                  const fallback = (e.target as HTMLImageElement).nextElementSibling
-                  if (fallback) (fallback as HTMLElement).style.display = 'inline'
-                }}
-              />
-              <span className="hidden font-semibold text-gray-500">Smartlamppost</span>
-            </div>
-          )}
-
-          {/* Language selector */}
-          <LanguageSelector variant="compact" />
-
-          {/* Theme toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-            title={isDark ? t('settings.themes.light') : t('settings.themes.dark')}
-          >
-            {isDark ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </button>
-
-          {/* Notifications */}
-          <button
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 relative"
-            title={t('settings.notifications')}
-          >
-            <Bell className="h-5 w-5" />
-          </button>
-
-          {/* User menu */}
-          <div className="relative">
+    <>
+      <IconGradientDefs />
+      <header className="sticky top-0 z-30 h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 lg:px-6 shadow-sm">
+        <div className="h-full flex items-center justify-between">
+          {/* Left side */}
+          <div className="flex items-center space-x-3">
+            {/* Mobile menu button */}
             <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={onToggleMobileMenu}
+              className="p-2.5 rounded-xl bg-slp-navy/5 hover:bg-slp-navy/10 dark:bg-white/5 dark:hover:bg-white/10 transition-colors lg:hidden"
             >
-              <div className="h-8 w-8 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                <User className="h-4 w-4 text-primary" />
-              </div>
-              <div className="hidden md:block text-left">
-                <div className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {user?.first_name || user?.email?.split('@')[0]}
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {roleLabels[user?.role || 'user']}
-                </div>
-              </div>
+              <IconMenu size={20} className="text-slp-navy dark:text-white" />
             </button>
 
-            {/* Dropdown menu */}
-            {showUserMenu && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setShowUserMenu(false)}
+            {/* Desktop sidebar toggle */}
+            <button
+              onClick={onToggleSidebar}
+              className="p-2.5 rounded-xl bg-slp-navy/5 hover:bg-slp-navy/10 dark:bg-white/5 dark:hover:bg-white/10 transition-colors hidden lg:flex items-center justify-center"
+              title={sidebarCollapsed ? t('common.view') : t('common.close')}
+            >
+              {sidebarCollapsed ? (
+                <IconChevronRight size={20} className="text-slp-navy dark:text-white" />
+              ) : (
+                <IconChevronLeft size={20} className="text-slp-navy dark:text-white" />
+              )}
+            </button>
+
+            {/* Page title or breadcrumb area */}
+            <div className="hidden sm:block">
+              <h1 className="text-lg font-semibold text-slp-navy dark:text-white">
+                {/* Dynamic title can be added here */}
+              </h1>
+            </div>
+          </div>
+
+          {/* Right side */}
+          <div className="flex items-center space-x-2 lg:space-x-3">
+            {/* Powered by badge - for non-master tenants */}
+            {user?.tenant_id && user.tenant_id !== 'smartlamppost' && (
+              <div className="hidden md:flex items-center space-x-2 text-xs text-gray-400 border-r border-gray-200 dark:border-gray-700 pr-4 mr-2">
+                <span className="text-gray-400 dark:text-gray-500">powered by</span>
+                <img
+                  src="/api/tenants/smartlamppost/logo"
+                  alt="Smartlamppost"
+                  className="h-5 object-contain dark:invert"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none'
+                    const fallback = (e.target as HTMLImageElement).nextElementSibling
+                    if (fallback) (fallback as HTMLElement).style.display = 'inline'
+                  }}
                 />
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
-                  <div className="p-3 border-b border-gray-100 dark:border-gray-700">
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {user?.email}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {user?.tenant_name || user?.tenant_id}
-                    </div>
+                <span className="hidden font-semibold text-gray-500">Smartlamppost</span>
+              </div>
+            )}
+
+            {/* Language selector */}
+            <LanguageSelector variant="compact" />
+
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl bg-slp-navy/5 hover:bg-slp-navy/10 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
+              title={isDark ? t('settings.themes.light') : t('settings.themes.dark')}
+            >
+              {isDark ? (
+                <IconSun size={20} className="text-amber-500" />
+              ) : (
+                <IconMoon size={20} className="text-slp-navy" />
+              )}
+            </button>
+
+            {/* Notifications */}
+            <button
+              className="p-2.5 rounded-xl bg-slp-navy/5 hover:bg-slp-navy/10 dark:bg-white/5 dark:hover:bg-white/10 transition-colors relative"
+              title={t('settings.notifications')}
+            >
+              <IconBell size={20} className="text-slp-navy dark:text-white" />
+              {/* Notification badge */}
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-slp-cyan rounded-full border-2 border-white dark:border-gray-900" />
+            </button>
+
+            {/* User menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center space-x-3 p-2 rounded-xl hover:bg-slp-navy/5 dark:hover:bg-white/5 transition-colors"
+              >
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-slp-cyan to-slp-blue-bright flex items-center justify-center shadow-md">
+                  <span className="text-white font-bold text-sm">
+                    {(user?.first_name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+                  </span>
+                </div>
+                <div className="hidden md:block text-left">
+                  <div className="text-sm font-semibold text-slp-navy dark:text-white">
+                    {user?.first_name || user?.email?.split('@')[0]}
                   </div>
-                  <div className="p-1">
-                    <button
-                      onClick={() => {
-                        setShowUserMenu(false)
-                        logout()
-                      }}
-                      className="w-full flex items-center px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md"
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      {t('auth.logout')}
-                    </button>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {roleLabels[user?.role || 'user']}
                   </div>
                 </div>
-              </>
-            )}
+              </button>
+
+              {/* Dropdown menu */}
+              {showUserMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowUserMenu(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
+                    {/* User info header */}
+                    <div className="p-4 bg-gradient-to-r from-slp-navy via-slp-navy-light to-slp-blue-deep">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center">
+                          <span className="text-white font-bold text-lg">
+                            {(user?.first_name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-white">
+                            {user?.first_name} {user?.last_name}
+                          </div>
+                          <div className="text-xs text-white/70">
+                            {user?.email}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tenant info */}
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Organização</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        {user?.tenant_name || user?.tenant_id}
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="p-2">
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false)
+                          logout()
+                        }}
+                        className="w-full flex items-center px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+                      >
+                        <IconLogout size={18} className="mr-3" />
+                        {t('auth.logout')}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   )
 }
