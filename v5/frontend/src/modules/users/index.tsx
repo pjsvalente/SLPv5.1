@@ -8,9 +8,9 @@ import { FormField } from '@/components/ui/FormField'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useLanguage } from '@/hooks/useLanguage'
 import {
-  Plus, ArrowLeft, Save, Loader2, Trash2,
-  Key, Shield, ShieldCheck, ShieldOff
-} from 'lucide-react'
+  IconPlus, IconArrowLeft, IconSave, IconLoader, IconTrash,
+  IconKey, IconShield, IconShieldCheck, IconGradientDefs
+} from '@/components/icons'
 
 interface User {
   id: number
@@ -90,9 +90,9 @@ const UsersList: React.FC = () => {
       label: '2FA',
       render: (value: boolean) => (
         value ? (
-          <ShieldCheck className="h-5 w-5 text-green-600" />
+          <IconShieldCheck className="h-5 w-5 text-green-600" />
         ) : (
-          <ShieldOff className="h-5 w-5 text-gray-400" />
+          <IconShield className="h-5 w-5 text-gray-400" />
         )
       )
     },
@@ -135,7 +135,7 @@ const UsersList: React.FC = () => {
             onClick={() => navigate('/users/new')}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
           >
-            <Plus className="h-5 w-5 mr-2" />
+            <IconPlus className="h-5 w-5 mr-2" />
             {t('users.newUser')}
           </button>
         }
@@ -238,7 +238,7 @@ const UserForm: React.FC<{ mode: 'create' | 'edit' }> = ({ mode }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <IconLoader className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     )
   }
@@ -247,7 +247,7 @@ const UserForm: React.FC<{ mode: 'create' | 'edit' }> = ({ mode }) => {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-          <ArrowLeft className="h-5 w-5" />
+          <IconArrowLeft className="h-5 w-5" />
         </button>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           {mode === 'create' ? t('users.newUser') : t('users.editUser')}
@@ -355,12 +355,12 @@ const UserForm: React.FC<{ mode: 'create' | 'edit' }> = ({ mode }) => {
           >
             {saving ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <IconLoader className="h-4 w-4 mr-2 animate-spin" />
                 {t('common.saving')}
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
+                <IconSave className="h-4 w-4 mr-2" />
                 {mode === 'create' ? t('common.create') : t('common.save')}
               </>
             )}
@@ -440,7 +440,7 @@ const UserDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <IconLoader className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     )
   }
@@ -458,7 +458,7 @@ const UserDetail: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex items-start gap-4">
           <button onClick={() => navigate('/users')} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-            <ArrowLeft className="h-5 w-5" />
+            <IconArrowLeft className="h-5 w-5" />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{user.email}</h1>
@@ -480,7 +480,7 @@ const UserDetail: React.FC = () => {
             onClick={() => setShowDeleteDialog(true)}
             className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            <IconTrash className="h-4 w-4 mr-2" />
             {t('common.delete')}
           </button>
         </div>
@@ -526,7 +526,7 @@ const UserDetail: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center gap-3">
-                <Shield className="h-5 w-5 text-gray-500" />
+                <IconShield className="h-5 w-5 text-gray-500" />
                 <div>
                   <p className="font-medium text-gray-900 dark:text-gray-100">{t('users.twoFactorEnabled')}</p>
                   <p className="text-sm text-gray-500">
@@ -549,7 +549,7 @@ const UserDetail: React.FC = () => {
 
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center gap-3">
-                <Key className="h-5 w-5 text-gray-500" />
+                <IconKey className="h-5 w-5 text-gray-500" />
                 <div>
                   <p className="font-medium text-gray-900 dark:text-gray-100">{t('auth.resetPassword')}</p>
                   <p className="text-sm text-gray-500">{t('users.mustChangePassword')}</p>

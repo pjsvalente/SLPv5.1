@@ -6,9 +6,10 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { api } from '@/services/api'
 import {
-  MapPin, Navigation, Filter, Layers, RefreshCw, Route as RouteIcon,
-  AlertCircle, CheckCircle, Wrench, Eye, Plus, X, Play, List, Crosshair
-} from 'lucide-react'
+  IconMapPin, IconNavigation, IconFilter, IconLayers, IconLoader, IconRoute,
+  IconAlertCircle, IconCheckCircle, IconWrench, IconEye, IconPlus, IconX, IconPlay, IconList, IconCrosshair,
+  IconGradientDefs
+} from '@/components/icons'
 
 // Fix Leaflet default marker icon issue
 import icon from 'leaflet/dist/images/marker-icon.png'
@@ -281,7 +282,7 @@ function MapView() {
             className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
             title={t('common.refresh') || 'Atualizar'}
           >
-            <RefreshCw className="h-5 w-5" />
+            <IconLoader className="h-5 w-5" />
           </button>
           <button
             onClick={() => setRoutePlanningMode(!routePlanningMode)}
@@ -291,7 +292,7 @@ function MapView() {
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
             }`}
           >
-            <RouteIcon className="h-4 w-4 mr-2" />
+            <IconRoute className="h-4 w-4 mr-2" />
             {t('map.planRoute') || 'Planear Rota'}
           </button>
         </div>
@@ -329,7 +330,7 @@ function MapView() {
           {/* Filters */}
           <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-              <Filter className="h-4 w-4 mr-1" />
+              <IconFilter className="h-4 w-4 mr-1" />
               {t('common.filters') || 'Filtros'}
             </h3>
 
@@ -368,7 +369,7 @@ function MapView() {
           {/* Layers */}
           <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-              <Layers className="h-4 w-4 mr-1" />
+              <IconLayers className="h-4 w-4 mr-1" />
               {t('map.layers') || 'Camadas'}
             </h3>
 
@@ -380,7 +381,7 @@ function MapView() {
                   onChange={(e) => setShowAssets(e.target.checked)}
                   className="rounded border-gray-300"
                 />
-                <MapPin className="h-4 w-4 text-green-600" />
+                <IconMapPin className="h-4 w-4 text-green-600" />
                 <span className="text-sm">{t('map.assets') || 'Ativos'} ({assets.length})</span>
               </label>
 
@@ -391,7 +392,7 @@ function MapView() {
                   onChange={(e) => setShowInterventions(e.target.checked)}
                   className="rounded border-gray-300"
                 />
-                <Wrench className="h-4 w-4 text-orange-600" />
+                <IconWrench className="h-4 w-4 text-orange-600" />
                 <span className="text-sm">{t('map.interventions') || 'Intervencoes'} ({interventions.length})</span>
               </label>
             </div>
@@ -401,7 +402,7 @@ function MapView() {
           {routePlanningMode && (
             <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                <RouteIcon className="h-4 w-4 mr-1" />
+                <IconRoute className="h-4 w-4 mr-1" />
                 {t('map.routePlanning') || 'Planeamento de Rota'}
               </h3>
 
@@ -416,7 +417,7 @@ function MapView() {
                       onClick={() => setStartingPoint(null)}
                       className="text-red-500 hover:text-red-700"
                     >
-                      <X className="h-3 w-3" />
+                      <IconX className="h-3 w-3" />
                     </button>
                   )}
                 </div>
@@ -433,7 +434,7 @@ function MapView() {
                         : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200'
                     }`}
                   >
-                    <Crosshair className="h-3 w-3" />
+                    <IconCrosshair className="h-3 w-3" />
                     {selectingStartPoint
                       ? (t('map.selectStartingPoint') || 'Clique no mapa...')
                       : (t('map.selectStartingPoint') || 'Selecionar no mapa')
@@ -456,7 +457,7 @@ function MapView() {
                         onClick={() => toggleInterventionSelection(id)}
                         className="text-red-500 hover:text-red-700"
                       >
-                        <X className="h-3 w-3" />
+                        <IconX className="h-3 w-3" />
                       </button>
                     </div>
                   ) : null
@@ -469,7 +470,7 @@ function MapView() {
                   disabled={selectedInterventions.length === 0}
                   className="flex-1 inline-flex items-center justify-center px-2 py-1.5 text-xs bg-blue-600 text-white rounded disabled:opacity-50"
                 >
-                  <Play className="h-3 w-3 mr-1" />
+                  <IconPlay className="h-3 w-3 mr-1" />
                   {t('map.calculate') || 'Calcular'}
                 </button>
                 <button
@@ -579,14 +580,14 @@ function MapView() {
                           onClick={() => navigate(`/assets/${asset.serial_number}`)}
                           className="text-xs px-2 py-1 bg-blue-600 text-white rounded"
                         >
-                          <Eye className="h-3 w-3 inline mr-1" />
+                          <IconEye className="h-3 w-3 inline mr-1" />
                           {t('common.view') || 'Ver'}
                         </button>
                         <button
                           onClick={() => navigate(`/interventions/new?asset=${asset.serial_number}`)}
                           className="text-xs px-2 py-1 bg-green-600 text-white rounded"
                         >
-                          <Plus className="h-3 w-3 inline mr-1" />
+                          <IconPlus className="h-3 w-3 inline mr-1" />
                           {t('map.newIntervention') || 'Intervencao'}
                         </button>
                       </div>
@@ -630,7 +631,7 @@ function MapView() {
                           onClick={() => navigate(`/interventions/${intervention.id}`)}
                           className="text-xs px-2 py-1 bg-blue-600 text-white rounded"
                         >
-                          <Eye className="h-3 w-3 inline mr-1" />
+                          <IconEye className="h-3 w-3 inline mr-1" />
                           {t('common.view') || 'Ver'}
                         </button>
                         {routePlanningMode && (
@@ -643,9 +644,9 @@ function MapView() {
                             }`}
                           >
                             {selectedInterventions.includes(intervention.id) ? (
-                              <><X className="h-3 w-3 inline mr-1" />{t('common.remove') || 'Remover'}</>
+                              <><IconX className="h-3 w-3 inline mr-1" />{t('common.remove') || 'Remover'}</>
                             ) : (
-                              <><Plus className="h-3 w-3 inline mr-1" />{t('map.addToRoute') || 'Adicionar'}</>
+                              <><IconPlus className="h-3 w-3 inline mr-1" />{t('map.addToRoute') || 'Adicionar'}</>
                             )}
                           </button>
                         )}

@@ -6,7 +6,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
-import { X, Camera, RotateCcw, Flashlight, QrCode, Barcode } from 'lucide-react'
+import { IconX, IconCamera, IconRotateCcw, IconFlashlight, IconQrCode, IconBarcode } from '@/components/icons'
 
 interface QRScannerProps {
   isOpen: boolean
@@ -193,11 +193,11 @@ export const QRScanner: React.FC<QRScannerProps> = ({
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/70 to-transparent">
         <div className="flex items-center gap-2 text-white">
           {acceptedFormats === 'qr' ? (
-            <QrCode className="h-6 w-6" />
+            <IconQrCode className="h-6 w-6" />
           ) : acceptedFormats === 'barcode' ? (
-            <Barcode className="h-6 w-6" />
+            <IconBarcode className="h-6 w-6" />
           ) : (
-            <Camera className="h-6 w-6" />
+            <IconCamera className="h-6 w-6" />
           )}
           <span className="font-medium">
             {title || t('scanner.title')}
@@ -207,7 +207,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
           onClick={onClose}
           className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
         >
-          <X className="h-6 w-6 text-white" />
+          <IconX className="h-6 w-6 text-white" />
         </button>
       </div>
 
@@ -252,7 +252,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
               className="p-4 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
               title={t('scanner.switchCamera')}
             >
-              <RotateCcw className="h-6 w-6 text-white" />
+              <IconRotateCcw className="h-6 w-6 text-white" />
             </button>
           )}
 
@@ -265,7 +265,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({
               }`}
               title={t('scanner.toggleFlash')}
             >
-              <Flashlight className={`h-6 w-6 ${flashOn ? 'text-black' : 'text-white'}`} />
+              <IconFlashlight className={`h-6 w-6 ${flashOn ? 'text-black' : 'text-white'}`} />
             </button>
           )}
         </div>

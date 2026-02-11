@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
 import { FormField } from '@/components/ui/FormField'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Save, Loader2, Plus, Trash2, Shield, Tag, Edit2, X } from 'lucide-react'
+import { IconSave, IconLoader, IconPlus, IconTrash2, IconShield, IconTag, IconEdit, IconX } from '@/components/icons'
 
 interface CatalogField {
   id: number

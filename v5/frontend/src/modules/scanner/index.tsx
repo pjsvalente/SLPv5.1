@@ -10,9 +10,10 @@ import { api } from '@/services/api'
 import { QRScanner } from '@/components/ui/QRScanner'
 import { LoadingSpinner } from '@/core/common/LoadingSpinner'
 import {
-  QrCode, Barcode, Search, Package, AlertTriangle,
-  ChevronRight, Camera, History, MapPin
-} from 'lucide-react'
+  IconQrCode, IconBarcode, IconSearch, IconPackage, IconAlertTriangle,
+  IconChevronRight, IconCamera, IconHistory, IconMapPin,
+  IconGradientDefs
+} from '@/components/icons'
 
 interface ScanHistory {
   code: string
@@ -117,7 +118,7 @@ const ScannerPage: React.FC = () => {
             onClick={() => { setScanMode('all'); setScannerOpen(true) }}
             className="flex flex-col items-center gap-3 p-6 border-2 border-blue-200 dark:border-blue-800 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
           >
-            <Camera className="h-12 w-12 text-blue-500" />
+            <IconCamera className="h-12 w-12 text-blue-500" />
             <span className="font-medium text-gray-900 dark:text-gray-100">
               {t('scanner.allCodes')}
             </span>
@@ -130,7 +131,7 @@ const ScannerPage: React.FC = () => {
             onClick={() => { setScanMode('qr'); setScannerOpen(true) }}
             className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
-            <QrCode className="h-12 w-12 text-purple-500" />
+            <IconQrCode className="h-12 w-12 text-purple-500" />
             <span className="font-medium text-gray-900 dark:text-gray-100">
               QR Code
             </span>
@@ -143,7 +144,7 @@ const ScannerPage: React.FC = () => {
             onClick={() => { setScanMode('barcode'); setScannerOpen(true) }}
             className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
-            <Barcode className="h-12 w-12 text-green-500" />
+            <IconBarcode className="h-12 w-12 text-green-500" />
             <span className="font-medium text-gray-900 dark:text-gray-100">
               {t('scanner.barcode')}
             </span>
@@ -173,7 +174,7 @@ const ScannerPage: React.FC = () => {
             disabled={!manualInput.trim() || searching}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            <Search className="h-5 w-5" />
+            <IconSearch className="h-5 w-5" />
             {t('common.search')}
           </button>
         </form>
@@ -193,7 +194,7 @@ const ScannerPage: React.FC = () => {
       {error && !searching && (
         <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <AlertTriangle className="h-6 w-6 text-orange-500 flex-shrink-0 mt-0.5" />
+            <IconAlertTriangle className="h-6 w-6 text-orange-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <h3 className="font-medium text-orange-800 dark:text-orange-300">
                 {t('scanner.assetNotFound')}
@@ -205,7 +206,7 @@ const ScannerPage: React.FC = () => {
                 onClick={() => createNewAsset(scanHistory[0]?.code || '')}
                 className="mt-4 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2"
               >
-                <Package className="h-5 w-5" />
+                <IconPackage className="h-5 w-5" />
                 {t('scanner.createNewAsset')}
               </button>
             </div>
@@ -217,7 +218,7 @@ const ScannerPage: React.FC = () => {
       {searchResult && !searching && (
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <Package className="h-8 w-8 text-green-500 flex-shrink-0" />
+            <IconPackage className="h-8 w-8 text-green-500 flex-shrink-0" />
             <div className="flex-1">
               <h3 className="font-semibold text-green-800 dark:text-green-300 text-lg">
                 {t('scanner.assetFound')}
@@ -248,7 +249,7 @@ const ScannerPage: React.FC = () => {
                 )}
                 {(searchResult.gps_latitude && searchResult.gps_longitude) && (
                   <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                    <MapPin className="h-4 w-4" />
+                    <IconMapPin className="h-4 w-4" />
                     <span className="text-sm">
                       {searchResult.gps_latitude.toFixed(6)}, {searchResult.gps_longitude.toFixed(6)}
                     </span>
@@ -261,7 +262,7 @@ const ScannerPage: React.FC = () => {
                 className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
               >
                 {t('scanner.viewAsset')}
-                <ChevronRight className="h-5 w-5" />
+                <IconChevronRight className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -272,7 +273,7 @@ const ScannerPage: React.FC = () => {
       {scanHistory.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
           <div className="flex items-center gap-2 mb-4">
-            <History className="h-5 w-5 text-gray-400" />
+            <IconHistory className="h-5 w-5 text-gray-400" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {t('scanner.recentScans')}
             </h2>
@@ -290,9 +291,9 @@ const ScannerPage: React.FC = () => {
               >
                 <div className="flex items-center gap-3">
                   {item.format === 'QR_CODE' ? (
-                    <QrCode className="h-5 w-5 text-gray-400" />
+                    <IconQrCode className="h-5 w-5 text-gray-400" />
                   ) : (
-                    <Barcode className="h-5 w-5 text-gray-400" />
+                    <IconBarcode className="h-5 w-5 text-gray-400" />
                   )}
                   <div>
                     <p className="font-mono text-sm text-gray-900 dark:text-gray-100 truncate max-w-[200px]">
@@ -310,7 +311,7 @@ const ScannerPage: React.FC = () => {
                     className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1"
                   >
                     {t('common.view')}
-                    <ChevronRight className="h-4 w-4" />
+                    <IconChevronRight className="h-4 w-4" />
                   </button>
                 )}
               </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Filter, RotateCcw } from 'lucide-react'
+import { IconX, IconFilter, IconRotateCcw } from '@/components/icons'
 
 export interface FilterOption {
   value: string
@@ -30,14 +30,14 @@ export function FilterBar({ filters, onReset, className = '' }: FilterBarProps) 
     <div className={`bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm ${className}`}>
       <div className="p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Filter className="h-4 w-4 text-gray-500" />
+          <IconFilter className="h-4 w-4 text-gray-500" />
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('common.filters')}</span>
           {hasActiveFilters && (
             <button
               onClick={onReset}
               className="ml-auto flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
             >
-              <RotateCcw className="h-3 w-3" />
+              <IconRotateCcw className="h-3 w-3" />
               {t('common.reset')}
             </button>
           )}
@@ -67,7 +67,7 @@ export function FilterBar({ filters, onReset, className = '' }: FilterBarProps) 
                   onClick={() => filter.onChange('')}
                   className="absolute right-7 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600"
                 >
-                  <X className="h-3 w-3" />
+                  <IconX className="h-3 w-3" />
                 </button>
               )}
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
@@ -96,7 +96,7 @@ export function FilterBar({ filters, onReset, className = '' }: FilterBarProps) 
                     onClick={() => filter.onChange('')}
                     className="p-0.5 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full"
                   >
-                    <X className="h-3 w-3" />
+                    <IconX className="h-3 w-3" />
                   </button>
                 </span>
               )

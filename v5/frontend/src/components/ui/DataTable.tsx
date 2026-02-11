@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, ChevronRight, Search, ChevronUp, ChevronDown } from 'lucide-react'
+import { IconChevronLeft, IconChevronRight, IconSearch, IconChevronUp, IconChevronDown } from '@/components/icons'
 
 interface Column<T> {
   key: keyof T | string
@@ -82,7 +82,7 @@ export function DataTable<T extends Record<string, any>>({
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center gap-4">
           {searchable && onSearchChange && (
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 value={searchValue}
@@ -112,7 +112,7 @@ export function DataTable<T extends Record<string, any>>({
                   <div className="flex items-center gap-1">
                     {column.label}
                     {column.sortable && sortKey === String(column.key) && (
-                      sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      sortDirection === 'asc' ? <IconChevronUp className="h-4 w-4" /> : <IconChevronDown className="h-4 w-4" />
                     )}
                   </div>
                 </th>
@@ -173,7 +173,7 @@ export function DataTable<T extends Record<string, any>>({
               disabled={pagination.page <= 1}
               className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <IconChevronLeft className="h-4 w-4" />
             </button>
             <span className="text-sm text-gray-700 dark:text-gray-300">
               {t('table.page')} {pagination.page} {t('table.of')} {totalPages}
@@ -183,7 +183,7 @@ export function DataTable<T extends Record<string, any>>({
               disabled={pagination.page >= totalPages}
               className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              <ChevronRight className="h-4 w-4" />
+              <IconChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>

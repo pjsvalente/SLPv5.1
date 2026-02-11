@@ -9,21 +9,22 @@ import { useTranslation } from 'react-i18next'
 import { useApi } from '@/hooks/useApi'
 import { DataTable, FormField, ConfirmDialog, StatusBadge, FileUpload } from '@/components/ui'
 import {
-  Plus,
-  Edit,
-  Trash2,
-  Building2,
-  Users,
-  Package,
-  ArrowLeft,
-  Save,
-  X,
-  Upload,
-  Image,
-  Crown,
-  Shield,
-  Settings2
-} from 'lucide-react'
+  IconPlus,
+  IconEdit,
+  IconTrash,
+  IconBuilding,
+  IconUsers,
+  IconPackage,
+  IconArrowLeft,
+  IconSave,
+  IconX,
+  IconUpload,
+  IconImage,
+  IconCrown,
+  IconShield,
+  IconSettings,
+  IconGradientDefs
+} from '@/components/icons'
 
 // Types
 interface Tenant {
@@ -110,7 +111,7 @@ function TenantsList() {
             <div className="flex items-center gap-2">
               <span className="font-medium">{tenant.name}</span>
               {tenant.is_master && (
-                <Crown className="w-4 h-4 text-yellow-500" title={t('tenants.tenantMaster')} />
+                <IconCrown className="w-4 h-4 text-yellow-500" title={t('tenants.tenantMaster')} />
               )}
             </div>
             <span className="text-sm text-gray-500">{tenant.id}</span>
@@ -140,7 +141,7 @@ function TenantsList() {
       sortable: true,
       render: (_value: any, tenant: Tenant) => (
         <div className="flex items-center gap-1">
-          <Users className="w-4 h-4 text-gray-400" />
+          <IconUsers className="w-4 h-4 text-gray-400" />
           <span>{tenant.user_count}</span>
         </div>
       )
@@ -151,7 +152,7 @@ function TenantsList() {
       sortable: true,
       render: (_value: any, tenant: Tenant) => (
         <div className="flex items-center gap-1">
-          <Package className="w-4 h-4 text-gray-400" />
+          <IconPackage className="w-4 h-4 text-gray-400" />
           <span>{tenant.asset_count}</span>
         </div>
       )
@@ -182,7 +183,7 @@ function TenantsList() {
             className="p-1 text-blue-600 hover:bg-blue-50 rounded"
             title={t('common.edit')}
           >
-            <Edit className="w-4 h-4" />
+            <IconEdit className="w-4 h-4" />
           </button>
           {!tenant.is_master && (
             <button
@@ -190,7 +191,7 @@ function TenantsList() {
               className={`p-1 rounded ${tenant.active ? 'text-orange-600 hover:bg-orange-50' : 'text-green-600 hover:bg-green-50'}`}
               title={tenant.active ? t('common.inactive') : t('common.active')}
             >
-              <Shield className="w-4 h-4" />
+              <IconShield className="w-4 h-4" />
             </button>
           )}
         </div>
@@ -211,14 +212,14 @@ function TenantsList() {
             onClick={() => navigate('/plans')}
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
           >
-            <Settings2 className="w-4 h-4" />
+            <IconSettings className="w-4 h-4" />
             {t('tenants.configurePlans')}
           </button>
           <button
             onClick={() => navigate('/tenants/new')}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            <Plus className="w-4 h-4" />
+            <IconPlus className="w-4 h-4" />
             {t('tenants.newTenant')}
           </button>
         </div>
@@ -229,7 +230,7 @@ function TenantsList() {
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <IconBuilding className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">{t('tenants.totalTenants')}</p>
@@ -240,7 +241,7 @@ function TenantsList() {
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-              <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
+              <IconShield className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">{t('tenants.activeTenants')}</p>
@@ -251,7 +252,7 @@ function TenantsList() {
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-              <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <IconUsers className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">{t('tenants.totalUsers')}</p>
@@ -428,7 +429,7 @@ function TenantForm() {
           onClick={() => navigate('/tenants')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <IconArrowLeft className="w-5 h-5" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -529,7 +530,7 @@ function TenantForm() {
               onClick={() => navigate('/tenants')}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
             >
-              <X className="w-4 h-4" />
+              <IconX className="w-4 h-4" />
               {t('common.cancel')}
             </button>
             <button
@@ -537,7 +538,7 @@ function TenantForm() {
               disabled={saving}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              <Save className="w-4 h-4" />
+              <IconSave className="w-4 h-4" />
               {saving ? t('common.saving') : t('common.save')}
             </button>
           </div>
@@ -547,7 +548,7 @@ function TenantForm() {
         {isEdit && (
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Image className="w-5 h-5" />
+              <IconImage className="w-5 h-5" />
               {t('tenants.logo')}
             </h2>
 
@@ -638,7 +639,7 @@ function TenantDetail() {
             onClick={() => navigate('/tenants')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <IconArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-4">
             <img
@@ -655,7 +656,7 @@ function TenantDetail() {
                   {tenant.name}
                 </h1>
                 {tenant.is_master && (
-                  <Crown className="w-5 h-5 text-yellow-500" />
+                  <IconCrown className="w-5 h-5 text-yellow-500" />
                 )}
               </div>
               <div className="flex items-center gap-2 mt-1">
@@ -675,7 +676,7 @@ function TenantDetail() {
           onClick={() => navigate(`/tenants/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          <Edit className="w-4 h-4" />
+          <IconEdit className="w-4 h-4" />
           {t('common.edit')}
         </button>
       </div>

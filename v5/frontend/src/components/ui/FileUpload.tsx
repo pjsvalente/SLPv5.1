@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Upload, X, File, Image, FileText } from 'lucide-react'
+import { IconUpload, IconX, IconFile, IconImage, IconFileText } from '@/components/icons'
 import { useTranslation } from 'react-i18next'
 
 interface UploadedFile {
@@ -48,9 +48,9 @@ export function FileUpload({
   }
 
   const getFileIcon = (type: string) => {
-    if (type.startsWith('image/')) return <Image className="h-8 w-8 text-blue-500" />
-    if (type === 'application/pdf') return <FileText className="h-8 w-8 text-red-500" />
-    return <File className="h-8 w-8 text-gray-500" />
+    if (type.startsWith('image/')) return <IconImage className="h-8 w-8 text-blue-500" />
+    if (type === 'application/pdf') return <IconFileText className="h-8 w-8 text-red-500" />
+    return <IconFile className="h-8 w-8 text-gray-500" />
   }
 
   const validateFiles = (newFiles: FileList): File[] => {
@@ -152,7 +152,7 @@ export function FileUpload({
           disabled={disabled}
           className="hidden"
         />
-        <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+        <IconUpload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {t('fileUpload.dragAndDrop')} <span className="text-blue-600 dark:text-blue-400">{t('fileUpload.clickToSelect')}</span>
         </p>
@@ -202,7 +202,7 @@ export function FileUpload({
                 disabled={disabled}
                 className="p-1 text-gray-400 hover:text-red-500 disabled:opacity-50"
               >
-                <X className="h-4 w-4" />
+                <IconX className="h-4 w-4" />
               </button>
             </li>
           ))}

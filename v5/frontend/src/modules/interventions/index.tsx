@@ -11,8 +11,8 @@ import { FilterBar } from '@/components/ui/FilterBar'
 import { useToastActions } from '@/components/ui/Toast'
 import { useLanguage } from '@/hooks/useLanguage'
 import {
-  ArrowLeft, Loader2, Download
-} from 'lucide-react'
+  IconArrowLeft, IconLoader, IconDownload
+} from '@/components/icons'
 import {
   IconPlus, IconSave, IconCheckCircle, IconXCircle, IconClock,
   IconFileText, IconUpload, IconTrash2, IconEdit, IconFolderOpen, IconImage, IconFileSpreadsheet,
@@ -291,7 +291,7 @@ const InterventionForm: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-          <ArrowLeft className="h-5 w-5" />
+          <IconArrowLeft className="h-5 w-5" />
         </button>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('interventions.newIntervention')}</h1>
       </div>
@@ -376,7 +376,7 @@ const InterventionForm: React.FC = () => {
             {t('common.cancel')}
           </button>
           <button type="submit" disabled={loading} className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
-            {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            {loading ? <IconLoader className="h-4 w-4 mr-2 animate-spin" /> : <IconSave className="h-4 w-4 mr-2" />}
             {t('common.create')}
           </button>
         </div>
@@ -443,7 +443,7 @@ const TimeLogEditModal: React.FC<{
             {t('common.cancel')}
           </button>
           <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.save')}
+            {saving ? <IconLoader className="h-4 w-4 animate-spin" /> : t('common.save')}
           </button>
         </div>
       </div>
@@ -580,7 +580,7 @@ const FileUploadModal: React.FC<{
           >
             {uploading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <IconLoader className="h-4 w-4 mr-2 animate-spin" />
                 {progress}%
               </>
             ) : (
@@ -745,7 +745,7 @@ const InterventionDetail: React.FC = () => {
   }
 
   if (loading) {
-    return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
+    return <div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>
   }
 
   if (!intervention) {
@@ -759,7 +759,7 @@ const InterventionDetail: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex items-start gap-4">
           <button onClick={() => navigate('/interventions')} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-            <ArrowLeft className="h-5 w-5" />
+            <IconArrowLeft className="h-5 w-5" />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('interventions.title')} #{intervention.id}</h1>
@@ -979,7 +979,7 @@ const InterventionDetail: React.FC = () => {
                           className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg"
                           title={t('common.download')}
                         >
-                          <Download className="h-4 w-4" />
+                          <IconDownload className="h-4 w-4" />
                         </a>
                         {intervention.status === 'em_curso' && (
                           <button
@@ -1179,7 +1179,7 @@ const InterventionDetail: React.FC = () => {
             <div className="mt-6 flex justify-end gap-3">
               <button onClick={() => setShowCompleteDialog(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400">{t('common.cancel')}</button>
               <button onClick={handleComplete} disabled={actionLoading} className="px-4 py-2 bg-green-600 text-white rounded-lg">
-                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('interventions.complete')}
+                {actionLoading ? <IconLoader className="h-4 w-4 animate-spin" /> : t('interventions.complete')}
               </button>
             </div>
           </div>

@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Globe, ChevronDown } from 'lucide-react'
+import { IconGlobe, IconChevronDown } from '@/components/icons'
 import { useTranslation } from 'react-i18next'
 import { SUPPORTED_LANGUAGES, type LanguageCode } from '@/i18n'
 
@@ -48,7 +48,7 @@ export function LanguageSelector({ variant = 'icon', className = '' }: LanguageS
       >
         {variant === 'icon' && (
           <>
-            <Globe className="w-5 h-5" />
+            <IconGlobe className="w-5 h-5" />
             <span className="text-lg">{currentLang.flag}</span>
           </>
         )}
@@ -56,7 +56,7 @@ export function LanguageSelector({ variant = 'icon', className = '' }: LanguageS
           <>
             <span className="text-lg">{currentLang.flag}</span>
             <span className="text-sm font-medium">{currentLang.name}</span>
-            <ChevronDown className="w-4 h-4" />
+            <IconChevronDown className="w-4 h-4" />
           </>
         )}
         {variant === 'compact' && (

@@ -9,25 +9,26 @@ import { useTranslation } from 'react-i18next'
 import { useApi } from '@/hooks/useApi'
 import { FormField, ConfirmDialog, FileUpload } from '@/components/ui'
 import {
-  Download,
-  Upload,
-  FileSpreadsheet,
-  FileJson,
-  Database,
-  Package,
-  Users,
-  Wrench,
-  AlertCircle,
-  CheckCircle,
-  ArrowLeft,
-  Eye,
-  FileCheck,
-  X,
-  ChevronDown,
-  ChevronUp,
-  Settings2,
-  Layers
-} from 'lucide-react'
+  IconDownload,
+  IconUpload,
+  IconFileSpreadsheet,
+  IconFileJson,
+  IconDatabase,
+  IconPackage,
+  IconUsers,
+  IconWrench,
+  IconAlertCircle,
+  IconCheckCircle,
+  IconArrowLeft,
+  IconEye,
+  IconFileCheck,
+  IconX,
+  IconChevronDown,
+  IconChevronUp,
+  IconSettings,
+  IconLayers,
+  IconGradientDefs
+} from '@/components/icons'
 
 // Types
 interface ExportField {
@@ -97,28 +98,28 @@ function DataHome() {
     {
       title: t('data.exportData'),
       description: t('data.exportDataDesc'),
-      icon: Download,
+      icon: IconDownload,
       color: 'blue',
       path: '/data/export'
     },
     {
       title: t('data.importData'),
       description: t('data.importDataDesc'),
-      icon: Upload,
+      icon: IconUpload,
       color: 'green',
       path: '/data/import'
     },
     {
       title: t('data.catalogData'),
       description: t('data.catalogDataDesc'),
-      icon: Layers,
+      icon: IconLayers,
       color: 'purple',
       path: '/data/catalog'
     },
     {
       title: t('data.backups'),
       description: t('data.backupsDesc'),
-      icon: Database,
+      icon: IconDatabase,
       color: 'yellow',
       path: '/data/backup'
     }
@@ -138,7 +139,7 @@ function DataHome() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <IconPackage className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('navigation.assets')}</p>
@@ -149,7 +150,7 @@ function DataHome() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                <Wrench className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <IconWrench className="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('navigation.interventions')}</p>
@@ -160,7 +161,7 @@ function DataHome() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <IconUsers className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('navigation.technicians')}</p>
@@ -171,7 +172,7 @@ function DataHome() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
-                <Users className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                <IconUsers className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('navigation.users')}</p>
@@ -395,7 +396,7 @@ function ExportPage() {
           onClick={() => navigate('/data')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <IconArrowLeft className="w-5 h-5" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('data.exportData')}</h1>
@@ -417,7 +418,7 @@ function ExportPage() {
             }`}
           >
             <div className="flex items-center gap-3">
-              <FileSpreadsheet className="w-8 h-8 text-green-600" />
+              <IconFileSpreadsheet className="w-8 h-8 text-green-600" />
               <div>
                 <p className="font-semibold">{t('data.excelFormat')}</p>
                 <p className="text-sm text-gray-500">{t('data.export4Sheets')}</p>
@@ -434,7 +435,7 @@ function ExportPage() {
             }`}
           >
             <div className="flex items-center gap-3">
-              <FileJson className="w-8 h-8 text-yellow-600" />
+              <IconFileJson className="w-8 h-8 text-yellow-600" />
               <div>
                 <p className="font-semibold">{t('data.jsonFormat')}</p>
                 <p className="text-sm text-gray-500">{t('data.exportAllData')}</p>
@@ -449,7 +450,7 @@ function ExportPage() {
             {/* Sheet Options */}
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <h3 className="font-medium mb-3 flex items-center gap-2">
-                <Layers className="w-4 h-4" />
+                <IconLayers className="w-4 h-4" />
                 {t('data.includedSheets')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -487,7 +488,7 @@ function ExportPage() {
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-medium flex items-center gap-2">
-                  <Settings2 className="w-4 h-4" />
+                  <IconSettings className="w-4 h-4" />
                   {t('data.fieldsToExport')}
                 </h3>
                 <div className="flex gap-2">
@@ -535,9 +536,9 @@ function ExportPage() {
                           </span>
                         </div>
                         {expandedCategories[category] ? (
-                          <ChevronUp className="w-4 h-4" />
+                          <IconChevronUp className="w-4 h-4" />
                         ) : (
-                          <ChevronDown className="w-4 h-4" />
+                          <IconChevronDown className="w-4 h-4" />
                         )}
                       </button>
                       {expandedCategories[category] && (
@@ -606,7 +607,7 @@ function ExportPage() {
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            <Download className="w-4 h-4" />
+            <IconDownload className="w-4 h-4" />
             {loading ? t('data.exporting') : t('common.export')}
           </button>
 
@@ -615,7 +616,7 @@ function ExportPage() {
               onClick={handleDownloadTemplate}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
             >
-              <FileSpreadsheet className="w-4 h-4" />
+              <IconFileSpreadsheet className="w-4 h-4" />
               {t('data.downloadTemplate')}
             </button>
           )}
@@ -738,7 +739,7 @@ function ImportPage() {
           onClick={() => navigate('/data')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <IconArrowLeft className="w-5 h-5" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('data.importData')}</h1>
@@ -760,7 +761,7 @@ function ImportPage() {
             }`}
           >
             <div className="flex items-center gap-3">
-              <FileSpreadsheet className="w-8 h-8 text-green-600" />
+              <IconFileSpreadsheet className="w-8 h-8 text-green-600" />
               <div>
                 <p className="font-semibold">{t('data.excelFormat')}</p>
                 <p className="text-sm text-gray-500">{t('data.importAssetsExcel')}</p>
@@ -777,7 +778,7 @@ function ImportPage() {
             }`}
           >
             <div className="flex items-center gap-3">
-              <FileJson className="w-8 h-8 text-yellow-600" />
+              <IconFileJson className="w-8 h-8 text-yellow-600" />
               <div>
                 <p className="font-semibold">{t('data.jsonFormat')}</p>
                 <p className="text-sm text-gray-500">{t('data.importBackupJson')}</p>
@@ -838,14 +839,14 @@ function ImportPage() {
             <div className="p-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
               <div className="flex items-center justify-between">
                 <h3 className="font-medium flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
+                  <IconEye className="w-4 h-4" />
                   {t('data.preview')}
                 </h3>
                 <button
                   onClick={() => setPreview(null)}
                   className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
                 >
-                  <X className="w-4 h-4" />
+                  <IconX className="w-4 h-4" />
                 </button>
               </div>
 
@@ -901,10 +902,10 @@ function ImportPage() {
                       </td>
                       <td className="p-2">
                         {row.is_valid ? (
-                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <IconCheckCircle className="w-4 h-4 text-green-500" />
                         ) : (
                           <div className="flex items-center gap-1">
-                            <AlertCircle className="w-4 h-4 text-red-500" />
+                            <IconAlertCircle className="w-4 h-4 text-red-500" />
                             <span className="text-xs text-red-600">{row.errors.join(', ')}</span>
                           </div>
                         )}
@@ -934,7 +935,7 @@ function ImportPage() {
               disabled={previewing || !selectedFile}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 disabled:opacity-50"
             >
-              <Eye className="w-4 h-4" />
+              <IconEye className="w-4 h-4" />
               {previewing ? t('data.loading') : t('data.preview')}
             </button>
           )}
@@ -944,7 +945,7 @@ function ImportPage() {
             disabled={loading || !selectedFile}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            <Upload className="w-4 h-4" />
+            <IconUpload className="w-4 h-4" />
             {loading ? t('data.importing') : t('common.import')}
           </button>
         </div>
@@ -954,13 +955,13 @@ function ImportPage() {
           <div className={`mt-6 p-4 rounded-lg ${result.error ? 'bg-red-50 dark:bg-red-900/20' : 'bg-green-50 dark:bg-green-900/20'}`}>
             {result.error ? (
               <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
-                <AlertCircle className="w-5 h-5" />
+                <IconAlertCircle className="w-5 h-5" />
                 <span>{result.error}</span>
               </div>
             ) : (
               <div>
                 <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-2">
-                  <CheckCircle className="w-5 h-5" />
+                  <IconCheckCircle className="w-5 h-5" />
                   <span className="font-medium">{result.message}</span>
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-sm">
@@ -1109,7 +1110,7 @@ function CatalogDataPage() {
           onClick={() => navigate('/data')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <IconArrowLeft className="w-5 h-5" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('data.catalogData')}</h1>
@@ -1120,7 +1121,7 @@ function CatalogDataPage() {
       {/* Export Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Download className="w-5 h-5" />
+          <IconDownload className="w-5 h-5" />
           {t('data.exportCatalog')}
         </h2>
         <p className="text-sm text-gray-500 mb-4">{t('data.exportCatalogDesc')}</p>
@@ -1131,7 +1132,7 @@ function CatalogDataPage() {
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            <FileSpreadsheet className="w-4 h-4" />
+            <IconFileSpreadsheet className="w-4 h-4" />
             {loading ? t('data.exporting') : t('data.exportCatalog')}
           </button>
 
@@ -1139,7 +1140,7 @@ function CatalogDataPage() {
             onClick={handleDownloadTemplate}
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
           >
-            <FileCheck className="w-4 h-4" />
+            <IconFileCheck className="w-4 h-4" />
             {t('data.downloadTemplate')}
           </button>
         </div>
@@ -1148,7 +1149,7 @@ function CatalogDataPage() {
       {/* Import Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Upload className="w-5 h-5" />
+          <IconUpload className="w-5 h-5" />
           {t('data.importCatalog')}
         </h2>
 
@@ -1180,7 +1181,7 @@ function CatalogDataPage() {
             disabled={loading || uploadedFiles.length === 0}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
-            <Upload className="w-4 h-4" />
+            <IconUpload className="w-4 h-4" />
             {loading ? t('data.importing') : t('data.importCatalog')}
           </button>
         </div>
@@ -1190,13 +1191,13 @@ function CatalogDataPage() {
           <div className={`mt-6 p-4 rounded-lg ${result.error ? 'bg-red-50 dark:bg-red-900/20' : 'bg-green-50 dark:bg-green-900/20'}`}>
             {result.error ? (
               <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
-                <AlertCircle className="w-5 h-5" />
+                <IconAlertCircle className="w-5 h-5" />
                 <span>{result.error}</span>
               </div>
             ) : (
               <div>
                 <div className="flex items-center gap-2 text-green-700 dark:text-green-400 mb-3">
-                  <CheckCircle className="w-5 h-5" />
+                  <IconCheckCircle className="w-5 h-5" />
                   <span className="font-medium">{result.message}</span>
                 </div>
 
@@ -1394,7 +1395,7 @@ function BackupPage() {
             onClick={() => navigate('/data')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <IconArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('data.backups')}</h1>
@@ -1446,7 +1447,7 @@ function BackupPage() {
               disabled={creating}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              <Database className="w-4 h-4" />
+              <IconDatabase className="w-4 h-4" />
               {creating ? t('data.creating') : t('data.createBackup')}
             </button>
           </div>
@@ -1465,7 +1466,7 @@ function BackupPage() {
                 {backups.map((backup) => (
                   <div key={backup.filename} className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Database className="w-5 h-5 text-gray-400" />
+                      <IconDatabase className="w-5 h-5 text-gray-400" />
                       <div>
                         <p className="font-medium">{backup.filename}</p>
                         <p className="text-sm text-gray-500">
@@ -1479,14 +1480,14 @@ function BackupPage() {
                         className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
                         title={t('common.download')}
                       >
-                        <Download className="w-4 h-4" />
+                        <IconDownload className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setRestoreDialog({ open: true, backup })}
                         className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 rounded"
                         title={t('data.restore')}
                       >
-                        <Upload className="w-4 h-4" />
+                        <IconUpload className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setDeleteDialog({ open: true, backup })}
@@ -1516,7 +1517,7 @@ function BackupPage() {
                 </span>
               ) : (
                 <span className="flex items-center gap-1 text-gray-500">
-                  <X className="w-4 h-4" />
+                  <IconX className="w-4 h-4" />
                   {t('backup.schedulerDisabled') || 'Agendamento inativo'}
                 </span>
               )}
@@ -1531,7 +1532,7 @@ function BackupPage() {
               disabled={creating}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
             >
-              <Database className="w-4 h-4" />
+              <IconDatabase className="w-4 h-4" />
               {t('backup.runNow') || 'Executar Agora'}
             </button>
           </div>
@@ -1546,7 +1547,7 @@ function BackupPage() {
                 {autoBackups.map((backup) => (
                   <div key={backup.filename} className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Database className="w-5 h-5 text-green-500" />
+                      <IconDatabase className="w-5 h-5 text-green-500" />
                       <div>
                         <p className="font-medium">{backup.filename}</p>
                         <p className="text-sm text-gray-500">
@@ -1565,14 +1566,14 @@ function BackupPage() {
                         className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
                         title={t('common.download')}
                       >
-                        <Download className="w-4 h-4" />
+                        <IconDownload className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setRestoreDialog({ open: true, backup })}
                         className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 rounded"
                         title={t('data.restore')}
                       >
-                        <Upload className="w-4 h-4" />
+                        <IconUpload className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setDeleteDialog({ open: true, backup })}

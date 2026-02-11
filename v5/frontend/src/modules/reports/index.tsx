@@ -9,15 +9,9 @@ import { useApi } from '@/hooks/useApi'
 import { useLanguage } from '@/hooks/useLanguage'
 import { FormField, StatusBadge } from '@/components/ui'
 import {
-  PieChart as PieIcon,
-  TrendingUp,
-  Package,
-  Wrench,
-  Users,
-  Clock,
-  RefreshCw,
-  Download
-} from 'lucide-react'
+  IconPieChart, IconTrendingUp, IconPackage, IconWrench, IconUsers, IconClock,
+  IconRefreshCw, IconDownload
+} from '@/components/icons'
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, LineChart, Line, CartesianGrid, Legend
@@ -120,10 +114,10 @@ export default function ReportsModule() {
   }, [activeTab, loadInterventionReport])
 
   const tabs = [
-    { id: 'overview', label: t('reports.overview'), icon: PieIcon },
-    { id: 'interventions', label: t('navigation.interventions'), icon: Wrench },
-    { id: 'assets', label: t('navigation.assets'), icon: Package },
-    { id: 'technicians', label: t('navigation.technicians'), icon: Users }
+    { id: 'overview', label: t('reports.overview'), icon: IconPieChart },
+    { id: 'interventions', label: t('navigation.interventions'), icon: IconWrench },
+    { id: 'assets', label: t('navigation.assets'), icon: IconPackage },
+    { id: 'technicians', label: t('navigation.technicians'), icon: IconUsers }
   ]
 
   const CustomTooltip = ({ active, payload }: any) => {
@@ -169,7 +163,7 @@ export default function ReportsModule() {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-                <Package className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <IconPackage className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('reports.totalAssets')}</p>
@@ -181,7 +175,7 @@ export default function ReportsModule() {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
-                <Wrench className="w-6 h-6 text-green-600 dark:text-green-400" />
+                <IconWrench className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('reports.totalInterventions')}</p>
@@ -193,7 +187,7 @@ export default function ReportsModule() {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-                <Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <IconUsers className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('reports.activeTechnicians')}</p>
@@ -205,7 +199,7 @@ export default function ReportsModule() {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-xl">
-                <TrendingUp className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                <IconTrendingUp className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('reports.last30Days')}</p>
@@ -385,7 +379,7 @@ export default function ReportsModule() {
               onClick={loadInterventionReport}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              <RefreshCw className="w-4 h-4" />
+              <IconRefreshCw className="w-4 h-4" />
               {t('common.refresh')}
             </button>
           </div>
@@ -413,7 +407,7 @@ export default function ReportsModule() {
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
+                  <IconClock className="w-4 h-4 text-gray-400" />
                   <p className="text-sm text-gray-500 dark:text-gray-400">{t('reports.averageDuration')}</p>
                 </div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{interventionReport.stats.avg_duration}h</p>
@@ -537,7 +531,7 @@ export default function ReportsModule() {
             <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-blue-500 rounded-xl">
-                  <Package className="w-6 h-6 text-white" />
+                  <IconPackage className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.recent_assets}</p>
@@ -550,7 +544,7 @@ export default function ReportsModule() {
             <div className="p-6 bg-green-50 dark:bg-green-900/20 rounded-xl">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-green-500 rounded-xl">
-                  <Wrench className="w-6 h-6 text-white" />
+                  <IconWrench className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.recent_interventions}</p>
@@ -642,7 +636,7 @@ export default function ReportsModule() {
           onClick={loadStats}
           className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
-          <RefreshCw className="w-4 h-4" />
+          <IconRefreshCw className="w-4 h-4" />
           {t('common.refresh')}
         </button>
       </div>

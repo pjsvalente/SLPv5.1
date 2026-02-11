@@ -8,47 +8,48 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useApi } from '@/hooks/useApi'
 import {
-  ArrowLeft,
-  Save,
-  Check,
-  X,
-  Package,
-  Users,
-  Wrench,
-  BookOpen,
-  HardHat,
-  FileText,
-  BarChart3,
-  Settings,
-  Database,
-  LayoutDashboard,
-  Crown,
-  Shield,
-  Zap,
-  Building2
-} from 'lucide-react'
+  IconArrowLeft,
+  IconSave,
+  IconCheck,
+  IconX,
+  IconPackage,
+  IconUsers,
+  IconWrench,
+  IconBookOpen,
+  IconHardHat,
+  IconFileText,
+  IconBarChart3,
+  IconSettings,
+  IconDatabase,
+  IconLayoutDashboard,
+  IconCrown,
+  IconShield,
+  IconZap,
+  IconBuilding,
+  IconGradientDefs
+} from '@/components/icons'
 
 // Icon mapping
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  LayoutDashboard,
-  Package,
-  Users,
-  Wrench,
-  BookOpen,
-  HardHat,
-  FileText,
-  BarChart3,
-  Settings,
-  Database,
-  Building2
+  LayoutDashboard: IconLayoutDashboard,
+  Package: IconPackage,
+  Users: IconUsers,
+  Wrench: IconWrench,
+  BookOpen: IconBookOpen,
+  HardHat: IconHardHat,
+  FileText: IconFileText,
+  BarChart3: IconBarChart3,
+  Settings: IconSettings,
+  Database: IconDatabase,
+  Building2: IconBuilding
 }
 
 // Plan icons
 const planIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  base: Shield,
-  pro: Zap,
-  premium: Crown,
-  enterprise: Building2
+  base: IconShield,
+  pro: IconZap,
+  premium: IconCrown,
+  enterprise: IconBuilding
 }
 
 // Plan colors
@@ -224,7 +225,7 @@ export default function PlansConfigModule() {
             onClick={() => navigate('/tenants')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <IconArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -241,7 +242,7 @@ export default function PlansConfigModule() {
             disabled={saving}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
+            <IconSave className="w-4 h-4" />
             {saving ? t('common.saving') : t('plans.saveChanges')}
           </button>
         )}
@@ -297,7 +298,7 @@ export default function PlansConfigModule() {
                                 : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                             }`}
                           >
-                            {isEnabled ? <Check className="w-5 h-5" /> : <X className="w-5 h-5" />}
+                            {isEnabled ? <IconCheck className="w-5 h-5" /> : <IconX className="w-5 h-5" />}
                           </button>
                         </td>
                       )
@@ -394,9 +395,9 @@ export default function PlansConfigModule() {
                     return (
                       <td key={plan.id} className="px-4 py-2 text-center">
                         {hasFeature ? (
-                          <Check className="w-4 h-4 text-green-500 mx-auto" />
+                          <IconCheck className="w-4 h-4 text-green-500 mx-auto" />
                         ) : (
-                          <X className="w-4 h-4 text-gray-300 mx-auto" />
+                          <IconX className="w-4 h-4 text-gray-300 mx-auto" />
                         )}
                       </td>
                     )

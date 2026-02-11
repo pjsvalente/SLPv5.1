@@ -566,6 +566,7 @@ export const IconLoader2: React.FC<IconProps> = ({ size = 24, className, gradien
     </svg>
   )
 }
+export const IconLoader = IconLoader2
 
 export const IconMoreHorizontal: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
   const fill = getFill(gradient, color)
@@ -1312,6 +1313,144 @@ export const IconStatusPending: React.FC<IconProps> = ({ size = 24, className })
     <path d="M24 12V24L32 28" stroke="#FFB300" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
+
+// Missing icons - Add aliases and new icons
+export const IconLayout: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <rect x="6" y="6" width="36" height="36" rx="4" stroke={stroke} strokeWidth="2"/>
+      <line x1="6" y1="18" x2="42" y2="18" stroke={stroke} strokeWidth="2"/>
+      <line x1="18" y1="18" x2="18" y2="42" stroke={stroke} strokeWidth="2"/>
+    </svg>
+  )
+}
+
+export const IconTag: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <path d="M8 26.34L21.66 40C22.91 41.25 24.91 41.25 26.16 40L40 26.16C41.25 24.91 41.25 22.91 40 21.66L26.34 8C25.72 7.38 24.88 7 24 7H12C9.24 7 7 9.24 7 12V24C7 24.88 7.38 25.72 8 26.34Z" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <circle cx="14" cy="14" r="3" fill={stroke}/>
+    </svg>
+  )
+}
+
+export const IconFileJson: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <path d="M12 6C10.34 6 9 7.34 9 9V39C9 40.66 10.34 42 12 42H36C37.66 42 39 40.66 39 39V15L27 6H12Z" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M27 6V15H39" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <text x="24" y="32" textAnchor="middle" fill={stroke} fontSize="10" fontFamily="monospace">{ }</text>
+    </svg>
+  )
+}
+
+export const IconFileCheck: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <path d="M12 6C10.34 6 9 7.34 9 9V39C9 40.66 10.34 42 12 42H36C37.66 42 39 40.66 39 39V15L27 6H12Z" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M27 6V15H39" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M18 28L22 32L30 24" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+export const IconPieChart: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <path d="M42 24C42 34 34 42 24 42C14 42 6 34 6 24C6 14 14 6 24 6V24H42Z" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M32 8C36.42 10.34 39.66 14.58 40 20H28V8C29.38 7.62 30.74 7.62 32 8Z" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+export const IconFlashlight: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <path d="M20 6H28L32 18V42H16V18L20 6Z" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <line x1="16" y1="18" x2="32" y2="18" stroke={stroke} strokeWidth="2"/>
+      <circle cx="24" cy="30" r="4" stroke={stroke} strokeWidth="2"/>
+    </svg>
+  )
+}
+
+export const IconPanelLeft: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <rect x="6" y="6" width="36" height="36" rx="4" stroke={stroke} strokeWidth="2"/>
+      <line x1="18" y1="6" x2="18" y2="42" stroke={stroke} strokeWidth="2"/>
+    </svg>
+  )
+}
+
+export const IconRadio: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <circle cx="24" cy="24" r="4" stroke={stroke} strokeWidth="2"/>
+      <path d="M16 16C19.5 12.5 28.5 12.5 32 16" stroke={stroke} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M12 12C18 6 30 6 36 12" stroke={stroke} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M16 32C19.5 35.5 28.5 35.5 32 32" stroke={stroke} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M12 36C18 42 30 42 36 36" stroke={stroke} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+export const IconCalculator: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <rect x="8" y="4" width="32" height="40" rx="4" stroke={stroke} strokeWidth="2"/>
+      <rect x="12" y="8" width="24" height="10" rx="2" stroke={stroke} strokeWidth="2"/>
+      <circle cx="16" cy="26" r="2" fill={stroke}/>
+      <circle cx="24" cy="26" r="2" fill={stroke}/>
+      <circle cx="32" cy="26" r="2" fill={stroke}/>
+      <circle cx="16" cy="34" r="2" fill={stroke}/>
+      <circle cx="24" cy="34" r="2" fill={stroke}/>
+      <circle cx="32" cy="34" r="2" fill={stroke}/>
+    </svg>
+  )
+}
+
+export const IconArrowRight: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <path d="M10 24H38" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M26 12L38 24L26 36" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+export const IconToggleLeft: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <rect x="6" y="14" width="36" height="20" rx="10" stroke={stroke} strokeWidth="2"/>
+      <circle cx="16" cy="24" r="6" fill={stroke}/>
+    </svg>
+  )
+}
+
+export const IconToggleRight: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const stroke = getStroke(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <rect x="6" y="14" width="36" height="20" rx="10" stroke={stroke} strokeWidth="2"/>
+      <circle cx="32" cy="24" r="6" fill={stroke}/>
+    </svg>
+  )
+}
+
+// Aliases for naming consistency
+export const IconLayoutDashboard = IconDashboard
+export const IconFileJson2 = IconFileJson
 
 // ============================================================================
 // ICON MAP - Easy access by name

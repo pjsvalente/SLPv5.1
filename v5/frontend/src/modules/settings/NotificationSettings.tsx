@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
 import { LoadingSpinner } from '@/core/common/LoadingSpinner'
-import { Bell, Mail, Send, Check, AlertTriangle, Clock, Calendar } from 'lucide-react'
+import { IconBell, IconMail, IconSend, IconCheck, IconAlertTriangle, IconClock, IconCalendar } from '@/components/icons'
 
 interface NotificationSettingsData {
   email_maintenance_alerts: string
@@ -96,7 +96,7 @@ const NotificationSettings: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Bell className="h-6 w-6 text-blue-600" />
+        <IconBell className="h-6 w-6 text-blue-600" />
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             {t('notifications.title')}
@@ -115,9 +115,9 @@ const NotificationSettings: React.FC = () => {
             : 'bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-300'
         }`}>
           {message.type === 'success' ? (
-            <Check className="h-5 w-5" />
+            <IconCheck className="h-5 w-5" />
           ) : (
-            <AlertTriangle className="h-5 w-5" />
+            <IconAlertTriangle className="h-5 w-5" />
           )}
           {message.text}
         </div>
@@ -129,7 +129,7 @@ const NotificationSettings: React.FC = () => {
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <Clock className="h-5 w-5 text-orange-600" />
+              <IconClock className="h-5 w-5 text-orange-600" />
             </div>
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">
@@ -160,7 +160,7 @@ const NotificationSettings: React.FC = () => {
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Mail className="h-5 w-5 text-blue-600" />
+              <IconMail className="h-5 w-5 text-blue-600" />
             </div>
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">
@@ -191,7 +191,7 @@ const NotificationSettings: React.FC = () => {
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <Calendar className="h-5 w-5 text-purple-600" />
+              <IconCalendar className="h-5 w-5 text-purple-600" />
             </div>
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-100">
@@ -282,7 +282,7 @@ const NotificationSettings: React.FC = () => {
             {testing ? (
               <LoadingSpinner size="sm" />
             ) : (
-              <Send className="h-4 w-4" />
+              <IconSend className="h-4 w-4" />
             )}
             {t('notifications.sendTest')}
           </button>
@@ -299,7 +299,7 @@ const NotificationSettings: React.FC = () => {
           {saving ? (
             <LoadingSpinner size="sm" />
           ) : (
-            <Check className="h-4 w-4" />
+            <IconCheck className="h-4 w-4" />
           )}
           {t('common.save')}
         </button>

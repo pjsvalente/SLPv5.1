@@ -11,27 +11,11 @@ import { useTranslation } from 'react-i18next'
 import { useApi } from '@/hooks/useApi'
 import { StatusBadge } from '@/components/ui'
 import {
-  ChevronRight,
-  ChevronLeft,
-  Check,
-  X,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Zap,
-  Columns,
-  Lightbulb,
-  Box,
-  Radio,
-  Car,
-  Monitor,
-  PanelLeft,
-  Antenna,
-  Package,
-  RefreshCw,
-  Calculator,
-  ArrowRight
-} from 'lucide-react'
+  IconChevronRight, IconChevronLeft, IconCheck, IconX, IconAlertTriangle,
+  IconCheckCircle, IconXCircle, IconZap, IconColumns, IconLightbulb, IconBox,
+  IconRadio, IconCar, IconMonitor, IconPanelLeft, IconAntenna, IconPackage,
+  IconRefreshCw, IconCalculator, IconArrowRight
+} from '@/components/icons'
 
 // =========================================================================
 // TYPES

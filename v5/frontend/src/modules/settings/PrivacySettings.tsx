@@ -9,9 +9,9 @@ import { api } from '@/services/api'
 import { LoadingSpinner } from '@/core/common/LoadingSpinner'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import {
-  Shield, Download, Trash2, Check, AlertTriangle, Clock,
-  FileText, ToggleLeft, ToggleRight, XCircle
-} from 'lucide-react'
+  IconShield, IconDownload, IconTrash, IconCheck, IconAlertTriangle, IconClock,
+  IconFileText, IconToggleLeft, IconToggleRight, IconX
+} from '@/components/icons'
 
 interface DeletionStatus {
   has_pending_request: boolean
@@ -161,7 +161,7 @@ const PrivacySettings: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Shield className="h-6 w-6 text-blue-600" />
+        <IconShield className="h-6 w-6 text-blue-600" />
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             {t('privacy.title')}
@@ -180,9 +180,9 @@ const PrivacySettings: React.FC = () => {
             : 'bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-300'
         }`}>
           {message.type === 'success' ? (
-            <Check className="h-5 w-5" />
+            <IconCheck className="h-5 w-5" />
           ) : (
-            <AlertTriangle className="h-5 w-5" />
+            <IconAlertTriangle className="h-5 w-5" />
           )}
           {message.text}
         </div>
@@ -192,7 +192,7 @@ const PrivacySettings: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-start gap-4">
           <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-            <Download className="h-6 w-6 text-blue-600" />
+            <IconDownload className="h-6 w-6 text-blue-600" />
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100">
@@ -212,7 +212,7 @@ const PrivacySettings: React.FC = () => {
               {exporting ? (
                 <LoadingSpinner size="sm" />
               ) : (
-                <FileText className="h-4 w-4" />
+                <IconFileText className="h-4 w-4" />
               )}
               {t('privacy.downloadMyData')}
             </button>
@@ -223,7 +223,7 @@ const PrivacySettings: React.FC = () => {
       {/* Consent Management - RGPD Art. 7 */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <ToggleRight className="h-5 w-5 text-green-600" />
+          <IconToggleRight className="h-5 w-5 text-green-600" />
           <h3 className="font-semibold text-gray-900 dark:text-gray-100">
             {t('privacy.consentTitle')}
           </h3>
@@ -270,7 +270,7 @@ const PrivacySettings: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-red-200 dark:border-red-900/50 p-6">
         <div className="flex items-start gap-4">
           <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
-            <Trash2 className="h-6 w-6 text-red-600" />
+            <IconTrash className="h-6 w-6 text-red-600" />
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100">
@@ -286,7 +286,7 @@ const PrivacySettings: React.FC = () => {
             {deletionStatus?.has_pending_request ? (
               <div className="mt-4 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                 <div className="flex items-center gap-2 text-orange-800 dark:text-orange-300">
-                  <Clock className="h-5 w-5" />
+                  <IconClock className="h-5 w-5" />
                   <span className="font-medium">{t('privacy.pendingDeletion')}</span>
                 </div>
                 <p className="text-sm text-orange-700 dark:text-orange-400 mt-2">
@@ -296,7 +296,7 @@ const PrivacySettings: React.FC = () => {
                   onClick={handleCancelDeletion}
                   className="mt-3 px-4 py-2 bg-white dark:bg-gray-700 text-orange-600 border border-orange-300 rounded-lg hover:bg-orange-50 flex items-center gap-2"
                 >
-                  <XCircle className="h-4 w-4" />
+                  <IconX className="h-4 w-4" />
                   {t('privacy.cancelDeletion')}
                 </button>
               </div>
@@ -305,7 +305,7 @@ const PrivacySettings: React.FC = () => {
                 onClick={() => setShowDeleteDialog(true)}
                 className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
               >
-                <Trash2 className="h-4 w-4" />
+                <IconTrash className="h-4 w-4" />
                 {t('privacy.requestDeletion')}
               </button>
             )}
@@ -319,7 +319,7 @@ const PrivacySettings: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
+                <IconAlertTriangle className="h-6 w-6 text-red-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {t('privacy.confirmDeletion')}
@@ -374,7 +374,7 @@ const PrivacySettings: React.FC = () => {
                 disabled={deleting || !deletePassword}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {deleting ? <LoadingSpinner size="sm" /> : <Trash2 className="h-4 w-4" />}
+                {deleting ? <LoadingSpinner size="sm" /> : <IconTrash className="h-4 w-4" />}
                 {t('privacy.confirmDelete')}
               </button>
             </div>

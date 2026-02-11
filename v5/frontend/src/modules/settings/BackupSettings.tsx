@@ -8,17 +8,17 @@ import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import {
-  Download,
-  Upload,
-  Trash2,
-  Plus,
-  Loader2,
-  HardDrive,
-  Clock,
-  User,
-  AlertCircle,
-  CheckCircle
-} from 'lucide-react'
+  IconDownload,
+  IconUpload,
+  IconTrash,
+  IconPlus,
+  IconLoader,
+  IconHardDrive,
+  IconClock,
+  IconUser,
+  IconAlertTriangle,
+  IconCheck
+} from '@/components/icons'
 
 interface Backup {
   filename: string
@@ -145,7 +145,7 @@ export const BackupSettings: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <IconLoader className="h-8 w-8 animate-spin text-gray-400" />
       </div>
     )
   }
@@ -168,9 +168,9 @@ export const BackupSettings: React.FC = () => {
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
           {creating ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            <IconLoader className="h-4 w-4 mr-2 animate-spin" />
           ) : (
-            <Plus className="h-4 w-4 mr-2" />
+            <IconPlus className="h-4 w-4 mr-2" />
           )}
           {t('backup.create')}
         </button>
@@ -184,9 +184,9 @@ export const BackupSettings: React.FC = () => {
             : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
         }`}>
           {message.type === 'error' ? (
-            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+            <IconAlertTriangle className="h-5 w-5 flex-shrink-0" />
           ) : (
-            <CheckCircle className="h-5 w-5 flex-shrink-0" />
+            <IconCheck className="h-5 w-5 flex-shrink-0" />
           )}
           {message.text}
         </div>
@@ -195,7 +195,7 @@ export const BackupSettings: React.FC = () => {
       {/* Backups List */}
       {backups.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-          <HardDrive className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <IconHardDrive className="h-12 w-12 mx-auto text-gray-400 mb-4" />
           <p className="text-gray-500 dark:text-gray-400">{t('backup.noBackups')}</p>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
             {t('backup.createFirst')}
@@ -210,18 +210,18 @@ export const BackupSettings: React.FC = () => {
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <HardDrive className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                  <IconHardDrive className="h-5 w-5 text-gray-400 flex-shrink-0" />
                   <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
                     {backup.filename}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-gray-500 dark:text-gray-400">
                   <span className="flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" />
+                    <IconClock className="h-3.5 w-3.5" />
                     {formatDate(backup.created_at)}
                   </span>
                   <span className="flex items-center gap-1">
-                    <User className="h-3.5 w-3.5" />
+                    <IconUser className="h-3.5 w-3.5" />
                     {backup.created_by}
                   </span>
                   <span>{formatFileSize(backup.size)}</span>
@@ -239,7 +239,7 @@ export const BackupSettings: React.FC = () => {
                   className="p-2 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors"
                   title={t('backup.download')}
                 >
-                  <Download className="h-5 w-5" />
+                  <IconDownload className="h-5 w-5" />
                 </button>
                 <button
                   onClick={() => setConfirmRestore(backup.filename)}
@@ -248,9 +248,9 @@ export const BackupSettings: React.FC = () => {
                   title={t('backup.restore')}
                 >
                   {restoring === backup.filename ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <IconLoader className="h-5 w-5 animate-spin" />
                   ) : (
-                    <Upload className="h-5 w-5" />
+                    <IconUpload className="h-5 w-5" />
                   )}
                 </button>
                 <button
@@ -260,9 +260,9 @@ export const BackupSettings: React.FC = () => {
                   title={t('backup.delete')}
                 >
                   {deleting === backup.filename ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <IconLoader className="h-5 w-5 animate-spin" />
                   ) : (
-                    <Trash2 className="h-5 w-5" />
+                    <IconTrash className="h-5 w-5" />
                   )}
                 </button>
               </div>

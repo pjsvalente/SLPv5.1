@@ -19,36 +19,37 @@ import { useTranslation } from 'react-i18next'
 import { useApi } from '@/hooks/useApi'
 import { FormField, ConfirmDialog, StatusBadge } from '@/components/ui'
 import {
-  Plus,
-  Edit,
-  Trash2,
-  Save,
-  X,
-  Download,
-  Upload,
-  RefreshCw,
-  FileSpreadsheet,
-  BarChart3,
-  ChevronDown,
-  ChevronUp,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Columns,
-  Package,
-  Lightbulb,
-  Zap,
-  Box,
-  Radio,
-  Car,
-  Monitor,
-  PanelLeft,
-  Antenna,
-  Search,
-  Filter,
-  MoreHorizontal,
-  Info
-} from 'lucide-react'
+  IconPlus,
+  IconEdit,
+  IconTrash,
+  IconSave,
+  IconX,
+  IconDownload,
+  IconUpload,
+  IconLoader,
+  IconFileSpreadsheet,
+  IconBarChart3,
+  IconChevronDown,
+  IconChevronUp,
+  IconCheckCircle,
+  IconXCircle,
+  IconAlertTriangle,
+  IconColumns,
+  IconPackage,
+  IconLightbulb,
+  IconZap,
+  IconBox,
+  IconRadio,
+  IconCar,
+  IconMonitor,
+  IconPanelLeft,
+  IconAntenna,
+  IconSearch,
+  IconFilter,
+  IconMoreHorizontal,
+  IconInfo,
+  IconGradientDefs
+} from '@/components/icons'
 
 // =========================================================================
 // TYPES
@@ -190,17 +191,17 @@ interface CatalogAntenna {
 type TabId = 'stats' | 'packs' | 'columns' | 'luminaires' | 'electrical' | 'fuse' | 'telemetry' | 'ev' | 'mupi' | 'lateral' | 'antennas'
 
 const TABS: Array<{ id: TabId; labelKey: string; icon: React.ElementType }> = [
-  { id: 'stats', labelKey: 'catalog.statistics', icon: BarChart3 },
-  { id: 'packs', labelKey: 'catalogModule.packs', icon: Package },
-  { id: 'columns', labelKey: 'catalog.columns', icon: Columns },
-  { id: 'luminaires', labelKey: 'catalog.luminaires', icon: Lightbulb },
-  { id: 'electrical', labelKey: 'catalog.electricalPanels', icon: Zap },
-  { id: 'fuse', labelKey: 'catalog.fuseBoxes', icon: Box },
-  { id: 'telemetry', labelKey: 'catalog.telemetry', icon: Radio },
-  { id: 'ev', labelKey: 'catalog.evChargers', icon: Car },
-  { id: 'mupi', labelKey: 'catalog.mupiModules', icon: Monitor },
-  { id: 'lateral', labelKey: 'catalog.lateralModules', icon: PanelLeft },
-  { id: 'antennas', labelKey: 'catalog.antennas', icon: Antenna }
+  { id: 'stats', labelKey: 'catalog.statistics', icon: IconBarChart3 },
+  { id: 'packs', labelKey: 'catalogModule.packs', icon: IconPackage },
+  { id: 'columns', labelKey: 'catalog.columns', icon: IconColumns },
+  { id: 'luminaires', labelKey: 'catalog.luminaires', icon: IconLightbulb },
+  { id: 'electrical', labelKey: 'catalog.electricalPanels', icon: IconZap },
+  { id: 'fuse', labelKey: 'catalog.fuseBoxes', icon: IconBox },
+  { id: 'telemetry', labelKey: 'catalog.telemetry', icon: IconRadio },
+  { id: 'ev', labelKey: 'catalog.evChargers', icon: IconCar },
+  { id: 'mupi', labelKey: 'catalog.mupiModules', icon: IconMonitor },
+  { id: 'lateral', labelKey: 'catalog.lateralModules', icon: IconPanelLeft },
+  { id: 'antennas', labelKey: 'catalog.antennas', icon: IconAntenna }
 ]
 
 // =========================================================================
@@ -301,15 +302,15 @@ function StatsTab({ stats, onRefresh }: { stats: CatalogStats | null; onRefresh:
   }
 
   const statCards = [
-    { label: t('catalog.columns'), value: stats.total_columns, icon: Columns, color: 'blue' },
-    { label: t('catalog.luminaires'), value: stats.total_luminaires, icon: Lightbulb, color: 'yellow' },
-    { label: t('catalog.electricalPanels'), value: stats.total_electrical_panels, icon: Zap, color: 'red' },
-    { label: t('catalog.fuseBoxes'), value: stats.total_fuse_boxes, icon: Box, color: 'orange' },
-    { label: t('catalog.telemetry'), value: stats.total_telemetry, icon: Radio, color: 'purple' },
-    { label: t('catalog.evChargers'), value: stats.total_ev_chargers, icon: Car, color: 'green' },
-    { label: t('catalog.mupiModules'), value: stats.total_mupi, icon: Monitor, color: 'pink' },
-    { label: t('catalog.lateralModules'), value: stats.total_lateral, icon: PanelLeft, color: 'indigo' },
-    { label: t('catalog.antennas'), value: stats.total_antennas, icon: Antenna, color: 'cyan' }
+    { label: t('catalog.columns'), value: stats.total_columns, icon: IconColumns, color: 'blue' },
+    { label: t('catalog.luminaires'), value: stats.total_luminaires, icon: IconLightbulb, color: 'yellow' },
+    { label: t('catalog.electricalPanels'), value: stats.total_electrical_panels, icon: IconZap, color: 'red' },
+    { label: t('catalog.fuseBoxes'), value: stats.total_fuse_boxes, icon: IconBox, color: 'orange' },
+    { label: t('catalog.telemetry'), value: stats.total_telemetry, icon: IconRadio, color: 'purple' },
+    { label: t('catalog.evChargers'), value: stats.total_ev_chargers, icon: IconCar, color: 'green' },
+    { label: t('catalog.mupiModules'), value: stats.total_mupi, icon: IconMonitor, color: 'pink' },
+    { label: t('catalog.lateralModules'), value: stats.total_lateral, icon: IconPanelLeft, color: 'indigo' },
+    { label: t('catalog.antennas'), value: stats.total_antennas, icon: IconAntenna, color: 'cyan' }
   ]
 
   const colorClasses: Record<string, string> = {
@@ -332,7 +333,7 @@ function StatsTab({ stats, onRefresh }: { stats: CatalogStats | null; onRefresh:
           onClick={onRefresh}
           className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
         >
-          <RefreshCw className="w-4 h-4" />
+          <IconLoader className="w-4 h-4" />
           {t('common.refresh')}
         </button>
       </div>
@@ -542,7 +543,7 @@ function CrudTable<T extends { id: number; active?: number }>({
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
             value={search}
@@ -555,7 +556,7 @@ function CrudTable<T extends { id: number; active?: number }>({
           onClick={handleAdd}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          <Plus className="w-4 h-4" />
+          <IconPlus className="w-4 h-4" />
           {t('common.add')}
         </button>
       </div>
@@ -582,7 +583,7 @@ function CrudTable<T extends { id: number; active?: number }>({
               {loading ? (
                 <tr>
                   <td colSpan={columns.length + 1} className="px-4 py-8 text-center">
-                    <RefreshCw className="w-5 h-5 animate-spin mx-auto text-gray-400" />
+                    <IconLoader className="w-5 h-5 animate-spin mx-auto text-gray-400" />
                   </td>
                 </tr>
               ) : filteredItems.length === 0 ? (
@@ -606,14 +607,14 @@ function CrudTable<T extends { id: number; active?: number }>({
                           className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
                           title={t('common.edit')}
                         >
-                          <Edit className="w-4 h-4" />
+                          <IconEdit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeleteDialog({ open: true, item })}
                           className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
                           title={t('common.delete')}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <IconTrash className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -637,7 +638,7 @@ function CrudTable<T extends { id: number; active?: number }>({
                 onClick={() => setShowForm(false)}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
-                <X className="w-5 h-5" />
+                <IconX className="w-5 h-5" />
               </button>
             </div>
             <div className="p-4 space-y-4">
@@ -669,12 +670,12 @@ function CrudTable<T extends { id: number; active?: number }>({
               >
                 {saving ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <IconLoader className="w-4 h-4 animate-spin" />
                     {t('common.saving')}
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4" />
+                    <IconSave className="w-4 h-4" />
                     {t('common.save')}
                   </>
                 )}
@@ -836,7 +837,7 @@ function LuminairesTab() {
         { key: 'color_temp_k', label: t('catalog.colorTemp'), width: '80px', render: (item) => `${item.color_temp_k}K` },
         { key: 'ip_rating', label: 'IP', width: '60px' },
         { key: 'dimmable', label: t('catalog.dimmable'), width: '80px', render: (item) => (
-          item.dimmable ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-gray-400" />
+          item.dimmable ? <IconCheckCircle className="w-4 h-4 text-green-600" /> : <IconXCircle className="w-4 h-4 text-gray-400" />
         )},
         { key: 'active', label: t('common.status'), width: '80px', render: (item) => (
           <StatusBadge status={item.active ? 'active' : 'inactive'} colorMap={{ active: 'green', inactive: 'gray' }} />
@@ -1053,7 +1054,7 @@ function MUPITab() {
         { key: 'power_consumption_w', label: t('catalog.powerConsumption'), width: '100px', render: (item) => `${item.power_consumption_w}W` },
         { key: 'screen_size', label: t('catalog.screenSize'), width: '100px' },
         { key: 'digital', label: t('catalog.digital'), width: '80px', render: (item) => (
-          item.digital ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-gray-400" />
+          item.digital ? <IconCheckCircle className="w-4 h-4 text-green-600" /> : <IconXCircle className="w-4 h-4 text-gray-400" />
         )},
         { key: 'active', label: t('common.status'), width: '80px', render: (item) => (
           <StatusBadge status={item.active ? 'active' : 'inactive'} colorMap={{ active: 'green', inactive: 'gray' }} />

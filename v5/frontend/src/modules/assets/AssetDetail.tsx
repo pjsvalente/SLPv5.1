@@ -5,18 +5,9 @@ import { api } from '@/services/api'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import {
-  ArrowLeft,
-  Edit,
-  Trash2,
-  MapPin,
-  Calendar,
-  Wrench,
-  Clock,
-  Loader2,
-  Cpu,
-  Copy,
-  Save
-} from 'lucide-react'
+  IconArrowLeft, IconEdit, IconTrash2, IconMapPin, IconCalendar, IconWrench,
+  IconClock, IconLoader, IconCpu, IconCopy, IconSave
+} from '@/components/icons'
 
 interface Asset {
   id: number
@@ -152,7 +143,7 @@ export function AssetDetail() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <IconLoader className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     )
   }
@@ -164,7 +155,7 @@ export function AssetDetail() {
           onClick={() => navigate('/assets')}
           className="inline-flex items-center text-gray-600 hover:text-gray-900"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <IconArrowLeft className="h-4 w-4 mr-2" />
           {t('common.back')}
         </button>
         <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
@@ -194,7 +185,7 @@ export function AssetDetail() {
             onClick={() => navigate('/assets')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <IconArrowLeft className="h-5 w-5" />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -211,21 +202,21 @@ export function AssetDetail() {
             onClick={() => setShowDuplicateDialog(true)}
             className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
           >
-            <Copy className="h-4 w-4 mr-2" />
+            <IconCopy className="h-4 w-4 mr-2" />
             {t('assets.duplicate') || 'Duplicar'}
           </button>
           <button
             onClick={() => navigate(`/assets/${serialNumber}/edit`)}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            <Edit className="h-4 w-4 mr-2" />
+            <IconEdit className="h-4 w-4 mr-2" />
             {t('common.edit')}
           </button>
           <button
             onClick={() => setShowDeleteDialog(true)}
             className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            <IconTrash2 className="h-4 w-4 mr-2" />
             {t('common.delete')}
           </button>
         </div>
@@ -256,7 +247,7 @@ export function AssetDetail() {
           {/* Location */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
+              <IconMapPin className="h-5 w-5" />
               {t('assets.location')}
             </h2>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -284,7 +275,7 @@ export function AssetDetail() {
           {/* Specifications */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-              <Wrench className="h-5 w-5" />
+              <IconWrench className="h-5 w-5" />
               {t('settings.categories.specifications')}
             </h2>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -300,7 +291,7 @@ export function AssetDetail() {
           {/* Dates */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
+              <IconCalendar className="h-5 w-5" />
               {t('assetDetail.importantDates')}
             </h2>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -341,7 +332,7 @@ export function AssetDetail() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <Cpu className="h-5 w-5" />
+                <IconCpu className="h-5 w-5" />
                 {t('assets.modules') || 'Módulos/Equipamentos'}
               </h2>
               {editingModules ? (
@@ -350,7 +341,7 @@ export function AssetDetail() {
                   disabled={savingModules}
                   className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {savingModules ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Save className="h-4 w-4 mr-1" />}
+                  {savingModules ? <IconLoader className="h-4 w-4 mr-1 animate-spin" /> : <IconSave className="h-4 w-4 mr-1" />}
                   {t('common.save')}
                 </button>
               ) : (
@@ -358,7 +349,7 @@ export function AssetDetail() {
                   onClick={() => setEditingModules(true)}
                   className="inline-flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
                 >
-                  <Edit className="h-4 w-4 mr-1" />
+                  <IconEdit className="h-4 w-4 mr-1" />
                   {t('common.edit')}
                 </button>
               )}
@@ -403,7 +394,7 @@ export function AssetDetail() {
           {/* Status History */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
-              <Clock className="h-5 w-5" />
+              <IconClock className="h-5 w-5" />
               {t('assetDetail.statusHistory')}
             </h2>
             {asset.status_history && asset.status_history.length > 0 ? (
@@ -509,7 +500,7 @@ export function AssetDetail() {
                 disabled={duplicating}
                 className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
               >
-                {duplicating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Copy className="h-4 w-4 mr-2" />}
+                {duplicating ? <IconLoader className="h-4 w-4 mr-2 animate-spin" /> : <IconCopy className="h-4 w-4 mr-2" />}
                 {t('assets.duplicate') || 'Duplicar'}
               </button>
             </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
-import { Save, Loader2, Star, Plus, Trash2 } from 'lucide-react'
+import { IconSave, IconLoader, IconStar, IconPlus, IconTrash } from '@/components/icons'
 
 interface ConfigurableList {
   name: string
@@ -149,7 +149,7 @@ const FavoritesSettings: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <IconLoader className="h-8 w-8 animate-spin" />
       </div>
     )
   }
@@ -221,7 +221,7 @@ const FavoritesSettings: React.FC = () => {
             disabled={saving}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            {saving ? <IconLoader className="h-4 w-4 mr-2 animate-spin" /> : <IconSave className="h-4 w-4 mr-2" />}
             {t('common.save') || 'Guardar'}
           </button>
         </div>
@@ -251,7 +251,7 @@ const FavoritesSettings: React.FC = () => {
               onClick={() => handleAddToList(listConfig.name)}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
-              <Plus className="h-5 w-5" />
+              <IconPlus className="h-5 w-5" />
             </button>
           </div>
 
@@ -275,14 +275,14 @@ const FavoritesSettings: React.FC = () => {
                     }`}
                     title={isFavorite ? 'Remover favorito' : 'Definir como favorito'}
                   >
-                    <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+                    <IconStar className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
                   </button>
                   <span className="text-sm">{value}</span>
                   <button
                     onClick={() => handleRemoveFromList(listConfig.name, index)}
                     className="text-gray-400 hover:text-red-500"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <IconTrash className="h-4 w-4" />
                   </button>
                 </div>
               )
@@ -303,7 +303,7 @@ const FavoritesSettings: React.FC = () => {
           disabled={saving}
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
-          {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+          {saving ? <IconLoader className="h-4 w-4 mr-2 animate-spin" /> : <IconSave className="h-4 w-4 mr-2" />}
           {t('settings.saveFavorites') || 'Guardar Favoritos'}
         </button>
       </div>

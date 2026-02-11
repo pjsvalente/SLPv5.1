@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
 import { FormField } from '@/components/ui/FormField'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Save, Loader2, Plus, Trash2, Settings as SettingsIcon, Hash, Palette, Database, Layout, BookOpen, HardDrive, FileText, Bell, Shield, Star } from 'lucide-react'
+import {
+  IconSave, IconLoader, IconPlus, IconTrash, IconSettings, IconHash, IconPalette,
+  IconDatabase, IconLayout, IconBookOpen, IconHardDrive, IconFileText, IconBell, IconShield, IconStar, IconGradientDefs
+} from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 
 // Lazy load components
@@ -71,7 +74,7 @@ const PrefixSettings: React.FC = () => {
     setPrefixes(prev => ({ ...prev, [key]: value }))
   }
 
-  if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>
 
   return (
     <div className="space-y-6">
@@ -147,7 +150,7 @@ const PrefixSettings: React.FC = () => {
           disabled={saving}
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
-          {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+          {saving ? <IconLoader className="h-4 w-4 mr-2 animate-spin" /> : <IconSave className="h-4 w-4 mr-2" />}
           {t('common.save')}
         </button>
       </div>
@@ -202,7 +205,7 @@ const ColorSettings: React.FC = () => {
     setColors(colors.filter((_, i) => i !== index))
   }
 
-  if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>
 
   return (
     <div className="space-y-6">
@@ -231,7 +234,7 @@ const ColorSettings: React.FC = () => {
           onClick={handleAdd}
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
-          <Plus className="h-5 w-5" />
+          <IconPlus className="h-5 w-5" />
         </button>
       </div>
 
@@ -246,7 +249,7 @@ const ColorSettings: React.FC = () => {
               onClick={() => handleRemove(index)}
               className="text-gray-400 hover:text-red-500"
             >
-              <Trash2 className="h-4 w-4" />
+              <IconTrash className="h-4 w-4" />
             </button>
           </div>
         ))}
@@ -258,7 +261,7 @@ const ColorSettings: React.FC = () => {
           disabled={saving}
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
-          {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+          {saving ? <IconLoader className="h-4 w-4 mr-2 animate-spin" /> : <IconSave className="h-4 w-4 mr-2" />}
           {t('common.save')}
         </button>
       </div>
@@ -310,7 +313,7 @@ const CounterSettings: React.FC = () => {
     int_inspecao: t('settings.inspectionPrefix')
   }
 
-  if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>
 
   return (
     <div className="space-y-6">
@@ -357,7 +360,7 @@ const CounterSettings: React.FC = () => {
                 disabled={saving === counter.counter_type}
                 className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {saving === counter.counter_type ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.update')}
+                {saving === counter.counter_type ? <IconLoader className="h-4 w-4 animate-spin" /> : t('common.update')}
               </button>
             </div>
           </div>
@@ -431,7 +434,7 @@ const SchemaSettings: React.FC = () => {
     other: t('settings.categories.other')
   }
 
-  if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>
 
   return (
     <div className="space-y-6">
@@ -443,7 +446,7 @@ const SchemaSettings: React.FC = () => {
           onClick={() => setShowAddDialog(true)}
           className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
-          <Plus className="h-4 w-4 mr-2" />
+          <IconPlus className="h-4 w-4 mr-2" />
           {t('settings.newField')}
         </button>
       </div>
@@ -473,7 +476,7 @@ const SchemaSettings: React.FC = () => {
               onClick={() => setShowDeleteDialog(field.id)}
               className="p-2 text-gray-400 hover:text-red-500"
             >
-              <Trash2 className="h-5 w-5" />
+              <IconTrash className="h-5 w-5" />
             </button>
           </div>
         ))}
@@ -558,21 +561,21 @@ const Settings: React.FC = () => {
 
   // Build tabs based on role
   const tabs = [
-    { id: 'prefixes', label: t('settings.prefixes'), icon: <Hash className="h-4 w-4" /> },
-    { id: 'favorites', label: t('settings.favorites') || 'Favoritos', icon: <Star className="h-4 w-4" /> },
-    { id: 'colors', label: t('settings.colors'), icon: <Palette className="h-4 w-4" /> },
-    { id: 'counters', label: t('settings.counters'), icon: <Database className="h-4 w-4" /> },
-    { id: 'fields', label: t('settings.fieldConfig') || 'Campos', icon: <Layout className="h-4 w-4" /> },
-    { id: 'notifications', label: t('notifications.title') || 'Notificações', icon: <Bell className="h-4 w-4" /> },
-    { id: 'privacy', label: t('privacy.title') || 'Privacidade', icon: <Shield className="h-4 w-4" /> },
-    { id: 'backup', label: t('backup.title') || 'Backup', icon: <HardDrive className="h-4 w-4" /> },
-    { id: 'audit', label: t('auditLog.title') || 'Audit Log', icon: <FileText className="h-4 w-4" /> },
-    { id: 'schema', label: t('settings.schema'), icon: <SettingsIcon className="h-4 w-4" /> },
+    { id: 'prefixes', label: t('settings.prefixes'), icon: <IconHash className="h-4 w-4" /> },
+    { id: 'favorites', label: t('settings.favorites') || 'Favoritos', icon: <IconStar className="h-4 w-4" /> },
+    { id: 'colors', label: t('settings.colors'), icon: <IconPalette className="h-4 w-4" /> },
+    { id: 'counters', label: t('settings.counters'), icon: <IconDatabase className="h-4 w-4" /> },
+    { id: 'fields', label: t('settings.fieldConfig') || 'Campos', icon: <IconLayout className="h-4 w-4" /> },
+    { id: 'notifications', label: t('notifications.title') || 'Notificações', icon: <IconBell className="h-4 w-4" /> },
+    { id: 'privacy', label: t('privacy.title') || 'Privacidade', icon: <IconShield className="h-4 w-4" /> },
+    { id: 'backup', label: t('backup.title') || 'Backup', icon: <IconHardDrive className="h-4 w-4" /> },
+    { id: 'audit', label: t('auditLog.title') || 'Audit Log', icon: <IconFileText className="h-4 w-4" /> },
+    { id: 'schema', label: t('settings.schema'), icon: <IconSettings className="h-4 w-4" /> },
   ]
 
   // Add field catalog tab for superadmin only
   if (isSuperadmin) {
-    tabs.splice(4, 0, { id: 'catalog', label: t('settings.fieldCatalog') || 'Catálogo', icon: <BookOpen className="h-4 w-4" /> })
+    tabs.splice(4, 0, { id: 'catalog', label: t('settings.fieldCatalog') || 'Catálogo', icon: <IconBookOpen className="h-4 w-4" /> })
   }
 
   return (
@@ -597,39 +600,39 @@ const Settings: React.FC = () => {
         <div className="p-6">
           {activeTab === 'prefixes' && <PrefixSettings />}
           {activeTab === 'favorites' && (
-            <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <Suspense fallback={<div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>}>
               <FavoritesSettings />
             </Suspense>
           )}
           {activeTab === 'colors' && <ColorSettings />}
           {activeTab === 'counters' && <CounterSettings />}
           {activeTab === 'fields' && (
-            <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <Suspense fallback={<div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>}>
               <FieldConfig />
             </Suspense>
           )}
           {activeTab === 'catalog' && isSuperadmin && (
-            <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <Suspense fallback={<div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>}>
               <FieldCatalog />
             </Suspense>
           )}
           {activeTab === 'notifications' && (
-            <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <Suspense fallback={<div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>}>
               <NotificationSettings />
             </Suspense>
           )}
           {activeTab === 'privacy' && (
-            <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <Suspense fallback={<div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>}>
               <PrivacySettings />
             </Suspense>
           )}
           {activeTab === 'backup' && (
-            <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <Suspense fallback={<div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>}>
               <BackupSettings />
             </Suspense>
           )}
           {activeTab === 'audit' && (
-            <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <Suspense fallback={<div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>}>
               <AuditLog />
             </Suspense>
           )}

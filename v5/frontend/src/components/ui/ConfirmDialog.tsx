@@ -1,4 +1,4 @@
-import { AlertTriangle, X } from 'lucide-react'
+import { IconAlertTriangle, IconX } from '@/components/icons'
 import { useTranslation } from 'react-i18next'
 
 interface ConfirmDialogProps {
@@ -62,12 +62,12 @@ export function ConfirmDialog({
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         >
-          <X className="h-5 w-5" />
+          <IconX className="h-5 w-5" />
         </button>
 
         <div className="flex items-start gap-4">
           <div className={`p-2 rounded-full bg-gray-100 dark:bg-gray-700 ${styles.icon}`}>
-            <AlertTriangle className="h-6 w-6" />
+            <IconAlertTriangle className="h-6 w-6" />
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

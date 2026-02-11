@@ -8,11 +8,12 @@ import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
 import { LoadingSpinner } from '@/core/common/LoadingSpinner'
 import {
-  BarChart3, TrendingUp, TrendingDown, Clock, DollarSign,
-  Activity, AlertTriangle, Wrench, CheckCircle, XCircle,
-  Calendar, Download, RefreshCw, Target, Gauge, Brain,
-  Cloud, CloudRain, Sun, Wind, Thermometer, Settings, MapPin
-} from 'lucide-react'
+  IconBarChart3, IconTrendingUp, IconTrendingDown, IconClock, IconDollarSign,
+  IconActivity, IconAlertTriangle, IconWrench, IconCheckCircle, IconXCircle,
+  IconCalendar, IconDownload, IconLoader, IconTarget, IconGauge, IconBrain,
+  IconCloud, IconCloudRain, IconSun, IconWind, IconThermometer, IconSettings, IconMapPin,
+  IconRefreshCw, IconGradientDefs
+} from '@/components/icons'
 
 interface MLPrediction {
   asset_id: number
@@ -159,8 +160,8 @@ const KPICard: React.FC<{
           <div className={`flex items-center gap-1 text-sm ${
             trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-500'
           }`}>
-            {trend === 'up' ? <TrendingUp className="h-4 w-4" /> :
-             trend === 'down' ? <TrendingDown className="h-4 w-4" /> : null}
+            {trend === 'up' ? <IconTrendingUp className="h-4 w-4" /> :
+             trend === 'down' ? <IconTrendingDown className="h-4 w-4" /> : null}
             {trendValue}
           </div>
         )}
@@ -341,10 +342,10 @@ const Analytics: React.FC = () => {
 
   const getWeatherIcon = (description: string) => {
     const desc = description.toLowerCase()
-    if (desc.includes('rain') || desc.includes('chuva')) return <CloudRain className="h-6 w-6 text-blue-500" />
-    if (desc.includes('cloud') || desc.includes('nuvem')) return <Cloud className="h-6 w-6 text-gray-500" />
-    if (desc.includes('wind') || desc.includes('vento')) return <Wind className="h-6 w-6 text-teal-500" />
-    return <Sun className="h-6 w-6 text-yellow-500" />
+    if (desc.includes('rain') || desc.includes('chuva')) return <IconCloudRain className="h-6 w-6 text-blue-500" />
+    if (desc.includes('cloud') || desc.includes('nuvem')) return <IconCloud className="h-6 w-6 text-gray-500" />
+    if (desc.includes('wind') || desc.includes('vento')) return <IconWind className="h-6 w-6 text-teal-500" />
+    return <IconSun className="h-6 w-6 text-yellow-500" />
   }
 
   const handleExport = async (type: 'interventions' | 'costs') => {
@@ -378,7 +379,7 @@ const Analytics: React.FC = () => {
   if (error) {
     return (
       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
-        <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+        <IconAlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-2" />
         <p className="text-red-700 dark:text-red-300">{error}</p>
         <button onClick={loadKPIs} className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
           {t('common.refresh')}
@@ -404,7 +405,7 @@ const Analytics: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <IconCheckCircle className="h-5 w-5 text-green-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t('analytics.lowRisk')}</p>
@@ -417,7 +418,7 @@ const Analytics: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                <IconAlertTriangle className="h-5 w-5 text-yellow-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t('analytics.mediumRisk')}</p>
@@ -430,7 +431,7 @@ const Analytics: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-orange-600" />
+                <IconAlertTriangle className="h-5 w-5 text-orange-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t('analytics.highRisk')}</p>
@@ -443,7 +444,7 @@ const Analytics: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                <XCircle className="h-5 w-5 text-red-600" />
+                <IconXCircle className="h-5 w-5 text-red-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t('analytics.criticalRisk')}</p>
@@ -459,7 +460,7 @@ const Analytics: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Brain className="h-5 w-5 text-purple-600" />
+              <IconBrain className="h-5 w-5 text-purple-600" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {t('analytics.maintenancePredictions')}
               </h2>
@@ -468,7 +469,7 @@ const Analytics: React.FC = () => {
               onClick={loadPredictions}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
             >
-              <RefreshCw className="h-4 w-4" />
+              <IconRefreshCw className="h-4 w-4" />
             </button>
           </div>
 
@@ -545,7 +546,7 @@ const Analytics: React.FC = () => {
       return (
         <div className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700 max-w-md mx-auto">
           <div className="text-center mb-6">
-            <Cloud className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+            <IconCloud className="h-12 w-12 text-blue-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
               {t('analytics.configureWeather')}
             </h2>
@@ -583,7 +584,7 @@ const Analytics: React.FC = () => {
             >
               {savingWeatherConfig ? (
                 <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  <IconRefreshCw className="h-4 w-4 animate-spin" />
                   {t('common.saving')}
                 </>
               ) : (
@@ -626,13 +627,13 @@ const Analytics: React.FC = () => {
                   className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                   title={t('common.refresh')}
                 >
-                  <RefreshCw className="h-4 w-4" />
+                  <IconRefreshCw className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setShowWeatherConfig(true)}
                   className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                 >
-                  <Settings className="h-4 w-4" />
+                  <IconSettings className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -646,12 +647,12 @@ const Analytics: React.FC = () => {
               </div>
               <div className="ml-auto grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <Thermometer className="h-5 w-5 text-red-500 mx-auto" />
+                  <IconThermometer className="h-5 w-5 text-red-500 mx-auto" />
                   <p className="text-sm text-gray-500">{t('analytics.humidity')}</p>
                   <p className="font-medium">{primaryLocation.humidity}%</p>
                 </div>
                 <div className="text-center">
-                  <Wind className="h-5 w-5 text-teal-500 mx-auto" />
+                  <IconWind className="h-5 w-5 text-teal-500 mx-auto" />
                   <p className="text-sm text-gray-500">{t('analytics.wind')}</p>
                   <p className="font-medium">{primaryLocation.wind_speed} m/s</p>
                 </div>
@@ -663,7 +664,7 @@ const Analytics: React.FC = () => {
         {/* No locations configured */}
         {(!weather.locations || weather.locations.length === 0) && (
           <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-6 border border-yellow-200 dark:border-yellow-700 text-center">
-            <MapPin className="h-8 w-8 text-yellow-600 mx-auto mb-3" />
+            <IconMapPin className="h-8 w-8 text-yellow-600 mx-auto mb-3" />
             <h3 className="font-medium text-yellow-700 dark:text-yellow-400 mb-2">
               {t('analytics.noLocations')}
             </h3>
@@ -677,7 +678,7 @@ const Analytics: React.FC = () => {
         {weather.alerts && weather.alerts.length > 0 && (
           <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-200 dark:border-orange-700">
             <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="h-5 w-5 text-orange-600" />
+              <IconAlertTriangle className="h-5 w-5 text-orange-600" />
               <h3 className="font-medium text-orange-700 dark:text-orange-400">
                 {t('analytics.weatherAlerts')}
               </h3>
@@ -786,7 +787,7 @@ const Analytics: React.FC = () => {
         {weather.maintenance_windows && weather.maintenance_windows.length > 0 && (
           <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-200 dark:border-green-700">
             <div className="flex items-center gap-2 mb-4">
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              <IconCheckCircle className="h-5 w-5 text-green-600" />
               <h2 className="text-lg font-semibold text-green-800 dark:text-green-300">
                 {t('analytics.goodMaintenanceWindows')}
               </h2>
@@ -835,7 +836,7 @@ const Analytics: React.FC = () => {
           {activeTab === 'kpis' && (
           <>
           <div className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2">
-            <Calendar className="h-4 w-4 text-gray-400" />
+            <IconCalendar className="h-4 w-4 text-gray-400" />
             <input
               type="date"
               value={dateRange.start}
@@ -855,12 +856,12 @@ const Analytics: React.FC = () => {
             onClick={loadKPIs}
             className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
           >
-            <RefreshCw className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            <IconRefreshCw className="h-5 w-5 text-gray-600 dark:text-gray-300" />
           </button>
 
           <div className="relative group">
             <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
-              <Download className="h-4 w-4" />
+              <IconDownload className="h-4 w-4" />
               {t('common.export')}
             </button>
             <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg hidden group-hover:block z-10">
@@ -894,7 +895,7 @@ const Analytics: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
-            <BarChart3 className="h-4 w-4" />
+            <IconBarChart3 className="h-4 w-4" />
             {t('analytics.kpis')}
           </button>
           <button
@@ -905,7 +906,7 @@ const Analytics: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
-            <Brain className="h-4 w-4" />
+            <IconBrain className="h-4 w-4" />
             {t('analytics.mlPredictions')}
           </button>
           <button
@@ -916,7 +917,7 @@ const Analytics: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
-            <Cloud className="h-4 w-4" />
+            <IconCloud className="h-4 w-4" />
             {t('analytics.weather')}
           </button>
         </nav>
@@ -933,28 +934,28 @@ const Analytics: React.FC = () => {
           title={t('analytics.mtbf')}
           value={`${kpis.mtbf.days.toFixed(0)} ${t('common.days')}`}
           subtitle={`${kpis.mtbf.value.toFixed(0)} ${t('analytics.hours')}`}
-          icon={<Clock className="h-6 w-6" />}
+          icon={<IconClock className="h-6 w-6" />}
           color="blue"
         />
         <KPICard
           title={t('analytics.mttr')}
           value={`${kpis.mttr.value.toFixed(1)}h`}
           subtitle={`${kpis.mttr.repairs_count} ${t('analytics.repairs')}`}
-          icon={<Wrench className="h-6 w-6" />}
+          icon={<IconWrench className="h-6 w-6" />}
           color="orange"
         />
         <KPICard
           title={t('analytics.availability')}
           value={`${kpis.availability.current.toFixed(1)}%`}
           subtitle={`${kpis.availability.operational_assets}/${kpis.availability.total_assets} ${t('analytics.operational')}`}
-          icon={<Activity className="h-6 w-6" />}
+          icon={<IconActivity className="h-6 w-6" />}
           color="green"
         />
         <KPICard
           title={t('analytics.totalCosts')}
           value={`€${kpis.costs.total.toLocaleString()}`}
           subtitle={`€${kpis.costs.cost_per_asset.toFixed(0)}/${t('analytics.perAsset')}`}
-          icon={<DollarSign className="h-6 w-6" />}
+          icon={<IconDollarSign className="h-6 w-6" />}
           color="purple"
         />
       </div>
@@ -964,7 +965,7 @@ const Analytics: React.FC = () => {
         {/* Efficiency Metrics */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <Target className="h-5 w-5 text-blue-600" />
+            <IconTarget className="h-5 w-5 text-blue-600" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {t('analytics.efficiencyMetrics')}
             </h2>
@@ -979,14 +980,14 @@ const Analytics: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4 mt-6">
               <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <CheckCircle className="h-6 w-6 text-green-600 mx-auto" />
+                <IconCheckCircle className="h-6 w-6 text-green-600 mx-auto" />
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
                   {kpis.efficiency.completed}
                 </p>
                 <p className="text-sm text-gray-500">{t('analytics.completed')}</p>
               </div>
               <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                <Clock className="h-6 w-6 text-orange-600 mx-auto" />
+                <IconClock className="h-6 w-6 text-orange-600 mx-auto" />
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">
                   {kpis.efficiency.pending + kpis.efficiency.in_progress}
                 </p>
@@ -1008,7 +1009,7 @@ const Analytics: React.FC = () => {
         {/* Asset Health */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <Gauge className="h-5 w-5 text-blue-600" />
+            <IconGauge className="h-5 w-5 text-blue-600" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {t('analytics.assetHealth')}
             </h2>
@@ -1056,7 +1057,7 @@ const Analytics: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <BarChart3 className="h-5 w-5 text-blue-600" />
+            <IconBarChart3 className="h-5 w-5 text-blue-600" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {t('analytics.interventionsByType')}
             </h2>
@@ -1093,7 +1094,7 @@ const Analytics: React.FC = () => {
       {kpis.interventions_summary.top_assets.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <AlertTriangle className="h-5 w-5 text-orange-600" />
+            <IconAlertTriangle className="h-5 w-5 text-orange-600" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {t('analytics.topAssets')}
             </h2>

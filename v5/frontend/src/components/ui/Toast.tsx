@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as ToastPrimitive from '@radix-ui/react-toast'
-import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react'
+import { IconX, IconCheckCircle, IconAlertCircle, IconAlertTriangle, IconInfo } from '@/components/icons'
 import { cn } from '@/lib/utils'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
@@ -14,10 +14,10 @@ export interface ToastProps {
 }
 
 const toastIcons: Record<ToastType, React.ReactNode> = {
-  success: <CheckCircle className="h-5 w-5 text-green-500" />,
-  error: <AlertCircle className="h-5 w-5 text-red-500" />,
-  warning: <AlertTriangle className="h-5 w-5 text-yellow-500" />,
-  info: <Info className="h-5 w-5 text-blue-500" />,
+  success: <IconCheckCircle className="h-5 w-5 text-green-500" />,
+  error: <IconAlertCircle className="h-5 w-5 text-red-500" />,
+  warning: <IconAlertTriangle className="h-5 w-5 text-yellow-500" />,
+  info: <IconInfo className="h-5 w-5 text-blue-500" />,
 }
 
 const toastStyles: Record<ToastType, string> = {
@@ -85,7 +85,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               )}
             </div>
             <ToastPrimitive.Close className="absolute right-2 top-2 rounded-md p-1 text-gray-500 opacity-0 transition-opacity hover:text-gray-900 focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 dark:text-gray-400 dark:hover:text-gray-100">
-              <X className="h-4 w-4" />
+              <IconX className="h-4 w-4" />
             </ToastPrimitive.Close>
           </ToastPrimitive.Root>
         ))}

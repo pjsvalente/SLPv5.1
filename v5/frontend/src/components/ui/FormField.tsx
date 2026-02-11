@@ -1,6 +1,6 @@
 import { forwardRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { MapPin, Navigation, Crosshair } from 'lucide-react'
+import { IconMapPin, IconNavigation, IconCrosshair } from '@/components/icons'
 
 // GPS Input Component for latitude, longitude format
 interface GPSInputProps {
@@ -94,7 +94,7 @@ function GPSInput({ name, value, onChange, placeholder, required, disabled, erro
       {/* Combined input */}
       <div className="flex gap-2">
         <div className="flex-1 relative">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <IconMapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
             id={name}
@@ -115,9 +115,9 @@ function GPSInput({ name, value, onChange, placeholder, required, disabled, erro
           title={t('form.getCurrentLocation')}
         >
           {gettingLocation ? (
-            <Navigation className="h-4 w-4 animate-pulse" />
+            <IconNavigation className="h-4 w-4 animate-pulse" />
           ) : (
-            <Crosshair className="h-4 w-4" />
+            <IconCrosshair className="h-4 w-4" />
           )}
         </button>
         {coords.lat && coords.lng && (
@@ -128,7 +128,7 @@ function GPSInput({ name, value, onChange, placeholder, required, disabled, erro
             className="px-3 py-2 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 flex items-center gap-1"
             title={t('form.viewOnGoogleMaps')}
           >
-            <Navigation className="h-4 w-4" />
+            <IconNavigation className="h-4 w-4" />
           </button>
         )}
       </div>

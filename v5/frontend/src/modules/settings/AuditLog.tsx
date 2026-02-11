@@ -7,22 +7,22 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
 import {
-  Search,
-  Filter,
-  Download,
-  ChevronLeft,
-  ChevronRight,
-  User,
-  Calendar,
-  Database,
-  Activity,
-  Eye,
-  X,
-  Loader2,
-  FileText,
-  BarChart3,
-  RefreshCw
-} from 'lucide-react'
+  IconSearch,
+  IconFilter,
+  IconDownload,
+  IconChevronLeft,
+  IconChevronRight,
+  IconUser,
+  IconCalendar,
+  IconDatabase,
+  IconActivity,
+  IconEye,
+  IconX,
+  IconLoader,
+  IconFileText,
+  IconBarChart3,
+  IconRefresh
+} from '@/components/icons'
 
 interface AuditEntry {
   id: number
@@ -237,7 +237,7 @@ const AuditLog: React.FC = () => {
             onClick={() => { loadStats(); setShowStats(true) }}
             className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
           >
-            <BarChart3 className="h-4 w-4 mr-2" />
+            <IconBarChart3 className="h-4 w-4 mr-2" />
             {t('auditLog.statistics')}
           </button>
           <button
@@ -248,7 +248,7 @@ const AuditLog: React.FC = () => {
                 : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
-            <Filter className="h-4 w-4 mr-2" />
+            <IconFilter className="h-4 w-4 mr-2" />
             {t('common.filters')}
             {hasActiveFilters && (
               <span className="ml-1 px-1.5 py-0.5 text-xs bg-blue-600 text-white rounded-full">!</span>
@@ -258,7 +258,7 @@ const AuditLog: React.FC = () => {
             onClick={handleExport}
             className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            <Download className="h-4 w-4 mr-2" />
+            <IconDownload className="h-4 w-4 mr-2" />
             {t('common.export')}
           </button>
         </div>
@@ -274,7 +274,7 @@ const AuditLog: React.FC = () => {
                 {t('common.search')}
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
                   value={filters.search}
@@ -369,7 +369,7 @@ const AuditLog: React.FC = () => {
                 onClick={handleClearFilters}
                 className="inline-flex items-center px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
               >
-                <X className="h-4 w-4 mr-1" />
+                <IconX className="h-4 w-4 mr-1" />
                 {t('common.clearFilters')}
               </button>
             </div>
@@ -381,11 +381,11 @@ const AuditLog: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <IconLoader className="h-8 w-8 animate-spin text-gray-400" />
           </div>
         ) : entries.length === 0 ? (
           <div className="text-center py-12">
-            <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+            <IconFileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
             <p className="text-gray-500 dark:text-gray-400">{t('auditLog.noEntries')}</p>
           </div>
         ) : (
@@ -421,7 +421,7 @@ const AuditLog: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-gray-400" />
+                        <IconUser className="h-4 w-4 text-gray-400" />
                         <div>
                           <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             {entry.user_name || t('common.unknown')}
@@ -439,7 +439,7 @@ const AuditLog: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <Database className="h-4 w-4 text-gray-400" />
+                        <IconDatabase className="h-4 w-4 text-gray-400" />
                         <span className="text-sm text-gray-700 dark:text-gray-300">{entry.table_name}</span>
                       </div>
                     </td>
@@ -452,7 +452,7 @@ const AuditLog: React.FC = () => {
                         className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded"
                         title={t('common.viewDetails')}
                       >
-                        <Eye className="h-4 w-4" />
+                        <IconEye className="h-4 w-4" />
                       </button>
                     </td>
                   </tr>
@@ -474,14 +474,14 @@ const AuditLog: React.FC = () => {
                 disabled={page === 1}
                 className="p-2 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <IconChevronLeft className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className="p-2 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                <ChevronRight className="h-4 w-4" />
+                <IconChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -500,7 +500,7 @@ const AuditLog: React.FC = () => {
                 onClick={() => setSelectedEntry(null)}
                 className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
-                <X className="h-5 w-5" />
+                <IconX className="h-5 w-5" />
               </button>
             </div>
 
@@ -582,7 +582,7 @@ const AuditLog: React.FC = () => {
                 onClick={() => setShowStats(false)}
                 className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
-                <X className="h-5 w-5" />
+                <IconX className="h-5 w-5" />
               </button>
             </div>
 
@@ -644,7 +644,7 @@ const AuditLog: React.FC = () => {
                   {stats.top_users.map(user => (
                     <div key={user.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-gray-400" />
+                        <IconUser className="h-4 w-4 text-gray-400" />
                         <span className="text-sm text-gray-700 dark:text-gray-300">{user.nome}</span>
                       </div>
                       <span className="text-sm text-gray-500">{user.count} {t('auditLog.actions')}</span>

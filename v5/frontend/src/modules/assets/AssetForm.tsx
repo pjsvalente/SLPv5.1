@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
 import { FormField } from '@/components/ui/FormField'
 import { useToastActions } from '@/components/ui/Toast'
-import { ArrowLeft, Save, Loader2, Settings2, Zap, CheckCircle, XCircle } from 'lucide-react'
+import { IconArrowLeft, IconSave, IconLoader, IconSettings, IconZap, IconCheckCircle, IconXCircle } from '@/components/icons'
 import { ReferenceConfigurator } from '@/modules/catalog/ReferenceConfigurator'
 
 interface SchemaField {
@@ -250,7 +250,7 @@ export function AssetForm({ mode }: AssetFormProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <IconLoader className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     )
   }
@@ -263,7 +263,7 @@ export function AssetForm({ mode }: AssetFormProps) {
           onClick={() => navigate(-1)}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <IconArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -280,7 +280,7 @@ export function AssetForm({ mode }: AssetFormProps) {
           onClick={() => setShowConfigurator(true)}
           className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
         >
-          <Settings2 className="h-4 w-4" />
+          <IconSettings className="h-4 w-4" />
           {t('configurator.openConfigurator')}
         </button>
       </div>
@@ -289,7 +289,7 @@ export function AssetForm({ mode }: AssetFormProps) {
       {configurationApplied && (
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+            <IconCheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
             <div className="flex-1">
               <h3 className="font-medium text-green-800 dark:text-green-200">
                 {t('configurator.title')} - {configurationApplied.column_reference}
@@ -302,7 +302,7 @@ export function AssetForm({ mode }: AssetFormProps) {
               {configurationApplied.power_calculation && (
                 <div className="mt-3 flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1">
-                    <Zap className="w-4 h-4 text-yellow-600" />
+                    <IconZap className="w-4 h-4 text-yellow-600" />
                     <span>{configurationApplied.power_calculation.max_power}W max</span>
                   </div>
                   <span className="text-gray-400">→</span>
@@ -312,9 +312,9 @@ export function AssetForm({ mode }: AssetFormProps) {
                     {configurationApplied.power_calculation.remaining_power}W {t('configurator.remainingPower')}
                   </span>
                   {configurationApplied.power_calculation.is_valid ? (
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <IconCheckCircle className="w-4 h-4 text-green-600" />
                   ) : (
-                    <XCircle className="w-4 h-4 text-red-600" />
+                    <IconXCircle className="w-4 h-4 text-red-600" />
                   )}
                 </div>
               )}
@@ -430,12 +430,12 @@ export function AssetForm({ mode }: AssetFormProps) {
           >
             {saving ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <IconLoader className="h-4 w-4 mr-2 animate-spin" />
                 {t('common.saving')}
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
+                <IconSave className="h-4 w-4 mr-2" />
                 {mode === 'create' ? t('assets.newAsset') : t('common.save')}
               </>
             )}

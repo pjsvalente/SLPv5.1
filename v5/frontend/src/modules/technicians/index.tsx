@@ -9,21 +9,21 @@ import { useTranslation } from 'react-i18next'
 import { useApi } from '@/hooks/useApi'
 import { DataTable, FormField, ConfirmDialog, StatusBadge } from '@/components/ui'
 import {
-  Plus,
-  Edit,
-  Trash2,
-  User,
-  Building,
-  Phone,
-  Mail,
-  Wrench,
-  ArrowLeft,
-  Save,
-  X,
-  Users,
-  UserCheck,
-  Building2
-} from 'lucide-react'
+  IconPlus,
+  IconEdit,
+  IconTrash,
+  IconUser,
+  IconBuilding,
+  IconPhone,
+  IconMail,
+  IconWrench,
+  IconArrowLeft,
+  IconSave,
+  IconX,
+  IconUsers,
+  IconUserCheck,
+  IconGradientDefs
+} from '@/components/icons'
 
 // Types
 interface Technician {
@@ -136,7 +136,7 @@ function TechniciansList() {
       sortable: true,
       render: (tech: Technician) => (
         <div className="flex items-center gap-2">
-          <User className="w-4 h-4 text-gray-400" />
+          <IconUser className="w-4 h-4 text-gray-400" />
           <span className="font-medium">{tech.nome}</span>
         </div>
       )
@@ -171,13 +171,13 @@ function TechniciansList() {
         <div className="text-sm">
           {tech.telefone && (
             <div className="flex items-center gap-1">
-              <Phone className="w-3 h-3" />
+              <IconPhone className="w-3 h-3" />
               {tech.telefone}
             </div>
           )}
           {tech.email && (
             <div className="flex items-center gap-1 text-gray-500">
-              <Mail className="w-3 h-3" />
+              <IconMail className="w-3 h-3" />
               {tech.email}
             </div>
           )}
@@ -204,7 +204,7 @@ function TechniciansList() {
             className="p-1 text-blue-600 hover:bg-blue-50 rounded"
             title="Editar"
           >
-            <Edit className="w-4 h-4" />
+            <IconEdit className="w-4 h-4" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); setDeleteDialog({ open: true, technician: tech }) }}
@@ -212,7 +212,7 @@ function TechniciansList() {
             title="Desativar"
             disabled={!tech.ativo}
           >
-            <Trash2 className="w-4 h-4" />
+            <IconTrash className="w-4 h-4" />
           </button>
         </div>
       )
@@ -231,7 +231,7 @@ function TechniciansList() {
           onClick={() => navigate('/technicians/new')}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          <Plus className="w-4 h-4" />
+          <IconPlus className="w-4 h-4" />
           {t('technicians.newTechnician')}
         </button>
       </div>
@@ -242,7 +242,7 @@ function TechniciansList() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <IconUsers className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('common.total')}</p>
@@ -253,7 +253,7 @@ function TechniciansList() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                <UserCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <IconUserCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('technicians.internal')}</p>
@@ -264,7 +264,7 @@ function TechniciansList() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <Building2 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <IconBuilding className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('technicians.external')}</p>
@@ -275,7 +275,7 @@ function TechniciansList() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
-                <Wrench className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                <IconWrench className="w-5 h-5 text-teal-600 dark:text-teal-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('common.active')}</p>
@@ -435,7 +435,7 @@ function TechnicianForm() {
           onClick={() => navigate('/technicians')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <IconArrowLeft className="w-5 h-5" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -538,7 +538,7 @@ function TechnicianForm() {
             onClick={() => navigate('/technicians')}
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
           >
-            <X className="w-4 h-4" />
+            <IconX className="w-4 h-4" />
             {t('common.cancel')}
           </button>
           <button
@@ -546,7 +546,7 @@ function TechnicianForm() {
             disabled={saving}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
+            <IconSave className="w-4 h-4" />
             {saving ? t('common.saving') : t('common.save')}
           </button>
         </div>
@@ -606,7 +606,7 @@ function TechnicianDetail() {
             onClick={() => navigate('/technicians')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <IconArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -628,7 +628,7 @@ function TechnicianDetail() {
           onClick={() => navigate(`/technicians/${id}/edit`)}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          <Edit className="w-4 h-4" />
+          <IconEdit className="w-4 h-4" />
           {t('common.edit')}
         </button>
       </div>
@@ -641,7 +641,7 @@ function TechnicianDetail() {
             {technician.empresa && (
               <div>
                 <dt className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                  <Building className="w-4 h-4" />
+                  <IconBuilding className="w-4 h-4" />
                   {t('technicians.company')}
                 </dt>
                 <dd className="font-medium">{technician.empresa}</dd>
@@ -650,7 +650,7 @@ function TechnicianDetail() {
             {technician.especialidade && (
               <div>
                 <dt className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                  <Wrench className="w-4 h-4" />
+                  <IconWrench className="w-4 h-4" />
                   {t('technicians.specialization')}
                 </dt>
                 <dd className="font-medium">{technician.especialidade}</dd>
@@ -659,7 +659,7 @@ function TechnicianDetail() {
             {technician.telefone && (
               <div>
                 <dt className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
+                  <IconPhone className="w-4 h-4" />
                   {t('technicians.phone')}
                 </dt>
                 <dd className="font-medium">{technician.telefone}</dd>
@@ -668,7 +668,7 @@ function TechnicianDetail() {
             {technician.email && (
               <div>
                 <dt className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
+                  <IconMail className="w-4 h-4" />
                   {t('technicians.email')}
                 </dt>
                 <dd className="font-medium">{technician.email}</dd>

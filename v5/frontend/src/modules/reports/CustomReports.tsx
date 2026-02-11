@@ -9,32 +9,11 @@ import { useApi } from '@/hooks/useApi'
 import { useLanguage } from '@/hooks/useLanguage'
 import { FormField, StatusBadge } from '@/components/ui'
 import {
-  FileSpreadsheet,
-  Plus,
-  Save,
-  Trash2,
-  Play,
-  Download,
-  Copy,
-  Edit2,
-  ChevronDown,
-  ChevronUp,
-  X,
-  Check,
-  RefreshCw,
-  Filter,
-  Columns,
-  Clock,
-  Calendar,
-  FileText,
-  BarChart3,
-  Package,
-  Wrench,
-  Users,
-  Eye,
-  Settings,
-  Layers
-} from 'lucide-react'
+  IconFileSpreadsheet, IconPlus, IconSave, IconTrash2, IconPlay, IconDownload,
+  IconCopy, IconEdit, IconChevronDown, IconChevronUp, IconX, IconCheck,
+  IconRefreshCw, IconFilter, IconColumns, IconClock, IconCalendar, IconFileText,
+  IconBarChart3, IconPackage, IconWrench, IconUsers, IconEye, IconSettings, IconLayers
+} from '@/components/icons'
 
 interface ReportTemplate {
   id: number
