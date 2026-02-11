@@ -1,0 +1,8 @@
+# SmartLamppost v4.0 - Dependencies
+# Install: pip install -r requirements.txt
+
+Flask>=3.0.0
+Werkzeug>=3.0.0
+flask-cors>=4.0.0
+openpyxl>=3.1.2
+pytest>=7.0.0
