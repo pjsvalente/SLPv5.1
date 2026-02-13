@@ -765,13 +765,22 @@ def import_excel():
 
         bd.commit()
 
+        logger.info(f"Import completed: imported={imported}, updated={updated}, skipped={skipped}, errors={len(errors)}")
+
         return jsonify({
             'message': 'Importação concluída',
             'mode': mode,
             'imported': imported,
             'updated': updated,
             'skipped': skipped,
-            'errors': errors[:20]  # Limit errors shown
+            'errors': errors[:20],  # Limit errors shown
+            'debug': {
+                'serial_col': serial_col,
+                'status_col': status_col,
+                'headers': headers_clean[:10],
+                'schema_fields_count': len(schema_fields),
+                'field_map_count': len(field_map)
+            }
         }), 200
 
     except Exception as e:
