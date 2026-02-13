@@ -257,6 +257,20 @@ export const IconMenu: React.FC<IconProps> = ({ size = 24, className, gradient, 
   )
 }
 
+export const IconGripVertical: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
+  const fill = getFill(gradient, color)
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className}>
+      <circle cx="18" cy="12" r="3" fill={fill}/>
+      <circle cx="30" cy="12" r="3" fill={fill}/>
+      <circle cx="18" cy="24" r="3" fill={fill}/>
+      <circle cx="30" cy="24" r="3" fill={fill}/>
+      <circle cx="18" cy="36" r="3" fill={fill}/>
+      <circle cx="30" cy="36" r="3" fill={fill}/>
+    </svg>
+  )
+}
+
 export const IconChevronLeft: React.FC<IconProps> = ({ size = 24, className, gradient, color }) => {
   const stroke = getStroke(gradient, color)
   return (

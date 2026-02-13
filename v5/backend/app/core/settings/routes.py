@@ -2140,3 +2140,120 @@ def add_to_configurable_list(list_name):
         bd.commit()
 
     return jsonify({'message': 'Valor adicionado', 'values': values}), 200
+
+
+# =========================================================================
+# MENU ORDER MANAGEMENT (per tenant)
+# =========================================================================
+
+@settings_bp.route('/menu-order', methods=['GET'])
+@requer_admin
+def get_menu_order():
+    """Get the custom menu order for the current tenant."""
+    bd = obter_bd()
+
+    # Get menu order from system_config
+    result = bd.execute('''
+        SELECT config_value FROM system_config WHERE config_key = 'menu_order'
+    ''').fetchone()
+
+    if result and result['config_value']:
+        try:
+            menu_order = json.loads(result['config_value'])
+            return jsonify({'menu_order': menu_order}), 200
+        except json.JSONDecodeError:
+            pass
+
+    # Return default order if not set
+    return jsonify({'menu_order': []}), 200
+
+
+@settings_bp.route('/menu-order', methods=['PUT'])
+@requer_admin
+def update_menu_order():
+    """Update the custom menu order for the current tenant."""
+    dados = request.get_json() or {}
+    menu_order = dados.get('menu_order', [])
+    bd = obter_bd()
+    user_id = g.utilizador_atual.get('user_id')
+
+    # Validate that menu_order is a list of strings (menu IDs)
+    if not isinstance(menu_order, list):
+        return jsonify({'error': 'menu_order deve ser uma lista'}), 400
+
+    bd.execute('''
+        INSERT INTO system_config (config_key, config_value, description, updated_by)
+        VALUES ('menu_order', ?, 'Ordem personalizada dos menus', ?)
+        ON CONFLICT(config_key) DO UPDATE SET
+            config_value = ?,
+            updated_by = ?,
+            updated_at = CURRENT_TIMESTAMP
+    ''', (json.dumps(menu_order), user_id, json.dumps(menu_order), user_id))
+
+    bd.commit()
+
+    return jsonify({'message': 'Ordem dos menus atualizada'}), 200
+
+
+@settings_bp.route('/menu-items', methods=['GET'])
+@requer_autenticacao
+def get_available_menu_items():
+    """Get all available menu items with their current order."""
+    bd = obter_bd()
+    user_role = g.utilizador_atual.get('role', 'user')
+
+    # Default menu items with their order
+    default_items = [
+        {'id': 'dashboard', 'icon': 'LayoutDashboard', 'default_order': 1},
+        {'id': 'assets', 'icon': 'Package', 'default_order': 2},
+        {'id': 'scan', 'icon': 'ScanLine', 'default_order': 3},
+        {'id': 'map', 'icon': 'MapPin', 'default_order': 4},
+        {'id': 'interventions', 'icon': 'Wrench', 'default_order': 5},
+        {'id': 'catalog', 'icon': 'BookOpen', 'default_order': 6},
+        {'id': 'technicians', 'icon': 'HardHat', 'default_order': 7},
+        {'id': 'reports', 'icon': 'FileText', 'default_order': 8},
+        {'id': 'customReports', 'icon': 'FileSpreadsheet', 'default_order': 9},
+        {'id': 'analytics', 'icon': 'BarChart3', 'default_order': 10},
+    ]
+
+    # Add admin-only items
+    if user_role in ['admin', 'superadmin']:
+        default_items.extend([
+            {'id': 'users', 'icon': 'Users', 'default_order': 11},
+            {'id': 'data', 'icon': 'Database', 'default_order': 12},
+            {'id': 'settings', 'icon': 'Settings', 'default_order': 99, 'fixed_position': 'end'},
+        ])
+
+    # Add superadmin-only items
+    if user_role == 'superadmin':
+        default_items.append({'id': 'tenants', 'icon': 'Building2', 'default_order': 97})
+
+    # Get custom menu order
+    result = bd.execute('''
+        SELECT config_value FROM system_config WHERE config_key = 'menu_order'
+    ''').fetchone()
+
+    custom_order = []
+    if result and result['config_value']:
+        try:
+            custom_order = json.loads(result['config_value'])
+        except json.JSONDecodeError:
+            pass
+
+    # Apply custom order to items
+    if custom_order:
+        order_map = {menu_id: idx for idx, menu_id in enumerate(custom_order)}
+        for item in default_items:
+            if item['id'] in order_map:
+                item['order'] = order_map[item['id']]
+            else:
+                # Items not in custom order go at the end
+                item['order'] = 1000 + item['default_order']
+    else:
+        for item in default_items:
+            item['order'] = item['default_order']
+
+    # Sort by order
+    default_items.sort(key=lambda x: x['order'])
+
+    return jsonify({'items': default_items}), 200

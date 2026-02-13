@@ -751,7 +751,14 @@
       "maintenance": "Wartung",
       "equipment": "Ausrüstung",
       "other": "Sonstiges"
-    }
+    },
+    "menuOrder": "Menüreihenfolge",
+    "menuOrderDescription": "Ziehen Sie Elemente per Drag & Drop, um die Seitenleistenmenüs neu anzuordnen. Die neue Reihenfolge wird nach dem Speichern angewendet.",
+    "menuItems": "Menüelemente",
+    "menuOrderSaved": "Menüreihenfolge erfolgreich gespeichert",
+    "menuOrderReset": "Menüreihenfolge auf Standardwerte zurückgesetzt",
+    "menuOrderNote": "Hinweis: Das Menü 'Einstellungen' bleibt immer am Ende der Liste.",
+    "resetOrder": "Standardreihenfolge wiederherstellen"
   },
   "tenants": {
     "title": "Tenants",

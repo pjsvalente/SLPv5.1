@@ -751,7 +751,14 @@
       "maintenance": "Maintenance",
       "equipment": "Équipement",
       "other": "Autres"
-    }
+    },
+    "menuOrder": "Ordre des Menus",
+    "menuOrderDescription": "Glissez et déposez les éléments pour réorganiser les menus de la barre latérale. Le nouvel ordre sera appliqué après l'enregistrement.",
+    "menuItems": "Éléments du Menu",
+    "menuOrderSaved": "Ordre des menus enregistré avec succès",
+    "menuOrderReset": "Ordre des menus réinitialisé aux valeurs par défaut",
+    "menuOrderNote": "Remarque: Le menu 'Paramètres' reste toujours à la fin de la liste.",
+    "resetOrder": "Réinitialiser l'Ordre"
   },
   "tenants": {
     "title": "Tenants",

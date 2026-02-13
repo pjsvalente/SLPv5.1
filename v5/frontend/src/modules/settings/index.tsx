@@ -5,7 +5,7 @@ import { FormField } from '@/components/ui/FormField'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import {
   IconSave, IconLoader, IconPlus, IconTrash, IconSettings, IconHash, IconPalette,
-  IconDatabase, IconLayout, IconBookOpen, IconHardDrive, IconFileText, IconBell, IconShield, IconStar, IconGradientDefs
+  IconDatabase, IconLayout, IconBookOpen, IconHardDrive, IconFileText, IconBell, IconShield, IconStar, IconGradientDefs, IconMenu
 } from '@/components/icons'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -17,6 +17,7 @@ const AuditLog = lazy(() => import('./AuditLog'))
 const NotificationSettings = lazy(() => import('./NotificationSettings'))
 const PrivacySettings = lazy(() => import('./PrivacySettings'))
 const FavoritesSettings = lazy(() => import('./FavoritesSettings'))
+const MenuOrderSettings = lazy(() => import('./MenuOrderSettings'))
 
 // Tab component
 const Tab: React.FC<{ active: boolean; onClick: () => void; icon: React.ReactNode; label: string }> = ({
@@ -562,6 +563,7 @@ const Settings: React.FC = () => {
   // Build tabs based on role
   const tabs = [
     { id: 'prefixes', label: t('settings.prefixes'), icon: <IconHash className="h-4 w-4" /> },
+    { id: 'menuOrder', label: t('settings.menuOrder') || 'Menus', icon: <IconMenu className="h-4 w-4" /> },
     { id: 'favorites', label: t('settings.favorites') || 'Favoritos', icon: <IconStar className="h-4 w-4" /> },
     { id: 'colors', label: t('settings.colors'), icon: <IconPalette className="h-4 w-4" /> },
     { id: 'counters', label: t('settings.counters'), icon: <IconDatabase className="h-4 w-4" /> },
@@ -575,7 +577,7 @@ const Settings: React.FC = () => {
 
   // Add field catalog tab for superadmin only
   if (isSuperadmin) {
-    tabs.splice(4, 0, { id: 'catalog', label: t('settings.fieldCatalog') || 'Catálogo', icon: <IconBookOpen className="h-4 w-4" /> })
+    tabs.splice(5, 0, { id: 'catalog', label: t('settings.fieldCatalog') || 'Catálogo', icon: <IconBookOpen className="h-4 w-4" /> })
   }
 
   return (
@@ -599,6 +601,11 @@ const Settings: React.FC = () => {
 
         <div className="p-6">
           {activeTab === 'prefixes' && <PrefixSettings />}
+          {activeTab === 'menuOrder' && (
+            <Suspense fallback={<div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>}>
+              <MenuOrderSettings />
+            </Suspense>
+          )}
           {activeTab === 'favorites' && (
             <Suspense fallback={<div className="flex justify-center p-8"><IconLoader className="h-8 w-8 animate-spin" /></div>}>
               <FavoritesSettings />

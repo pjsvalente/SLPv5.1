@@ -751,7 +751,14 @@
       "maintenance": "Manutenção",
       "equipment": "Equipamento",
       "other": "Outros"
-    }
+    },
+    "menuOrder": "Ordem dos Menus",
+    "menuOrderDescription": "Arraste e solte os itens para reorganizar os menus da barra lateral. A nova ordem será aplicada após guardar.",
+    "menuItems": "Itens do Menu",
+    "menuOrderSaved": "Ordem dos menus guardada com sucesso",
+    "menuOrderReset": "Ordem dos menus reposta aos valores originais",
+    "menuOrderNote": "Nota: O menu 'Definições' permanece sempre no final da lista.",
+    "resetOrder": "Repor Ordem Original"
   },
   "tenants": {
     "title": "Tenants",

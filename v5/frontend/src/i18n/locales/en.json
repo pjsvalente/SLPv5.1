@@ -751,7 +751,14 @@
       "maintenance": "Maintenance",
       "equipment": "Equipment",
       "other": "Other"
-    }
+    },
+    "menuOrder": "Menu Order",
+    "menuOrderDescription": "Drag and drop items to reorder the sidebar menus. The new order will be applied after saving.",
+    "menuItems": "Menu Items",
+    "menuOrderSaved": "Menu order saved successfully",
+    "menuOrderReset": "Menu order reset to default values",
+    "menuOrderNote": "Note: The 'Settings' menu always stays at the end of the list.",
+    "resetOrder": "Reset to Default Order"
   },
   "tenants": {
     "title": "Tenants",

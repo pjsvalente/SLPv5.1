@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { api } from '@/services/api'
 import {
   IconGradientDefs,
   IconDashboard,
@@ -55,12 +56,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onClose
   const menuItems = user?.menu_items || []
   const [tenantLogoLoaded, setTenantLogoLoaded] = useState(false)
   const [logoKey, setLogoKey] = useState(Date.now())
+  const [customMenuOrder, setCustomMenuOrder] = useState<string[]>([])
 
   // Check if tenant has a custom logo
   useEffect(() => {
     setLogoKey(Date.now())
     setTenantLogoLoaded(false)
   }, [user?.tenant_id])
+
+  // Load custom menu order
+  useEffect(() => {
+    const loadMenuOrder = async () => {
+      if (user?.role === 'admin' || user?.role === 'superadmin') {
+        try {
+          const data = await api.get('/settings/menu-order')
+          if (data.menu_order && data.menu_order.length > 0) {
+            setCustomMenuOrder(data.menu_order)
+          }
+        } catch (err) {
+          // Silently ignore - will use default order
+          console.debug('Menu order not available, using defaults')
+        }
+      }
+    }
+    loadMenuOrder()
+  }, [user?.tenant_id, user?.role])
 
   // Build menu items dynamically based on user role
   const buildMenuItems = () => {
@@ -97,7 +117,35 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onClose
   }
 
   const defaultMenuItems = buildMenuItems()
-  const sortedItems = [...defaultMenuItems].sort((a, b) => a.order - b.order)
+
+  // Apply custom order if available
+  const sortedItems = React.useMemo(() => {
+    const items = [...defaultMenuItems]
+
+    if (customMenuOrder.length > 0) {
+      // Create order map from custom order
+      const orderMap: Record<string, number> = {}
+      customMenuOrder.forEach((id, index) => {
+        orderMap[id] = index
+      })
+
+      // Sort items based on custom order
+      items.sort((a, b) => {
+        const orderA = orderMap[a.id] ?? 1000 + a.order
+        const orderB = orderMap[b.id] ?? 1000 + b.order
+
+        // Settings always stays at the end
+        if (a.id === 'settings') return 1
+        if (b.id === 'settings') return -1
+
+        return orderA - orderB
+      })
+    } else {
+      items.sort((a, b) => a.order - b.order)
+    }
+
+    return items
+  }, [defaultMenuItems, customMenuOrder])
 
   // Sidebar content component to avoid duplication
   const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
