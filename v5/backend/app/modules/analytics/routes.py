@@ -7,7 +7,7 @@ import logging
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, g
 
-from ...shared.database import obter_bd
+from ...shared.database import obter_bd, extrair_valor
 from ...shared.permissions import requer_autenticacao, requer_permissao
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ def calculate_mtbf(bd, start_date, end_date):
     failure_count = failures['count'] if failures else 0
 
     # Get total assets and operating time
-    total_assets = bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0]
+    total_assets = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0
 
     # Calculate days in period
     try:
@@ -128,14 +128,14 @@ def calculate_availability(bd, start_date, end_date):
         availability = 100
 
     # Count assets by status
-    operational = bd.execute('''
-        SELECT COUNT(DISTINCT a.id)
+    operational = extrair_valor(bd.execute('''
+        SELECT COUNT(DISTINCT a.id) as cnt
         FROM assets a
         LEFT JOIN asset_data ad ON a.id = ad.asset_id AND ad.field_name = 'condition_status'
         WHERE ad.field_value = 'Operacional' OR ad.field_value IS NULL
-    ''').fetchone()[0]
+    ''').fetchone(), 0) or 0
 
-    total = bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0]
+    total = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0
 
     current_availability = (operational / total * 100) if total > 0 else 100
 
@@ -181,7 +181,7 @@ def calculate_costs(bd, start_date, end_date):
           AND total_cost IS NOT NULL
     ''', (start_date, end_date)).fetchone()
 
-    total_assets = bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0]
+    total_assets = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0
 
     total = total_costs['total'] or 0
     cost_per_asset = total / total_assets if total_assets > 0 else 0
@@ -287,27 +287,27 @@ def get_asset_health(bd):
 
     # Warranty status
     today = datetime.now().date().isoformat()
-    warranty_expiring = bd.execute('''
-        SELECT COUNT(*)
+    warranty_expiring = extrair_valor(bd.execute('''
+        SELECT COUNT(*) as cnt
         FROM asset_data
         WHERE field_name = 'warranty_end_date'
           AND DATE(field_value) BETWEEN DATE('now') AND DATE('now', '+30 days')
-    ''').fetchone()[0]
+    ''').fetchone(), 0) or 0
 
-    warranty_expired = bd.execute('''
-        SELECT COUNT(*)
+    warranty_expired = extrair_valor(bd.execute('''
+        SELECT COUNT(*) as cnt
         FROM asset_data
         WHERE field_name = 'warranty_end_date'
           AND DATE(field_value) < DATE('now')
-    ''').fetchone()[0]
+    ''').fetchone(), 0) or 0
 
     # Maintenance due
-    maintenance_due = bd.execute('''
-        SELECT COUNT(*)
+    maintenance_due = extrair_valor(bd.execute('''
+        SELECT COUNT(*) as cnt
         FROM asset_data
         WHERE field_name IN ('next_maintenance_date', 'next_inspection_date')
           AND DATE(field_value) <= DATE('now', '+7 days')
-    ''').fetchone()[0]
+    ''').fetchone(), 0) or 0
 
     return {
         'by_status': [dict(h) for h in health],

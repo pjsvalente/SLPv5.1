@@ -1108,42 +1108,54 @@ def import_catalog():
 
     bd = obter_bd_catalogo()
 
-    # Sheet name to table mapping
+    # Sheet name to table mapping (table_name, unique_field)
+    # The unique_field is used to check for existing records
     sheet_to_table = {
-        'Packs': ('catalog_packs', 'pack_code'),
-        'Colunas': ('catalog_columns', 'column_code'),
-        'Luminárias': ('catalog_luminaires', 'luminaire_code'),
-        'Quadros Elétricos': ('catalog_electrical_panels', 'panel_code'),
-        'Cofretes': ('catalog_fuse_boxes', 'fuse_box_code'),
-        'Telemetria': ('catalog_telemetry_panels', 'panel_code'),
-        'Carregadores EV': ('catalog_module_ev', 'module_code'),
-        'MUPI': ('catalog_module_mupi', 'module_code'),
-        'Módulos Laterais': ('catalog_module_lateral', 'module_code'),
-        'Antenas': ('catalog_module_antenna', 'module_code'),
+        'Packs': ('catalog_packs', 'pack_name'),
+        'Colunas': ('catalog_columns', 'reference'),
+        'Luminárias': ('catalog_luminaires', 'reference'),
+        'Quadros Elétricos': ('catalog_electrical_panels', 'reference'),
+        'Cofretes': ('catalog_fuse_boxes', 'reference'),
+        'Telemetria': ('catalog_telemetry_panels', 'reference'),
+        'Carregadores EV': ('catalog_module_ev', 'reference'),
+        'MUPI': ('catalog_module_mupi', 'reference'),
+        'Módulos Laterais': ('catalog_module_lateral', 'reference'),
+        'Antenas': ('catalog_module_antenna', 'reference'),
+    }
+
+    # Alternative sheet names (EN)
+    sheet_aliases = {
+        'Packs': 'Packs',
+        'Columns': 'Colunas',
+        'Luminaires': 'Luminárias',
+        'Electrical Panels': 'Quadros Elétricos',
+        'Fuse Boxes': 'Cofretes',
+        'Telemetry': 'Telemetria',
+        'EV Chargers': 'Carregadores EV',
+        'Lateral Modules': 'Módulos Laterais',
+        'Antennas': 'Antenas',
     }
 
     results = {}
 
     for sheet_name in wb.sheetnames:
-        if sheet_name not in sheet_to_table:
+        # Map alias to standard name
+        standard_name = sheet_aliases.get(sheet_name, sheet_name)
+
+        if standard_name not in sheet_to_table:
             continue
 
-        table_name, code_field = sheet_to_table[sheet_name]
+        table_name, unique_field = sheet_to_table[standard_name]
         ws = wb[sheet_name]
 
-        # Check if table exists
-        table_exists = bd.execute(
-            f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'"
-        ).fetchone()
-
-        if not table_exists:
-            results[sheet_name] = {'error': 'Tabela não existe'}
+        # Get headers from first row
+        headers = [cell.value for cell in ws[1] if cell.value]
+        if not headers:
+            results[sheet_name] = {'error': 'Sem cabeçalhos válidos'}
             continue
 
-        # Get headers
-        headers = [cell.value for cell in ws[1]]
-        if 'id' in headers:
-            headers.remove('id')  # Don't import ID
+        # Clean headers - remove 'id' if present
+        headers_clean = [h for h in headers if h and str(h).lower() != 'id']
 
         imported = 0
         updated = 0
@@ -1151,38 +1163,62 @@ def import_catalog():
         errors = []
 
         for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
-            if not row:
+            if not row or all(cell is None for cell in row):
                 continue
 
-            row_data = dict(zip([cell.value for cell in ws[1]], row))
+            # Create dict from row
+            row_data = {}
+            for i, header in enumerate(headers):
+                if header and i < len(row):
+                    row_data[header] = row[i]
 
-            # Get unique code field
-            code_value = row_data.get(code_field)
-            if not code_value:
-                errors.append(f'Linha {row_num}: Código vazio')
+            # Find the unique field value (try multiple common names)
+            unique_value = None
+            for field_name in [unique_field, 'reference', 'Reference', 'Referência', 'pack_name', 'pack_code', 'code', 'Code']:
+                if field_name in row_data and row_data[field_name]:
+                    unique_value = str(row_data[field_name]).strip()
+                    unique_field_actual = field_name
+                    break
+
+            if not unique_value:
+                # Try first non-empty column as reference
+                for key, val in row_data.items():
+                    if val and str(key).lower() not in ['id', 'created_at', 'updated_at']:
+                        unique_value = str(val).strip()
+                        unique_field_actual = key
+                        break
+
+            if not unique_value:
+                errors.append(f'Linha {row_num}: Campo único vazio')
                 continue
-
-            # Check if exists
-            existing = bd.execute(
-                f'SELECT id FROM {table_name} WHERE {code_field} = ?',
-                (code_value,)
-            ).fetchone()
 
             try:
+                # Check if record exists
+                existing = bd.execute(
+                    f'SELECT id FROM {table_name} WHERE {unique_field} = ?',
+                    (unique_value,)
+                ).fetchone()
+
                 # Build field lists (excluding id and timestamps)
-                fields = [h for h in headers if h not in ['id', 'created_at', 'updated_at']]
-                values = [row_data.get(f) for f in fields]
+                fields = []
+                values = []
+                for h in headers_clean:
+                    if h and str(h).lower() not in ['id', 'created_at', 'updated_at']:
+                        # Map common header variations to actual column names
+                        field_name = str(h).lower().replace(' ', '_').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ã', 'a').replace('õ', 'o').replace('ç', 'c')
+                        fields.append(field_name)
+                        values.append(row_data.get(h))
 
                 if existing:
                     if mode == 'create_only':
                         skipped += 1
                         continue
 
-                    # Update
+                    # Update existing record
                     set_clause = ', '.join([f'{f} = ?' for f in fields])
                     bd.execute(
-                        f'UPDATE {table_name} SET {set_clause} WHERE {code_field} = ?',
-                        values + [code_value]
+                        f'UPDATE {table_name} SET {set_clause} WHERE {unique_field} = ?',
+                        values + [unique_value]
                     )
                     updated += 1
                 else:
@@ -1190,7 +1226,7 @@ def import_catalog():
                         skipped += 1
                         continue
 
-                    # Insert
+                    # Insert new record
                     placeholders = ', '.join(['?' for _ in fields])
                     field_names = ', '.join(fields)
                     bd.execute(
@@ -1201,6 +1237,7 @@ def import_catalog():
 
             except Exception as e:
                 errors.append(f'Linha {row_num}: {str(e)}')
+                logger.error(f"Catalog import error row {row_num}: {e}")
 
         results[sheet_name] = {
             'imported': imported,

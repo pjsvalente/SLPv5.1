@@ -418,21 +418,37 @@ def get_assets_for_map():
     """Get assets with GPS coordinates for map display."""
     bd = obter_bd()
 
-    assets = bd.execute('''
-        SELECT a.id, a.serial_number,
-               MAX(CASE WHEN ad.field_name = 'gps_latitude' THEN ad.field_value END) as lat,
-               MAX(CASE WHEN ad.field_name = 'gps_longitude' THEN ad.field_value END) as lng,
-               MAX(CASE WHEN ad.field_name = 'status' THEN ad.field_value END) as status,
-               MAX(CASE WHEN ad.field_name = 'condition_status' THEN ad.field_value END) as condition_status,
-               MAX(CASE WHEN ad.field_name = 'installation_location' THEN ad.field_value END) as location,
-               MAX(CASE WHEN ad.field_name = 'street_address' THEN ad.field_value END) as address
-        FROM assets a
-        LEFT JOIN asset_data ad ON a.id = ad.asset_id
-        GROUP BY a.id
-        HAVING lat IS NOT NULL AND lng IS NOT NULL
-    ''').fetchall()
+    # Get all assets first
+    assets = bd.execute('SELECT id, serial_number FROM assets').fetchall()
 
-    return jsonify([dict(a) for a in assets]), 200
+    result = []
+    for asset in assets:
+        # Get GPS and other fields for each asset
+        fields = bd.execute('''
+            SELECT field_name, field_value FROM asset_data WHERE asset_id = ?
+        ''', (asset['id'],)).fetchall()
+
+        fields_dict = {f['field_name']: f['field_value'] for f in fields}
+
+        lat = fields_dict.get('gps_latitude')
+        lng = fields_dict.get('gps_longitude')
+
+        if lat and lng:
+            try:
+                result.append({
+                    'id': asset['id'],
+                    'serial_number': asset['serial_number'],
+                    'lat': float(lat),
+                    'lng': float(lng),
+                    'status': fields_dict.get('status'),
+                    'condition_status': fields_dict.get('condition_status'),
+                    'location': fields_dict.get('installation_location'),
+                    'address': fields_dict.get('street_address')
+                })
+            except (ValueError, TypeError):
+                continue
+
+    return jsonify(result), 200
 
 
 @assets_bp.route('/schema', methods=['GET'])
