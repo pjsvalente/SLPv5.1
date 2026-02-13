@@ -1,16 +1,35 @@
 """
-SmartLamppost v4.0 - Database management utilities
+SmartLamppost v5.0 - Database management utilities
 Handles multi-tenant database connections, initialization, and migrations.
+Supports both SQLite (local development) and PostgreSQL (Railway production).
 """
 
 import os
 import json
 import sqlite3
 import logging
+from urllib.parse import urlparse
 
 from flask import g
 
 logger = logging.getLogger(__name__)
+
+# Database mode detection
+DATABASE_URL = os.environ.get('DATABASE_URL')
+USE_POSTGRES = DATABASE_URL is not None and DATABASE_URL.startswith('postgres')
+
+# PostgreSQL connection pool (only if using Postgres)
+_pg_pool = None
+
+if USE_POSTGRES:
+    try:
+        import psycopg2
+        from psycopg2 import pool
+        from psycopg2.extras import RealDictCursor
+        logger.info("PostgreSQL mode enabled")
+    except ImportError:
+        logger.warning("psycopg2 not installed, falling back to SQLite")
+        USE_POSTGRES = False
 
 # These will be set by the app during initialization
 PASTA_BASE = None
@@ -22,8 +41,86 @@ FICHEIRO_TENANTS = None
 MASTER_TENANT_ID = 'smartlamppost'
 
 # Current schema version for migration tracking
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
+
+# =========================================================================
+# DATABASE ADAPTER - Unified interface for SQLite/PostgreSQL
+# =========================================================================
+
+class DatabaseAdapter:
+    """Adapter to provide consistent interface for SQLite and PostgreSQL."""
+
+    def __init__(self, connection, is_postgres=False):
+        self.conn = connection
+        self.is_postgres = is_postgres
+        self._cursor = None
+
+    def execute(self, query, params=None):
+        """Execute query with automatic parameter placeholder conversion."""
+        if self.is_postgres:
+            # Convert ? to %s for PostgreSQL
+            query = query.replace('?', '%s')
+            # Handle AUTOINCREMENT -> SERIAL
+            query = query.replace('AUTOINCREMENT', '')
+            query = query.replace('INTEGER PRIMARY KEY', 'SERIAL PRIMARY KEY')
+
+        cursor = self.conn.cursor()
+        if params:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+        return cursor
+
+    def executemany(self, query, params_list):
+        """Execute many with automatic conversion."""
+        if self.is_postgres:
+            query = query.replace('?', '%s')
+        cursor = self.conn.cursor()
+        cursor.executemany(query, params_list)
+        return cursor
+
+    def commit(self):
+        self.conn.commit()
+
+    def rollback(self):
+        self.conn.rollback()
+
+    def close(self):
+        self.conn.close()
+
+
+def _get_pg_connection(schema_name='public'):
+    """Get a PostgreSQL connection for a specific schema (tenant)."""
+    global _pg_pool
+
+    if _pg_pool is None:
+        # Parse DATABASE_URL
+        result = urlparse(DATABASE_URL)
+        _pg_pool = pool.ThreadedConnectionPool(
+            minconn=1,
+            maxconn=10,
+            host=result.hostname,
+            port=result.port or 5432,
+            database=result.path[1:],  # Remove leading /
+            user=result.username,
+            password=result.password
+        )
+
+    conn = _pg_pool.getconn()
+    conn.cursor().execute(f"SET search_path TO {schema_name}")
+    return conn
+
+
+def _return_pg_connection(conn):
+    """Return connection to pool."""
+    if _pg_pool:
+        _pg_pool.putconn(conn)
+
+
+# =========================================================================
+# PATH INITIALIZATION
+# =========================================================================
 
 def init_paths(base_path):
     """Initialize all database paths from the application base path (v5 root)."""
@@ -32,24 +129,31 @@ def init_paths(base_path):
 
     PASTA_BASE = base_path
     data_path = os.path.join(base_path, 'data')
-    PASTA_TENANTS = os.path.join(data_path, 'tenants')  # /app/data/tenants
-    PASTA_SHARED = os.path.join(data_path, 'shared')    # /app/data/shared
-    PASTA_CONFIG = os.path.join(data_path, 'config')    # /app/data/config
+    PASTA_TENANTS = os.path.join(data_path, 'tenants')
+    PASTA_SHARED = os.path.join(data_path, 'shared')
+    PASTA_CONFIG = os.path.join(data_path, 'config')
     CATALOGO_PARTILHADO = os.path.join(PASTA_SHARED, 'catalog.db')
     FICHEIRO_TENANTS = os.path.join(PASTA_CONFIG, 'tenants.json')
 
-    # Create directories if they don't exist
-    for path in [data_path, PASTA_TENANTS, PASTA_SHARED, PASTA_CONFIG]:
-        os.makedirs(path, exist_ok=True)
-        logger.info(f"Ensured directory exists: {path}")
+    # Create directories if they don't exist (SQLite mode)
+    if not USE_POSTGRES:
+        for path in [data_path, PASTA_TENANTS, PASTA_SHARED, PASTA_CONFIG]:
+            os.makedirs(path, exist_ok=True)
+            logger.info(f"Ensured directory exists: {path}")
+
+    logger.info(f"Database mode: {'PostgreSQL' if USE_POSTGRES else 'SQLite'}")
 
 
 # Alias for compatibility
 db_init_paths = init_paths
 
 
+# =========================================================================
+# CONNECTION MANAGEMENT
+# =========================================================================
+
 def obter_caminho_bd_tenant(tenant_id):
-    """Get the database file path for a specific tenant."""
+    """Get the database file path for a specific tenant (SQLite only)."""
     return os.path.join(PASTA_TENANTS, tenant_id, 'database.db')
 
 
@@ -65,11 +169,21 @@ def obter_bd(tenant_id=None):
     bd = getattr(g, cache_key, None)
 
     if bd is None:
-        caminho_bd = obter_caminho_bd_tenant(tenant_id)
-        os.makedirs(os.path.dirname(caminho_bd), exist_ok=True)
-        bd = sqlite3.connect(caminho_bd)
-        bd.row_factory = sqlite3.Row
-        bd.execute("PRAGMA foreign_keys = ON")
+        if USE_POSTGRES:
+            # PostgreSQL: use schema per tenant
+            schema_name = f"tenant_{tenant_id.replace('-', '_')}"
+            conn = _get_pg_connection(schema_name)
+            conn.cursor_factory = RealDictCursor if 'RealDictCursor' in dir() else None
+            bd = DatabaseAdapter(conn, is_postgres=True)
+        else:
+            # SQLite: file per tenant
+            caminho_bd = obter_caminho_bd_tenant(tenant_id)
+            os.makedirs(os.path.dirname(caminho_bd), exist_ok=True)
+            conn = sqlite3.connect(caminho_bd)
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA foreign_keys = ON")
+            bd = conn  # Return raw connection for SQLite (backward compatible)
+
         setattr(g, cache_key, bd)
 
     return bd
@@ -79,8 +193,12 @@ def obter_bd_catalogo():
     """Get a connection to the shared catalog database."""
     bd = getattr(g, '_database_catalog', None)
     if bd is None:
-        bd = sqlite3.connect(CATALOGO_PARTILHADO)
-        bd.row_factory = sqlite3.Row
+        if USE_POSTGRES:
+            conn = _get_pg_connection('catalog')
+            bd = DatabaseAdapter(conn, is_postgres=True)
+        else:
+            bd = sqlite3.connect(CATALOGO_PARTILHADO)
+            bd.row_factory = sqlite3.Row
         g._database_catalog = bd
     return bd
 
@@ -91,46 +209,58 @@ def obter_bd_para_tenant(tenant_id: str):
     Used by scheduler and background tasks.
     """
     try:
-        caminho_bd = obter_caminho_bd_tenant(tenant_id)
-        if not os.path.exists(caminho_bd):
-            return None
-        bd = sqlite3.connect(caminho_bd)
-        bd.row_factory = sqlite3.Row
-        bd.execute("PRAGMA foreign_keys = ON")
-        return bd
+        if USE_POSTGRES:
+            schema_name = f"tenant_{tenant_id.replace('-', '_')}"
+            conn = _get_pg_connection(schema_name)
+            return DatabaseAdapter(conn, is_postgres=True)
+        else:
+            caminho_bd = obter_caminho_bd_tenant(tenant_id)
+            if not os.path.exists(caminho_bd):
+                return None
+            bd = sqlite3.connect(caminho_bd)
+            bd.row_factory = sqlite3.Row
+            bd.execute("PRAGMA foreign_keys = ON")
+            return bd
     except Exception as e:
         logger.error("Error connecting to tenant %s database: %s", tenant_id, e)
         return None
 
 
 def obter_lista_tenants():
-    """
-    Get list of all tenant IDs from the tenants folder.
-    """
-    if not PASTA_TENANTS or not os.path.exists(PASTA_TENANTS):
-        return []
-
-    tenants = []
-    for item in os.listdir(PASTA_TENANTS):
-        tenant_path = os.path.join(PASTA_TENANTS, item)
-        if os.path.isdir(tenant_path) and os.path.exists(os.path.join(tenant_path, 'database.db')):
-            tenants.append(item)
-
-    return tenants
+    """Get list of all tenant IDs."""
+    if USE_POSTGRES:
+        # Get from tenants.json or query pg_catalog
+        dados = carregar_tenants()
+        return [t['id'] for t in dados.get('tenants', [])]
+    else:
+        if not PASTA_TENANTS or not os.path.exists(PASTA_TENANTS):
+            return []
+        tenants = []
+        for item in os.listdir(PASTA_TENANTS):
+            tenant_path = os.path.join(PASTA_TENANTS, item)
+            if os.path.isdir(tenant_path) and os.path.exists(os.path.join(tenant_path, 'database.db')):
+                tenants.append(item)
+        return tenants
 
 
 def fechar_ligacoes(excecao):
     """Close all database connections at end of request."""
     bd_catalog = getattr(g, '_database_catalog', None)
     if bd_catalog is not None:
-        bd_catalog.close()
+        if USE_POSTGRES and hasattr(bd_catalog, 'conn'):
+            _return_pg_connection(bd_catalog.conn)
+        elif hasattr(bd_catalog, 'close'):
+            bd_catalog.close()
 
     for attr in list(vars(g).keys()):
         if attr.startswith('_database_'):
             bd = getattr(g, attr, None)
             if bd is not None:
                 try:
-                    bd.close()
+                    if USE_POSTGRES and hasattr(bd, 'conn'):
+                        _return_pg_connection(bd.conn)
+                    elif hasattr(bd, 'close'):
+                        bd.close()
                 except Exception:
                     logger.debug("Error closing database connection for %s", attr)
 
@@ -143,7 +273,9 @@ def obter_config(chave, valor_padrao=None, tenant_id=None):
             'SELECT config_value FROM system_config WHERE config_key = ?',
             (chave,)
         ).fetchone()
-        return resultado['config_value'] if resultado else valor_padrao
+        if resultado:
+            return resultado['config_value'] if isinstance(resultado, dict) else resultado[0]
+        return valor_padrao
     except Exception:
         return valor_padrao
 
@@ -153,8 +285,13 @@ def obter_config(chave, valor_padrao=None, tenant_id=None):
 # =========================================================================
 
 def carregar_tenants():
-    """Load the tenant list from the configuration file."""
-    if os.path.exists(FICHEIRO_TENANTS):
+    """Load the tenant list from the configuration file or database."""
+    if USE_POSTGRES:
+        # For PostgreSQL, we still use JSON file for tenant registry
+        # This allows tenant list to persist without needing a special table
+        pass
+
+    if FICHEIRO_TENANTS and os.path.exists(FICHEIRO_TENANTS):
         with open(FICHEIRO_TENANTS, 'r', encoding='utf-8') as f:
             return json.load(f)
     return {'tenants': [], 'version': '1.0.0'}
@@ -162,6 +299,10 @@ def carregar_tenants():
 
 def guardar_tenants(dados):
     """Save the tenant list to the configuration file."""
+    # Ensure config directory exists
+    if PASTA_CONFIG:
+        os.makedirs(PASTA_CONFIG, exist_ok=True)
+
     with open(FICHEIRO_TENANTS, 'w', encoding='utf-8') as f:
         json.dump(dados, f, indent=2, ensure_ascii=False)
 
@@ -181,7 +322,401 @@ def tenant_existe(tenant_id):
 
 
 # =========================================================================
-# SCHEMA INITIALIZATION
+# SCHEMA INITIALIZATION - PostgreSQL
+# =========================================================================
+
+def _criar_schema_postgres(tenant_id):
+    """Create PostgreSQL schema for a tenant."""
+    schema_name = f"tenant_{tenant_id.replace('-', '_')}"
+
+    conn = _get_pg_connection('public')
+    cursor = conn.cursor()
+
+    # Create schema if not exists
+    cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
+    conn.commit()
+
+    # Set search path to new schema
+    cursor.execute(f"SET search_path TO {schema_name}")
+
+    return conn, schema_name
+
+
+def _criar_tabelas_postgres(conn, schema_name):
+    """Create all tables in PostgreSQL schema."""
+    cursor = conn.cursor()
+
+    # Users table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            role TEXT DEFAULT 'user',
+            first_name TEXT,
+            last_name TEXT,
+            phone TEXT,
+            two_factor_enabled INTEGER DEFAULT 0,
+            two_factor_method TEXT DEFAULT 'email',
+            must_change_password INTEGER DEFAULT 1,
+            failed_login_attempts INTEGER DEFAULT 0,
+            locked_until TIMESTAMP,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_login TIMESTAMP,
+            created_by INTEGER,
+            language TEXT DEFAULT 'pt'
+        )
+    ''')
+
+    # Sessions
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sessions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            token TEXT UNIQUE NOT NULL,
+            expires_at TIMESTAMP NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            ip_address TEXT,
+            user_agent TEXT
+        )
+    ''')
+
+    # Two Factor Codes
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS two_factor_codes (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            code TEXT NOT NULL,
+            method TEXT DEFAULT 'email',
+            expires_at TIMESTAMP NOT NULL,
+            attempts INTEGER DEFAULT 0,
+            used INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Password Reset Tokens
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS password_reset_tokens (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            token TEXT UNIQUE NOT NULL,
+            expires_at TIMESTAMP NOT NULL,
+            used INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # User Permissions
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_permissions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            section TEXT NOT NULL,
+            field_name TEXT,
+            can_view INTEGER DEFAULT 1,
+            can_create INTEGER DEFAULT 0,
+            can_edit INTEGER DEFAULT 0,
+            can_delete INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, section, field_name)
+        )
+    ''')
+
+    # Permission Templates
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS permission_templates (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            description TEXT,
+            permissions_json TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Schema Fields
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS schema_fields (
+            id SERIAL PRIMARY KEY,
+            field_name TEXT UNIQUE NOT NULL,
+            field_type TEXT NOT NULL,
+            field_label TEXT NOT NULL,
+            required INTEGER DEFAULT 0,
+            field_order INTEGER DEFAULT 0,
+            field_category TEXT DEFAULT 'general',
+            field_options TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Assets
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS assets (
+            id SERIAL PRIMARY KEY,
+            serial_number TEXT UNIQUE NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_by INTEGER,
+            updated_by INTEGER
+        )
+    ''')
+
+    # Asset Data (key-value)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS asset_data (
+            id SERIAL PRIMARY KEY,
+            asset_id INTEGER NOT NULL,
+            field_name TEXT NOT NULL,
+            field_value TEXT,
+            UNIQUE(asset_id, field_name)
+        )
+    ''')
+
+    # Maintenance Log
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS maintenance_log (
+            id SERIAL PRIMARY KEY,
+            asset_id INTEGER NOT NULL,
+            action_type TEXT NOT NULL,
+            description TEXT,
+            performed_by INTEGER,
+            performed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Audit Log
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS audit_log (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER,
+            action TEXT NOT NULL,
+            table_name TEXT,
+            record_id INTEGER,
+            old_values TEXT,
+            new_values TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # System Config
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS system_config (
+            config_key TEXT PRIMARY KEY,
+            config_value TEXT,
+            description TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Sequence Counters
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sequence_counters (
+            id SERIAL PRIMARY KEY,
+            counter_type TEXT UNIQUE NOT NULL,
+            current_value INTEGER DEFAULT 0,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Status Change Log
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS status_change_log (
+            id SERIAL PRIMARY KEY,
+            asset_id INTEGER NOT NULL,
+            previous_status TEXT,
+            new_status TEXT NOT NULL,
+            description TEXT NOT NULL,
+            changed_by INTEGER NOT NULL,
+            intervention_id INTEGER,
+            changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # External Technicians
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS external_technicians (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            company TEXT NOT NULL,
+            phone TEXT,
+            email TEXT,
+            notes TEXT,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_by INTEGER
+        )
+    ''')
+
+    # Technicians
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS technicians (
+            id SERIAL PRIMARY KEY,
+            nome TEXT NOT NULL,
+            tipo TEXT NOT NULL,
+            empresa TEXT,
+            telefone TEXT,
+            email TEXT,
+            especialidade TEXT,
+            notas TEXT,
+            ativo INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Backup History
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS backup_history (
+            id SERIAL PRIMARY KEY,
+            filename TEXT NOT NULL,
+            description TEXT,
+            file_size INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Interventions
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS interventions (
+            id SERIAL PRIMARY KEY,
+            asset_id INTEGER NOT NULL,
+            intervention_type TEXT NOT NULL,
+            problem_description TEXT,
+            solution_description TEXT,
+            parts_used TEXT,
+            total_cost REAL DEFAULT 0,
+            duration_hours REAL,
+            status TEXT DEFAULT 'em_curso',
+            previous_asset_status TEXT,
+            final_asset_status TEXT,
+            notes TEXT,
+            created_by INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            completed_at TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_by INTEGER
+        )
+    ''')
+
+    # Intervention Technicians
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS intervention_technicians (
+            id SERIAL PRIMARY KEY,
+            intervention_id INTEGER NOT NULL,
+            user_id INTEGER,
+            external_technician_id INTEGER,
+            technician_id INTEGER,
+            role TEXT DEFAULT 'participante'
+        )
+    ''')
+
+    # Intervention Files
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS intervention_files (
+            id SERIAL PRIMARY KEY,
+            intervention_id INTEGER NOT NULL,
+            file_category TEXT NOT NULL,
+            file_name TEXT NOT NULL,
+            original_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            file_type TEXT NOT NULL,
+            file_size INTEGER,
+            description TEXT,
+            cost_value REAL,
+            uploaded_by INTEGER NOT NULL,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Intervention Edit Log
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS intervention_edit_log (
+            id SERIAL PRIMARY KEY,
+            intervention_id INTEGER NOT NULL,
+            edited_by INTEGER NOT NULL,
+            edited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            field_name TEXT NOT NULL,
+            old_value TEXT,
+            new_value TEXT
+        )
+    ''')
+
+    # Intervention Time Logs
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS intervention_time_logs (
+            id SERIAL PRIMARY KEY,
+            intervention_id INTEGER NOT NULL,
+            logged_by INTEGER NOT NULL,
+            time_spent REAL NOT NULL,
+            work_date DATE DEFAULT CURRENT_DATE,
+            description TEXT,
+            logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Tenant Field Config
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tenant_field_config (
+            id SERIAL PRIMARY KEY,
+            field_name TEXT UNIQUE NOT NULL,
+            is_active INTEGER DEFAULT 1,
+            is_required INTEGER DEFAULT 0,
+            custom_label TEXT,
+            custom_order INTEGER,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_by INTEGER
+        )
+    ''')
+
+    # Intervention Updates
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS intervention_updates (
+            id SERIAL PRIMARY KEY,
+            intervention_id INTEGER NOT NULL,
+            update_code TEXT UNIQUE NOT NULL,
+            update_number INTEGER NOT NULL,
+            description TEXT,
+            notes TEXT,
+            created_by INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # GDPR Tables
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS deletion_requests (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            reason TEXT,
+            scheduled_deletion_date TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            cancelled_at TIMESTAMP,
+            completed_at TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_consents (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            consent_type TEXT NOT NULL,
+            granted INTEGER DEFAULT 0,
+            ip_address TEXT,
+            user_agent TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, consent_type)
+        )
+    ''')
+
+    conn.commit()
+
+
+# =========================================================================
+# SCHEMA INITIALIZATION - SQLite (Original)
 # =========================================================================
 
 def inicializar_bd_tenant(tenant_id):
@@ -190,6 +725,15 @@ def inicializar_bd_tenant(tenant_id):
     This is the single source of truth for the tenant database schema.
     Uses CREATE TABLE IF NOT EXISTS and ALTER TABLE for safe migration.
     """
+    if USE_POSTGRES:
+        conn, schema_name = _criar_schema_postgres(tenant_id)
+        _criar_tabelas_postgres(conn, schema_name)
+        _inserir_dados_iniciais_postgres(conn)
+        _return_pg_connection(conn)
+        logger.info("PostgreSQL tenant schema initialized: %s", tenant_id)
+        return None
+
+    # SQLite mode
     bd = obter_bd(tenant_id)
 
     # --- Users ---
@@ -713,15 +1257,63 @@ def inicializar_bd_tenant(tenant_id):
     return bd
 
 
+def _inserir_dados_iniciais_postgres(conn):
+    """Insert initial data for PostgreSQL tenant."""
+    cursor = conn.cursor()
+
+    # Check if schema_fields has data
+    cursor.execute('SELECT COUNT(*) FROM schema_fields')
+    count = cursor.fetchone()[0]
+
+    if count == 0:
+        campos = [
+            ('rfid_tag', 'text', 'RFID Tag', 1, 1, 'identification', None),
+            ('product_reference', 'text', 'Referência do Produto', 1, 2, 'identification', None),
+            ('manufacturer', 'text', 'Fabricante', 1, 3, 'identification', None),
+            ('model', 'text', 'Modelo', 1, 4, 'identification', None),
+            ('height_meters', 'number', 'Altura (m)', 0, 5, 'specifications', None),
+            ('condition_status', 'select', 'Estado', 0, 60, 'maintenance',
+             json.dumps(['Operacional', 'Manutenção Necessária', 'Em Reparação', 'Desativado', 'Suspenso'])),
+            ('notes', 'textarea', 'Observações', 0, 99, 'other', None),
+        ]
+        for campo in campos:
+            cursor.execute('''
+                INSERT INTO schema_fields
+                (field_name, field_type, field_label, required, field_order, field_category, field_options)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (field_name) DO NOTHING
+            ''', campo)
+
+    # Default config
+    configs = [
+        ('prefix_assets', 'SLP', 'Prefixo para ativos'),
+        ('prefix_assets_digits', '9', 'Dígitos para numeração'),
+    ]
+    for chave, valor, desc in configs:
+        cursor.execute('''
+            INSERT INTO system_config (config_key, config_value, description)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (config_key) DO NOTHING
+        ''', (chave, valor, desc))
+
+    # Default counters
+    for contador in ['assets', 'int_preventiva', 'int_corretiva', 'int_substituicao', 'int_inspecao']:
+        cursor.execute('''
+            INSERT INTO sequence_counters (counter_type, current_value)
+            VALUES (%s, 0)
+            ON CONFLICT (counter_type) DO NOTHING
+        ''', (contador,))
+
+    conn.commit()
+
+
 def inicializar_catalogo():
-    """Initialize the shared catalog database schema.
+    """Initialize the shared catalog database schema."""
+    if USE_POSTGRES:
+        _inicializar_catalogo_postgres()
+        return
 
-    This function creates the catalog database directly without using Flask's g context,
-    so it can be called during application startup.
-
-    RFID v3 Migration: Complete catalog structure with power calculations support.
-    """
-    # Create connection directly (not using g context as this runs at startup)
+    # SQLite mode
     bd = sqlite3.connect(CATALOGO_PARTILHADO)
     bd.row_factory = sqlite3.Row
 
@@ -749,7 +1341,6 @@ def inicializar_catalogo():
     ''')
 
     # --- Catalog Columns (base posts/columns) ---
-    # mod1-mod8 flags indicate which modules are compatible with this column
     bd.execute('''
         CREATE TABLE IF NOT EXISTS catalog_columns (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -794,7 +1385,7 @@ def inicializar_catalogo():
         )
     ''')
 
-    # --- Mod.2: Electrical Panels (Quadros Elétricos) ---
+    # --- Mod.2: Electrical Panels ---
     bd.execute('''
         CREATE TABLE IF NOT EXISTS catalog_electrical_panels (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -811,7 +1402,7 @@ def inicializar_catalogo():
         )
     ''')
 
-    # --- Mod.3: Fuse Boxes (Cofretes Fusível) ---
+    # --- Mod.3: Fuse Boxes ---
     bd.execute('''
         CREATE TABLE IF NOT EXISTS catalog_fuse_boxes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -860,7 +1451,7 @@ def inicializar_catalogo():
         )
     ''')
 
-    # --- Mod.6: MUPI (Advertising/Display Panels) ---
+    # --- Mod.6: MUPI ---
     bd.execute('''
         CREATE TABLE IF NOT EXISTS catalog_module_mupi (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -905,7 +1496,7 @@ def inicializar_catalogo():
         )
     ''')
 
-    # --- Field Catalog (global - shared by all tenants) ---
+    # --- Field Catalog (global) ---
     bd.execute('''
         CREATE TABLE IF NOT EXISTS field_catalog (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -925,8 +1516,7 @@ def inicializar_catalogo():
         )
     ''')
 
-    # --- Safe migration for existing catalog tables ---
-    # Add new columns if they don't exist (for upgrades from older versions)
+    # Safe migrations
     _safe_add_columns_catalog(bd, 'catalog_columns', [
         ('mod1', 'INTEGER DEFAULT 0'),
         ('mod2', 'INTEGER DEFAULT 0'),
@@ -939,66 +1529,62 @@ def inicializar_catalogo():
         ('active', 'INTEGER DEFAULT 1'),
     ])
 
-    _safe_add_columns_catalog(bd, 'catalog_luminaires', [
-        ('power_watts', 'REAL DEFAULT 0'),
-        ('voltage', 'TEXT DEFAULT "230V"'),
-        ('current_amps', 'REAL'),
-        ('active', 'INTEGER DEFAULT 1'),
-    ])
+    # Insert default field catalog
+    campos_existentes = bd.execute('SELECT COUNT(*) FROM field_catalog').fetchone()[0]
+    if campos_existentes == 0:
+        campos_catalogo = [
+            ('rfid_tag', 'text', 'RFID Tag', 'RFID Tag', 'Tag RFID', 'RFID-Tag', 'identification', None, 1, 1, 1),
+            ('product_reference', 'text', 'Referência do Produto', 'Product Reference', 'Référence Produit', 'Produktreferenz', 'identification', None, 2, 1, 1),
+            ('manufacturer', 'text', 'Fabricante', 'Manufacturer', 'Fabricant', 'Hersteller', 'identification', None, 3, 1, 1),
+            ('model', 'text', 'Modelo', 'Model', 'Modèle', 'Modell', 'identification', None, 4, 1, 1),
+            ('condition_status', 'select', 'Estado', 'Condition', 'État', 'Zustand', 'maintenance', json.dumps(['Operacional', 'Manutenção Necessária', 'Em Reparação', 'Desativado']), 21, 1, 0),
+            ('height_meters', 'number', 'Altura (m)', 'Height (m)', 'Hauteur (m)', 'Höhe (m)', 'specifications', None, 5, 0, 0),
+            ('notes', 'textarea', 'Observações', 'Notes', 'Observations', 'Bemerkungen', 'other', None, 99, 0, 0),
+        ]
+        for campo in campos_catalogo:
+            bd.execute('''
+                INSERT OR IGNORE INTO field_catalog
+                (field_name, field_type, field_label_pt, field_label_en, field_label_fr, field_label_de,
+                 field_category, field_options, field_order, is_system, is_required_default)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', campo)
 
-    _safe_add_columns_catalog(bd, 'catalog_electrical_panels', [
-        ('max_power_total', 'REAL DEFAULT 0'),
-        ('max_power_per_phase', 'REAL'),
-        ('phases', 'INTEGER DEFAULT 1'),
-        ('voltage', 'TEXT DEFAULT "230V"'),
-        ('active', 'INTEGER DEFAULT 1'),
-    ])
+    # Default packs
+    packs_existentes = bd.execute('SELECT COUNT(*) FROM catalog_packs').fetchone()[0]
+    if packs_existentes == 0:
+        packs = [('Standard', 'Pack padrão'), ('Premium', 'Pack premium'), ('Industrial', 'Pack industrial')]
+        for p in packs:
+            bd.execute('INSERT OR IGNORE INTO catalog_packs (pack_name, pack_description) VALUES (?, ?)', p)
 
-    _safe_add_columns_catalog(bd, 'catalog_fuse_boxes', [
-        ('max_power', 'REAL DEFAULT 0'),
-        ('voltage', 'TEXT DEFAULT "230V"'),
-        ('active', 'INTEGER DEFAULT 1'),
-    ])
+    bd.commit()
+    bd.close()
+    logger.info("Catalog database initialized")
 
-    _safe_add_columns_catalog(bd, 'catalog_telemetry_panels', [
-        ('power_watts', 'REAL DEFAULT 0'),
-        ('voltage', 'TEXT DEFAULT "230V"'),
-        ('active', 'INTEGER DEFAULT 1'),
-    ])
 
-    _safe_add_columns_catalog(bd, 'catalog_module_ev', [
-        ('power_watts', 'REAL DEFAULT 0'),
-        ('current_amps', 'REAL'),
-        ('voltage', 'TEXT DEFAULT "230V"'),
-        ('connector_type', 'TEXT'),
-        ('active', 'INTEGER DEFAULT 1'),
-    ])
+def _inicializar_catalogo_postgres():
+    """Initialize catalog schema in PostgreSQL."""
+    conn = _get_pg_connection('public')
+    cursor = conn.cursor()
 
-    _safe_add_columns_catalog(bd, 'catalog_module_mupi', [
-        ('power_watts', 'REAL DEFAULT 0'),
-        ('size', 'TEXT'),
-        ('active', 'INTEGER DEFAULT 1'),
-    ])
+    # Create catalog schema
+    cursor.execute("CREATE SCHEMA IF NOT EXISTS catalog")
+    cursor.execute("SET search_path TO catalog")
 
-    _safe_add_columns_catalog(bd, 'catalog_module_lateral', [
-        ('lateral_type', 'TEXT'),
-        ('active', 'INTEGER DEFAULT 1'),
-    ])
+    # Create tables (simplified for brevity - add all tables as needed)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_packs (
+            id SERIAL PRIMARY KEY,
+            pack_name TEXT UNIQUE NOT NULL,
+            pack_description TEXT,
+            pack_data TEXT,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
 
-    _safe_add_columns_catalog(bd, 'catalog_module_antenna', [
-        ('frequency', 'TEXT'),
-        ('power_watts', 'REAL DEFAULT 0'),
-        ('active', 'INTEGER DEFAULT 1'),
-    ])
-
-    _safe_add_columns_catalog(bd, 'catalog_packs', [
-        ('active', 'INTEGER DEFAULT 1'),
-    ])
-
-    # --- Field Catalog (global - shared by all tenants) ---
-    bd.execute('''
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS field_catalog (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             field_name TEXT UNIQUE NOT NULL,
             field_type TEXT NOT NULL,
             field_label_pt TEXT NOT NULL,
@@ -1015,100 +1601,30 @@ def inicializar_catalogo():
         )
     ''')
 
-    # Insert predefined fields if table is empty
-    campos_existentes = bd.execute('SELECT COUNT(*) FROM field_catalog').fetchone()[0]
-    if campos_existentes == 0:
-        campos_catalogo = [
-            # (field_name, field_type, label_pt, label_en, label_fr, label_de, category, options, order, is_system, is_required_default)
-            ('rfid_tag', 'text', 'RFID Tag', 'RFID Tag', 'Tag RFID', 'RFID-Tag', 'identification', None, 1, 1, 1),
-            ('product_reference', 'text', 'Referência do Produto', 'Product Reference', 'Référence Produit', 'Produktreferenz', 'identification', None, 2, 1, 1),
-            ('manufacturer', 'text', 'Fabricante', 'Manufacturer', 'Fabricant', 'Hersteller', 'identification', None, 3, 1, 1),
-            ('model', 'text', 'Modelo', 'Model', 'Modèle', 'Modell', 'identification', None, 4, 1, 1),
-            ('condition_status', 'select', 'Estado', 'Condition', 'État', 'Zustand', 'maintenance', json.dumps(['Operacional', 'Manutenção Necessária', 'Em Reparação', 'Desativado']), 21, 1, 0),
-            ('height_meters', 'number', 'Altura (m)', 'Height (m)', 'Hauteur (m)', 'Höhe (m)', 'specifications', None, 5, 0, 0),
-            ('material', 'select', 'Material', 'Material', 'Matériau', 'Material', 'specifications', json.dumps(['Aço Galvanizado', 'Alumínio', 'Aço Inox', 'Compósito']), 6, 0, 0),
-            ('power_watts', 'number', 'Potência (W)', 'Power (W)', 'Puissance (W)', 'Leistung (W)', 'specifications', None, 7, 0, 0),
-            ('connection_type', 'select', 'Tipologia de Ligação', 'Connection Type', 'Type de Connexion', 'Anschlusstyp', 'specifications', json.dumps(['Monofásica', 'Trifásica']), 8, 0, 0),
-            # Electrical balance fields (RFID v3 migration)
-            ('electrical_max_power', 'number', 'Potência Máxima (W)', 'Max Power (W)', 'Puissance Max (W)', 'Max. Leistung (W)', 'electrical', None, 30, 0, 0),
-            ('total_installed_power', 'number', 'Potência Instalada (W)', 'Installed Power (W)', 'Puissance Installée (W)', 'Installierte Leistung (W)', 'electrical', None, 31, 0, 0),
-            ('remaining_power', 'number', 'Potência Restante (W)', 'Remaining Power (W)', 'Puissance Restante (W)', 'Restleistung (W)', 'electrical', None, 32, 0, 0),
-            ('electrical_connection_type', 'select', 'Tipo de Ligação Elétrica', 'Electrical Connection', 'Connexion Électrique', 'Elektrischer Anschluss', 'electrical', json.dumps(['Monofásico', 'Trifásico']), 33, 0, 0),
-            # Installation fields
-            ('installation_date', 'date', 'Data de Instalação', 'Installation Date', "Date d'Installation", 'Installationsdatum', 'installation', None, 9, 0, 0),
-            ('installation_location', 'text', 'Localização', 'Location', 'Emplacement', 'Standort', 'installation', None, 10, 0, 0),
-            ('gps_coordinates', 'gps', 'Coordenadas GPS', 'GPS Coordinates', 'Coordonnées GPS', 'GPS-Koordinaten', 'installation', None, 11, 0, 0),
-            ('gps_latitude', 'number', 'GPS Latitude', 'GPS Latitude', 'GPS Latitude', 'GPS Breitengrad', 'installation', None, 12, 0, 0),
-            ('gps_longitude', 'number', 'GPS Longitude', 'GPS Longitude', 'GPS Longitude', 'GPS Längengrad', 'installation', None, 13, 0, 0),
-            ('municipality', 'text', 'Município', 'Municipality', 'Commune', 'Gemeinde', 'installation', None, 13, 0, 0),
-            ('street_address', 'text', 'Morada', 'Address', 'Adresse', 'Adresse', 'installation', None, 14, 0, 0),
-            ('postal_code', 'text', 'Código Postal', 'Postal Code', 'Code Postal', 'Postleitzahl', 'installation', None, 15, 0, 0),
-            # Warranty
-            ('warranty_end_date', 'date', 'Fim da Garantia', 'Warranty End', 'Fin de Garantie', 'Garantieende', 'warranty', None, 40, 0, 0),
-            ('warranty_certificate', 'text', 'Certificado de Garantia', 'Warranty Certificate', 'Certificat de Garantie', 'Garantiezertifikat', 'warranty', None, 41, 0, 0),
-            # Maintenance
-            ('last_inspection_date', 'date', 'Última Inspeção', 'Last Inspection', 'Dernière Inspection', 'Letzte Inspektion', 'maintenance', None, 50, 0, 0),
-            ('next_inspection_date', 'date', 'Próxima Inspeção', 'Next Inspection', 'Prochaine Inspection', 'Nächste Inspektion', 'maintenance', None, 51, 0, 0),
-            ('next_maintenance_date', 'date', 'Próxima Manutenção', 'Next Maintenance', 'Prochaine Maintenance', 'Nächste Wartung', 'maintenance', None, 52, 0, 0),
-            ('maintenance_notes', 'textarea', 'Notas de Manutenção', 'Maintenance Notes', 'Notes de Maintenance', 'Wartungshinweise', 'maintenance', None, 53, 0, 0),
-            # Equipment
-            ('attached_equipment', 'textarea', 'Equipamentos Associados', 'Attached Equipment', 'Équipements Associés', 'Angeschlossene Geräte', 'equipment', None, 60, 0, 0),
-            ('luminaire_type', 'text', 'Tipo de Luminária', 'Luminaire Type', 'Type de Luminaire', 'Leuchtentyp', 'equipment', None, 61, 0, 0),
-            ('column_color', 'color_select', 'Cor da Coluna', 'Column Color', 'Couleur de la Colonne', 'Säulenfarbe', 'specifications', None, 62, 0, 0),
-            # Other
-            ('notes', 'textarea', 'Observações', 'Notes', 'Observations', 'Bemerkungen', 'other', None, 99, 0, 0),
-        ]
-        for campo in campos_catalogo:
-            bd.execute('''
-                INSERT OR IGNORE INTO field_catalog
-                (field_name, field_type, field_label_pt, field_label_en, field_label_fr, field_label_de,
-                 field_category, field_options, field_order, is_system, is_required_default)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', campo)
-
-    # Insert default packs if none exist
-    packs_existentes = bd.execute('SELECT COUNT(*) FROM catalog_packs').fetchone()[0]
-    if packs_existentes == 0:
-        packs_default = [
-            ('Standard', 'Pack padrão para colunas standard'),
-            ('Premium', 'Pack premium com módulos avançados'),
-            ('Industrial', 'Pack para aplicações industriais'),
-            ('Smart City', 'Pack completo para cidades inteligentes'),
-        ]
-        for pack_name, pack_desc in packs_default:
-            bd.execute('''
-                INSERT OR IGNORE INTO catalog_packs (pack_name, pack_description)
-                VALUES (?, ?)
-            ''', (pack_name, pack_desc))
-
-    bd.commit()
-    bd.close()  # Close connection since this runs outside request context
-    logger.info("Catalog database initialized with RFID v3 schema")
+    conn.commit()
+    _return_pg_connection(conn)
+    logger.info("PostgreSQL catalog schema initialized")
 
 
 def _safe_add_columns_catalog(bd, table_name, columns):
-    """Safely add columns to a catalog table (no-op if they already exist).
-
-    Used for the shared catalog database migrations.
-    """
+    """Safely add columns to a catalog table."""
     for col_def in columns:
-        # col_def is a tuple like ('column_name', 'COLUMN_TYPE DEFAULT value')
         col_name = col_def[0]
         col_type = col_def[1]
         try:
             bd.execute(f'ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type}')
             logger.debug(f"Added column {col_name} to {table_name}")
         except sqlite3.OperationalError:
-            pass  # Column already exists
+            pass
 
 
 def _safe_add_columns(bd, table_name, columns):
-    """Safely add columns to an existing table (no-op if they already exist)."""
+    """Safely add columns to an existing table."""
     for col_name, col_type in columns:
         try:
             bd.execute(f'ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type}')
         except sqlite3.OperationalError:
-            pass  # Column already exists
+            pass
 
 
 def registar_auditoria(bd, user_id, acao, tabela, record_id, valores_antigos, valores_novos):

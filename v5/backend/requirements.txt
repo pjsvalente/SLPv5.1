@@ -7,6 +7,8 @@ flask-cors>=4.0.0
 
 # Database
 # SQLite is built-in, no extra package needed
+# PostgreSQL support (for Railway/production)
+psycopg2-binary>=2.9.9
 
 # Excel support
 openpyxl>=3.1.0
