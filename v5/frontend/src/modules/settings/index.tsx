@@ -562,17 +562,17 @@ const Settings: React.FC = () => {
 
   // Build tabs based on role
   const tabs = [
-    { id: 'prefixes', label: t('settings.prefixes'), icon: <IconHash className="h-4 w-4" /> },
-    { id: 'menuOrder', label: t('settings.menuOrder') || 'Menus', icon: <IconMenu className="h-4 w-4" /> },
-    { id: 'favorites', label: t('settings.favorites') || 'Favoritos', icon: <IconStar className="h-4 w-4" /> },
-    { id: 'colors', label: t('settings.colors'), icon: <IconPalette className="h-4 w-4" /> },
-    { id: 'counters', label: t('settings.counters'), icon: <IconDatabase className="h-4 w-4" /> },
+    { id: 'prefixes', label: t('settings.prefixes'), icon: <IconHash size={16} /> },
+    { id: 'menuOrder', label: t('settings.menuOrder') || 'Menus', icon: <IconMenu size={16} /> },
+    { id: 'favorites', label: t('settings.favorites') || 'Favoritos', icon: <IconStar size={16} /> },
+    { id: 'colors', label: t('settings.colors'), icon: <IconPalette size={16} /> },
+    { id: 'counters', label: t('settings.counters'), icon: <IconDatabase size={16} /> },
     { id: 'fields', label: t('settings.fieldConfig') || 'Campos', icon: <IconLayout size={16} /> },
-    { id: 'notifications', label: t('notifications.title') || 'Notificações', icon: <IconBell className="h-4 w-4" /> },
-    { id: 'privacy', label: t('privacy.title') || 'Privacidade', icon: <IconShield className="h-4 w-4" /> },
-    { id: 'backup', label: t('backup.title') || 'Backup', icon: <IconHardDrive className="h-4 w-4" /> },
-    { id: 'audit', label: t('auditLog.title') || 'Audit Log', icon: <IconFileText className="h-4 w-4" /> },
-    { id: 'schema', label: t('settings.schema'), icon: <IconSettings className="h-4 w-4" /> },
+    { id: 'notifications', label: t('notifications.title') || 'Notificações', icon: <IconBell size={16} /> },
+    { id: 'privacy', label: t('privacy.title') || 'Privacidade', icon: <IconShield size={16} /> },
+    { id: 'backup', label: t('backup.title') || 'Backup', icon: <IconHardDrive size={16} /> },
+    { id: 'audit', label: t('auditLog.title') || 'Audit Log', icon: <IconFileText size={16} /> },
+    { id: 'schema', label: t('settings.schema'), icon: <IconSettings size={16} /> },
   ]
 
   // Add field catalog tab for superadmin only

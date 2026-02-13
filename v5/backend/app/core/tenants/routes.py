@@ -362,7 +362,7 @@ def get_logo(tenant_id):
     tenant_path = os.path.join(Config.TENANTS_PATH, tenant_id)
 
     # Try different extensions
-    for ext in ['png', 'jpg', 'jpeg']:
+    for ext in ['png', 'jpg', 'jpeg', 'svg']:
         logo_path = os.path.join(tenant_path, f'logo.{ext}')
         if os.path.exists(logo_path):
             resp = make_response(send_file(logo_path))
@@ -370,14 +370,22 @@ def get_logo(tenant_id):
             return resp
 
     # Fallback to master tenant logo
-    for ext in ['png', 'jpg', 'jpeg']:
+    for ext in ['png', 'jpg', 'jpeg', 'svg']:
         master_logo = os.path.join(Config.TENANTS_PATH, MASTER_TENANT_ID, f'logo.{ext}')
         if os.path.exists(master_logo):
             resp = make_response(send_file(master_logo))
             resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
             return resp
 
-    return jsonify({'error': 'Logo não encontrado'}), 404
+    # Return default SVG logo
+    default_svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <rect width="100" height="100" rx="12" fill="#1e40af"/>
+        <text x="50" y="60" text-anchor="middle" fill="white" font-size="40" font-family="Arial, sans-serif" font-weight="bold">SL</text>
+    </svg>'''
+    resp = make_response(default_svg)
+    resp.headers['Content-Type'] = 'image/svg+xml'
+    resp.headers['Cache-Control'] = 'public, max-age=86400'
+    return resp
 
 
 @tenants_bp.route('/<string:tenant_id>/users', methods=['GET'])
