@@ -54,10 +54,11 @@ SCHEMA_VERSION = 5
 class DatabaseAdapter:
     """Adapter to provide consistent interface for SQLite and PostgreSQL."""
 
-    def __init__(self, connection, is_postgres=False):
+    def __init__(self, connection, is_postgres=False, schema_name=None):
         self.conn = connection
         self.is_postgres = is_postgres
         self._cursor = None
+        self.schema_name = schema_name  # Store schema for re-setting search_path
 
     def execute(self, query, params=None):
         """Execute query with automatic parameter placeholder conversion."""
@@ -121,6 +122,12 @@ class DatabaseAdapter:
 
         if self.is_postgres and RealDictCursor:
             cursor = self.conn.cursor(cursor_factory=RealDictCursor)
+            # Ensure search_path is set for this cursor if we have a specific schema
+            if self.schema_name and self.schema_name != 'public':
+                try:
+                    cursor.execute(f"SET search_path TO {self.schema_name}, public")
+                except Exception as e:
+                    logger.warning(f"Could not set search_path in execute: {e}")
         else:
             cursor = self.conn.cursor()
 
@@ -289,7 +296,7 @@ def obter_bd(tenant_id=None):
             conn = _get_pg_connection(schema_name)
             if RealDictCursor:
                 conn.cursor_factory = RealDictCursor
-            bd = DatabaseAdapter(conn, is_postgres=True)
+            bd = DatabaseAdapter(conn, is_postgres=True, schema_name=schema_name)
         else:
             # SQLite: file per tenant
             caminho_bd = obter_caminho_bd_tenant(tenant_id)
@@ -310,7 +317,7 @@ def obter_bd_catalogo():
     if bd is None:
         if USE_POSTGRES:
             conn = _get_pg_connection('catalog')
-            bd = DatabaseAdapter(conn, is_postgres=True)
+            bd = DatabaseAdapter(conn, is_postgres=True, schema_name='catalog')
         else:
             bd = sqlite3.connect(CATALOGO_PARTILHADO)
             bd.row_factory = sqlite3.Row
@@ -327,7 +334,7 @@ def obter_bd_para_tenant(tenant_id: str):
         if USE_POSTGRES:
             schema_name = f"tenant_{tenant_id.replace('-', '_')}"
             conn = _get_pg_connection(schema_name)
-            return DatabaseAdapter(conn, is_postgres=True)
+            return DatabaseAdapter(conn, is_postgres=True, schema_name=schema_name)
         else:
             caminho_bd = obter_caminho_bd_tenant(tenant_id)
             if not os.path.exists(caminho_bd):

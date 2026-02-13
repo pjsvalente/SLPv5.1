@@ -33,7 +33,14 @@ def debug_catalog():
 
         # Check current search_path
         result = bd.execute("SHOW search_path").fetchone()
-        search_path = result[0] if result else 'unknown'
+        # Handle both dict (PostgreSQL RealDictCursor) and tuple (SQLite)
+        if result:
+            if isinstance(result, dict):
+                search_path = result.get('search_path', list(result.values())[0] if result else 'unknown')
+            else:
+                search_path = result[0]
+        else:
+            search_path = 'unknown'
 
         # List all tables in current schema
         tables_result = bd.execute("""
@@ -42,12 +49,20 @@ def debug_catalog():
             WHERE table_schema = 'catalog'
             ORDER BY table_name
         """).fetchall()
-        tables = [t[0] if isinstance(t, tuple) else t['table_name'] for t in tables_result]
+        tables = []
+        for t in tables_result:
+            if isinstance(t, dict):
+                tables.append(t.get('table_name', ''))
+            else:
+                tables.append(t[0])
 
         # Try to count packs
         try:
-            packs_count = bd.execute("SELECT COUNT(*) FROM catalog_packs").fetchone()
-            packs = packs_count[0] if isinstance(packs_count, tuple) else list(packs_count.values())[0]
+            packs_count = bd.execute("SELECT COUNT(*) as cnt FROM catalog_packs").fetchone()
+            if isinstance(packs_count, dict):
+                packs = packs_count.get('cnt', 0)
+            else:
+                packs = packs_count[0] if packs_count else 0
         except Exception as e:
             packs = f"Error: {e}"
 
@@ -58,8 +73,22 @@ def debug_catalog():
         except Exception as e:
             packs_data = f"Error: {e}"
 
+        # Check all schemas in database
+        schemas_result = bd.execute("""
+            SELECT schema_name
+            FROM information_schema.schemata
+            ORDER BY schema_name
+        """).fetchall()
+        schemas = []
+        for s in schemas_result:
+            if isinstance(s, dict):
+                schemas.append(s.get('schema_name', ''))
+            else:
+                schemas.append(s[0])
+
         return jsonify({
             'search_path': search_path,
+            'all_schemas': schemas,
             'tables_in_catalog_schema': tables,
             'packs_count': packs,
             'packs_sample': packs_data
