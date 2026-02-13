@@ -203,10 +203,25 @@ def _get_pg_connection(schema_name='public'):
         )
 
     conn = _pg_pool.getconn()
-    # Set search_path persistently for this connection
     cursor = conn.cursor()
-    cursor.execute(f"SET search_path TO {schema_name}")
-    conn.commit()  # Commit to make the search_path change persistent
+
+    # Ensure the schema exists before setting search_path
+    if schema_name != 'public':
+        try:
+            cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
+            conn.commit()
+        except Exception as e:
+            logger.warning(f"Could not create schema {schema_name}: {e}")
+            conn.rollback()
+
+    # Set search_path persistently for this connection
+    try:
+        cursor.execute(f"SET search_path TO {schema_name}, public")
+        conn.commit()
+    except Exception as e:
+        logger.error(f"Error setting search_path to {schema_name}: {e}")
+        conn.rollback()
+
     cursor.close()
     return conn
 

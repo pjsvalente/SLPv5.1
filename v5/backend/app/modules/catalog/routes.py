@@ -25,6 +25,54 @@ logger = logging.getLogger(__name__)
 catalog_bp = Blueprint('catalog', __name__)
 
 
+@catalog_bp.route('/debug', methods=['GET'])
+def debug_catalog():
+    """Debug endpoint to check catalog database status."""
+    try:
+        bd = obter_bd_catalogo()
+
+        # Check current search_path
+        result = bd.execute("SHOW search_path").fetchone()
+        search_path = result[0] if result else 'unknown'
+
+        # List all tables in current schema
+        tables_result = bd.execute("""
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'catalog'
+            ORDER BY table_name
+        """).fetchall()
+        tables = [t[0] if isinstance(t, tuple) else t['table_name'] for t in tables_result]
+
+        # Try to count packs
+        try:
+            packs_count = bd.execute("SELECT COUNT(*) FROM catalog_packs").fetchone()
+            packs = packs_count[0] if isinstance(packs_count, tuple) else list(packs_count.values())[0]
+        except Exception as e:
+            packs = f"Error: {e}"
+
+        # List all packs
+        try:
+            packs_list = bd.execute("SELECT * FROM catalog_packs LIMIT 5").fetchall()
+            packs_data = [dict(p) if hasattr(p, 'keys') else list(p) for p in packs_list]
+        except Exception as e:
+            packs_data = f"Error: {e}"
+
+        return jsonify({
+            'search_path': search_path,
+            'tables_in_catalog_schema': tables,
+            'packs_count': packs,
+            'packs_sample': packs_data
+        }), 200
+
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
+
 # =============================================================================
 # STATISTICS
 # =============================================================================
@@ -33,28 +81,34 @@ catalog_bp = Blueprint('catalog', __name__)
 @requer_autenticacao
 def get_catalog_stats():
     """Get statistics for all catalog tables."""
-    bd = obter_bd_catalogo()
+    try:
+        bd = obter_bd_catalogo()
 
-    stats = {
-        'packs': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_packs WHERE active = 1').fetchone(), 0) or 0,
-        'columns': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_columns WHERE active = 1').fetchone(), 0) or 0,
-        'luminaires': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_luminaires WHERE active = 1').fetchone(), 0) or 0,
-        'electrical_panels': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_electrical_panels WHERE active = 1').fetchone(), 0) or 0,
-        'fuse_boxes': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_fuse_boxes WHERE active = 1').fetchone(), 0) or 0,
-        'telemetry_panels': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_telemetry_panels WHERE active = 1').fetchone(), 0) or 0,
-        'ev_chargers': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_ev WHERE active = 1').fetchone(), 0) or 0,
-        'mupi': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_mupi WHERE active = 1').fetchone(), 0) or 0,
-        'lateral': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_lateral WHERE active = 1').fetchone(), 0) or 0,
-        'antennas': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_antenna WHERE active = 1').fetchone(), 0) or 0,
-    }
+        stats = {
+            'packs': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_packs WHERE active = 1').fetchone(), 0) or 0,
+            'columns': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_columns WHERE active = 1').fetchone(), 0) or 0,
+            'luminaires': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_luminaires WHERE active = 1').fetchone(), 0) or 0,
+            'electrical_panels': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_electrical_panels WHERE active = 1').fetchone(), 0) or 0,
+            'fuse_boxes': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_fuse_boxes WHERE active = 1').fetchone(), 0) or 0,
+            'telemetry_panels': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_telemetry_panels WHERE active = 1').fetchone(), 0) or 0,
+            'ev_chargers': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_ev WHERE active = 1').fetchone(), 0) or 0,
+            'mupi': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_mupi WHERE active = 1').fetchone(), 0) or 0,
+            'lateral': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_lateral WHERE active = 1').fetchone(), 0) or 0,
+            'antennas': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_antenna WHERE active = 1').fetchone(), 0) or 0,
+        }
 
-    stats['total_references'] = sum([
-        stats['columns'], stats['luminaires'], stats['electrical_panels'],
-        stats['fuse_boxes'], stats['telemetry_panels'], stats['ev_chargers'],
-        stats['mupi'], stats['lateral'], stats['antennas']
-    ])
+        stats['total_references'] = sum([
+            stats['columns'], stats['luminaires'], stats['electrical_panels'],
+            stats['fuse_boxes'], stats['telemetry_panels'], stats['ev_chargers'],
+            stats['mupi'], stats['lateral'], stats['antennas']
+        ])
 
-    return jsonify(stats), 200
+        return jsonify(stats), 200
+    except Exception as e:
+        logger.error(f"Error getting catalog stats: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e), 'packs': 0, 'columns': 0, 'luminaires': 0, 'electrical_panels': 0, 'fuse_boxes': 0, 'telemetry_panels': 0, 'ev_chargers': 0, 'mupi': 0, 'lateral': 0, 'antennas': 0, 'total_references': 0}), 200
 
 
 # =============================================================================
