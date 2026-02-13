@@ -67,13 +67,24 @@ class DatabaseAdapter:
             # Handle AUTOINCREMENT -> SERIAL
             query = query.replace('AUTOINCREMENT', '')
             query = query.replace('INTEGER PRIMARY KEY', 'SERIAL PRIMARY KEY')
-            # Handle INSERT OR REPLACE -> INSERT ON CONFLICT
+            # Handle INSERT OR REPLACE -> INSERT ON CONFLICT DO UPDATE
             if 'INSERT OR REPLACE' in query:
-                query = query.replace('INSERT OR REPLACE', 'INSERT')
-                # Add ON CONFLICT clause if not present
-                if 'ON CONFLICT' not in query:
-                    # Try to detect unique constraint from table
-                    pass  # Complex - handle case by case
+                # Special handling for known tables
+                if 'asset_data' in query:
+                    query = query.replace('INSERT OR REPLACE', 'INSERT')
+                    query = query.rstrip().rstrip(';')
+                    query += ' ON CONFLICT (asset_id, field_name) DO UPDATE SET field_value = EXCLUDED.field_value'
+                elif 'notification_settings' in query:
+                    query = query.replace('INSERT OR REPLACE', 'INSERT')
+                    query = query.rstrip().rstrip(';')
+                    query += ' ON CONFLICT (setting_key) DO UPDATE SET setting_value = EXCLUDED.setting_value, updated_at = EXCLUDED.updated_at'
+                elif 'system_config' in query:
+                    query = query.replace('INSERT OR REPLACE', 'INSERT')
+                    query = query.rstrip().rstrip(';')
+                    query += ' ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value'
+                else:
+                    # Generic fallback - just replace without ON CONFLICT
+                    query = query.replace('INSERT OR REPLACE', 'INSERT')
             # Handle INSERT OR IGNORE -> INSERT ON CONFLICT DO NOTHING
             if 'INSERT OR IGNORE' in query:
                 query = query.replace('INSERT OR IGNORE', 'INSERT')
@@ -153,6 +164,25 @@ def get_count(bd, query, params=None):
     """
     result = bd.execute(query, params).fetchone() if params else bd.execute(query).fetchone()
     return extrair_valor(result, 0) or 0
+
+
+def table_exists(bd, table_name):
+    """
+    Check if a table exists in the database.
+    Works with both SQLite and PostgreSQL.
+    """
+    if USE_POSTGRES:
+        result = bd.execute(
+            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = ?)",
+            (table_name,)
+        ).fetchone()
+        return extrair_valor(result, 0) or False
+    else:
+        result = bd.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+            (table_name,)
+        ).fetchone()
+        return result is not None
 
 
 def _get_pg_connection(schema_name='public'):
@@ -1673,7 +1703,7 @@ def _inicializar_catalogo_postgres():
     cursor.execute("CREATE SCHEMA IF NOT EXISTS catalog")
     cursor.execute("SET search_path TO catalog")
 
-    # Create tables (simplified for brevity - add all tables as needed)
+    # Catalog Packs
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS catalog_packs (
             id SERIAL PRIMARY KEY,
@@ -1685,6 +1715,174 @@ def _inicializar_catalogo_postgres():
         )
     ''')
 
+    # Catalog Values (for dropdowns)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_values (
+            id SERIAL PRIMARY KEY,
+            column_name TEXT NOT NULL,
+            value TEXT NOT NULL,
+            value_label TEXT,
+            value_order INTEGER DEFAULT 0
+        )
+    ''')
+
+    # Catalog Columns (base posts/columns)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_columns (
+            id SERIAL PRIMARY KEY,
+            reference TEXT UNIQUE NOT NULL,
+            description TEXT,
+            pack TEXT NOT NULL,
+            column_type TEXT DEFAULT 'Standard',
+            fixing TEXT DEFAULT 'Flange',
+            height_m REAL,
+            arm_count INTEGER DEFAULT 1,
+            arm_street INTEGER DEFAULT 0,
+            arm_sidewalk INTEGER DEFAULT 0,
+            mod1 INTEGER DEFAULT 0,
+            mod2 INTEGER DEFAULT 0,
+            mod3 INTEGER DEFAULT 0,
+            mod4 INTEGER DEFAULT 0,
+            mod5 INTEGER DEFAULT 0,
+            mod6 INTEGER DEFAULT 0,
+            mod7 INTEGER DEFAULT 0,
+            mod8 INTEGER DEFAULT 0,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Mod.1: Luminaires
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_luminaires (
+            id SERIAL PRIMARY KEY,
+            reference TEXT NOT NULL,
+            description TEXT,
+            luminaire_type TEXT,
+            manufacturer_ref TEXT,
+            power_watts REAL DEFAULT 0,
+            voltage TEXT DEFAULT '230V',
+            current_amps REAL,
+            type_1 INTEGER DEFAULT 1,
+            type_2 INTEGER DEFAULT 0,
+            column_height_m REAL,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Mod.2: Electrical Panels
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_electrical_panels (
+            id SERIAL PRIMARY KEY,
+            reference TEXT UNIQUE NOT NULL,
+            description TEXT,
+            panel_type TEXT,
+            short_reference TEXT,
+            max_power_total REAL DEFAULT 0,
+            max_power_per_phase REAL,
+            phases INTEGER DEFAULT 1,
+            voltage TEXT DEFAULT '230V',
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Mod.3: Fuse Boxes
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_fuse_boxes (
+            id SERIAL PRIMARY KEY,
+            reference TEXT UNIQUE NOT NULL,
+            description TEXT,
+            fuse_type TEXT,
+            short_reference TEXT,
+            max_power REAL DEFAULT 0,
+            voltage TEXT DEFAULT '230V',
+            type_s INTEGER DEFAULT 0,
+            type_d INTEGER DEFAULT 0,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Mod.4: Telemetry Panels
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_telemetry_panels (
+            id SERIAL PRIMARY KEY,
+            reference TEXT UNIQUE NOT NULL,
+            description TEXT,
+            panel_type TEXT,
+            short_reference TEXT,
+            power_watts REAL DEFAULT 0,
+            voltage TEXT DEFAULT '230V',
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Mod.5: EV Chargers
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_module_ev (
+            id SERIAL PRIMARY KEY,
+            reference TEXT UNIQUE NOT NULL,
+            description TEXT,
+            module_type TEXT,
+            short_reference TEXT,
+            power_watts REAL DEFAULT 0,
+            current_amps REAL,
+            voltage TEXT DEFAULT '230V',
+            connector_type TEXT,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Mod.6: MUPI
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_module_mupi (
+            id SERIAL PRIMARY KEY,
+            reference TEXT UNIQUE NOT NULL,
+            description TEXT,
+            module_type TEXT,
+            short_reference TEXT,
+            power_watts REAL DEFAULT 0,
+            size TEXT,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Mod.7: Lateral Modules
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_module_lateral (
+            id SERIAL PRIMARY KEY,
+            reference TEXT UNIQUE NOT NULL,
+            description TEXT,
+            module_type TEXT,
+            short_reference TEXT,
+            lateral_type TEXT,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Mod.8: Antennas
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS catalog_module_antenna (
+            id SERIAL PRIMARY KEY,
+            reference TEXT UNIQUE NOT NULL,
+            description TEXT,
+            module_type TEXT,
+            short_reference TEXT,
+            column_height_m REAL,
+            frequency TEXT,
+            power_watts REAL DEFAULT 0,
+            active INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Field Catalog
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS field_catalog (
             id SERIAL PRIMARY KEY,
@@ -1703,6 +1901,19 @@ def _inicializar_catalogo_postgres():
             created_by TEXT
         )
     ''')
+
+    # Insert default packs
+    default_packs = [
+        ('Pack Standard', 'Colunas standard'),
+        ('Pack Premium', 'Colunas premium com mais funcionalidades'),
+        ('Pack Urban', 'Colunas para ambiente urbano')
+    ]
+    for pack_name, pack_desc in default_packs:
+        cursor.execute('''
+            INSERT INTO catalog_packs (pack_name, pack_description)
+            VALUES (%s, %s)
+            ON CONFLICT (pack_name) DO NOTHING
+        ''', (pack_name, pack_desc))
 
     conn.commit()
     _return_pg_connection(conn)

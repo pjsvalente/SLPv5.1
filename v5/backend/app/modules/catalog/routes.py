@@ -111,9 +111,16 @@ def add_pack():
         ''', (dados['pack_name'], dados.get('pack_description', '')))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_pack = bd.execute(
+            'SELECT id FROM catalog_packs WHERE pack_name = ?',
+            (dados['pack_name'],)
+        ).fetchone()
+        new_id = new_pack['id'] if new_pack else None
+
         return jsonify({
             'message': 'Pack adicionado',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding pack: {e}")
@@ -202,9 +209,16 @@ def add_column():
         ))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_col = bd.execute(
+            'SELECT id FROM catalog_columns WHERE reference = ?',
+            (dados['reference'],)
+        ).fetchone()
+        new_id = new_col['id'] if new_col else None
+
         return jsonify({
             'message': 'Coluna adicionada',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding column: {e}")
@@ -330,9 +344,16 @@ def add_luminaire():
         ))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_item = bd.execute(
+            'SELECT id FROM catalog_luminaires WHERE reference = ?',
+            (dados['reference'],)
+        ).fetchone()
+        new_id = new_item['id'] if new_item else None
+
         return jsonify({
             'message': 'Luminária adicionada',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding luminaire: {e}")
@@ -436,9 +457,16 @@ def add_electrical_panel():
         ))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_item = bd.execute(
+            'SELECT id FROM catalog_electrical_panels WHERE reference = ?',
+            (dados['reference'],)
+        ).fetchone()
+        new_id = new_item['id'] if new_item else None
+
         return jsonify({
             'message': 'Quadro elétrico adicionado',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding electrical panel: {e}")
@@ -538,9 +566,16 @@ def add_fuse_box():
         ))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_item = bd.execute(
+            'SELECT id FROM catalog_fuse_boxes WHERE reference = ?',
+            (dados['reference'],)
+        ).fetchone()
+        new_id = new_item['id'] if new_item else None
+
         return jsonify({
             'message': 'Cofrete adicionado',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding fuse box: {e}")
@@ -601,9 +636,16 @@ def add_telemetry_panel():
         ))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_item = bd.execute(
+            'SELECT id FROM catalog_telemetry_panels WHERE reference = ?',
+            (dados['reference'],)
+        ).fetchone()
+        new_id = new_item['id'] if new_item else None
+
         return jsonify({
             'message': 'Painel de telemetria adicionado',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding telemetry panel: {e}")
@@ -666,9 +708,16 @@ def add_ev_charger():
         ))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_item = bd.execute(
+            'SELECT id FROM catalog_module_ev WHERE reference = ?',
+            (dados['reference'],)
+        ).fetchone()
+        new_id = new_item['id'] if new_item else None
+
         return jsonify({
             'message': 'Carregador EV adicionado',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding EV charger: {e}")
@@ -729,9 +778,16 @@ def add_mupi():
         ))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_item = bd.execute(
+            'SELECT id FROM catalog_module_mupi WHERE reference = ?',
+            (dados['reference'],)
+        ).fetchone()
+        new_id = new_item['id'] if new_item else None
+
         return jsonify({
             'message': 'MUPI adicionado',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding MUPI: {e}")
@@ -791,9 +847,16 @@ def add_lateral():
         ))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_item = bd.execute(
+            'SELECT id FROM catalog_module_lateral WHERE reference = ?',
+            (dados['reference'],)
+        ).fetchone()
+        new_id = new_item['id'] if new_item else None
+
         return jsonify({
             'message': 'Módulo lateral adicionado',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding lateral module: {e}")
@@ -855,9 +918,16 @@ def add_antenna():
         ))
         bd.commit()
 
+        # Get the newly inserted ID
+        new_item = bd.execute(
+            'SELECT id FROM catalog_module_antenna WHERE reference = ?',
+            (dados['reference'],)
+        ).fetchone()
+        new_id = new_item['id'] if new_item else None
+
         return jsonify({
             'message': 'Antena adicionada',
-            'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            'id': new_id
         }), 201
     except Exception as e:
         logger.error(f"Error adding antenna: {e}")

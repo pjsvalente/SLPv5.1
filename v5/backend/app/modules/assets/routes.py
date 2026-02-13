@@ -257,12 +257,17 @@ def create_asset():
         return jsonify({'error': 'Número de série já existe'}), 400
 
     # Create asset
-    cursor = bd.execute('''
+    bd.execute('''
         INSERT INTO assets (serial_number, created_by, created_at)
         VALUES (?, ?, ?)
     ''', (serial_number, g.utilizador_atual['user_id'], datetime.now().isoformat()))
 
-    asset_id = cursor.lastrowid
+    # Get the newly inserted ID (PostgreSQL compatible)
+    new_asset = bd.execute(
+        'SELECT id FROM assets WHERE serial_number = ?',
+        (serial_number,)
+    ).fetchone()
+    asset_id = new_asset['id'] if new_asset else None
 
     # Save dynamic fields
     schema_fields = bd.execute('SELECT field_name FROM schema_fields').fetchall()
@@ -509,7 +514,7 @@ def add_schema_field():
     if options and isinstance(options, list):
         options = json.dumps(options)
 
-    cursor = bd.execute('''
+    bd.execute('''
         INSERT INTO schema_fields (field_name, field_type, field_label, required,
                                    field_order, field_category, field_options)
         VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -522,9 +527,16 @@ def add_schema_field():
     ))
     bd.commit()
 
+    # Get the newly inserted ID (PostgreSQL compatible)
+    new_field = bd.execute(
+        'SELECT id FROM schema_fields WHERE field_name = ?',
+        (field_name,)
+    ).fetchone()
+    new_id = new_field['id'] if new_field else None
+
     logger.info("Schema field added: %s", field_name)
     return jsonify({
-        'id': cursor.lastrowid,
+        'id': new_id,
         'field_name': field_name,
         'message': 'Campo adicionado com sucesso'
     }), 201
@@ -664,11 +676,17 @@ def duplicate_asset():
             new_serial = gerar_proximo_numero()
 
             # Create new asset
-            cursor = bd.execute(
+            bd.execute(
                 'INSERT INTO assets (serial_number, created_by, created_at) VALUES (?, ?, ?)',
                 (new_serial, user_id, datetime.now().isoformat())
             )
-            new_id = cursor.lastrowid
+
+            # Get the newly inserted ID (PostgreSQL compatible)
+            new_asset = bd.execute(
+                'SELECT id FROM assets WHERE serial_number = ?',
+                (new_serial,)
+            ).fetchone()
+            new_id = new_asset['id'] if new_asset else None
 
             # Copy data (except excluded fields)
             for field_name, field_value in data_dict.items():

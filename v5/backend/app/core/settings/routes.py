@@ -12,7 +12,7 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify, send_file
 
 from flask import g
-from ...shared.database import obter_bd, obter_bd_catalogo, extrair_valor
+from ...shared.database import obter_bd, obter_bd_catalogo, extrair_valor, table_exists
 from ...shared.permissions import requer_admin, requer_superadmin, requer_autenticacao
 from ...shared.config import Config
 
@@ -186,7 +186,14 @@ def add_schema_field():
     ))
     bd.commit()
 
-    return jsonify({'message': 'Campo adicionado', 'id': bd.execute('SELECT last_insert_rowid()').fetchone()[0]}), 201
+    # Get the newly inserted ID (PostgreSQL compatible)
+    new_field = bd.execute(
+        'SELECT id FROM schema_fields WHERE field_name = ?',
+        (dados['field_name'],)
+    ).fetchone()
+    new_id = new_field['id'] if new_field else None
+
+    return jsonify({'message': 'Campo adicionado', 'id': new_id}), 201
 
 
 @settings_bp.route('/schema/<int:field_id>', methods=['PUT'])
@@ -1499,12 +1506,8 @@ def get_notification_settings():
     """Get notification settings for current tenant."""
     bd = obter_bd()
 
-    # Check if notification_settings table exists
-    table_exists = bd.execute('''
-        SELECT name FROM sqlite_master WHERE type='table' AND name='notification_settings'
-    ''').fetchone()
-
-    if not table_exists:
+    # Check if notification_settings table exists (cross-database compatible)
+    if not table_exists(bd, 'notification_settings'):
         # Create table if not exists
         bd.execute('''
             CREATE TABLE IF NOT EXISTS notification_settings (

@@ -77,7 +77,7 @@ def create_user():
         return jsonify({'error': 'Email já existe'}), 400
 
     # Create user
-    cursor = bd.execute('''
+    bd.execute('''
         INSERT INTO users (email, password_hash, role, first_name, last_name,
                           must_change_password, created_by)
         VALUES (?, ?, ?, ?, ?, 1, ?)
@@ -87,7 +87,12 @@ def create_user():
     ))
     bd.commit()
 
-    user_id = cursor.lastrowid
+    # Get the newly inserted ID (PostgreSQL compatible)
+    new_user = bd.execute(
+        'SELECT id FROM users WHERE email = ?',
+        (email,)
+    ).fetchone()
+    user_id = new_user['id'] if new_user else None
 
     # Log audit
     registar_auditoria(bd, g.utilizador_atual['user_id'], 'CREATE', 'users', user_id, None, {

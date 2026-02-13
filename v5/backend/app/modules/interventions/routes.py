@@ -213,7 +213,12 @@ def create_intervention():
         user_id
     ))
 
-    intervention_id = bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+    # Get the newly inserted ID (PostgreSQL compatible)
+    new_intervention = bd.execute(
+        'SELECT id FROM interventions WHERE asset_id = ? ORDER BY id DESC LIMIT 1',
+        (asset['id'],)
+    ).fetchone()
+    intervention_id = new_intervention['id'] if new_intervention else None
 
     # Add technicians if provided
     technicians = dados.get('technicians', [])
@@ -465,7 +470,12 @@ def upload_file(intervention_id):
         user_id
     ))
 
-    file_id = bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+    # Get the newly inserted ID (PostgreSQL compatible)
+    new_file = bd.execute(
+        'SELECT id FROM intervention_files WHERE file_name = ?',
+        (unique_name,)
+    ).fetchone()
+    file_id = new_file['id'] if new_file else None
     bd.commit()
 
     return jsonify({'id': file_id, 'message': 'Ficheiro carregado'}), 201
@@ -766,7 +776,12 @@ def upload_multiple_files(intervention_id):
                 user_id
             ))
 
-            file_id = bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+            # Get the newly inserted ID (PostgreSQL compatible)
+            new_file = bd.execute(
+                'SELECT id FROM intervention_files WHERE file_name = ?',
+                (unique_name,)
+            ).fetchone()
+            file_id = new_file['id'] if new_file else None
             uploaded.append({
                 'id': file_id,
                 'name': original_name,

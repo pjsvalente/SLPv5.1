@@ -9,7 +9,7 @@ import logging
 from datetime import datetime
 from flask import Blueprint, request, jsonify, send_file, g
 
-from ...shared.database import obter_bd, obter_bd_catalogo, extrair_valor
+from ...shared.database import obter_bd, obter_bd_catalogo, extrair_valor, table_exists
 from ...shared.permissions import requer_admin, requer_autenticacao
 
 logger = logging.getLogger(__name__)
@@ -205,12 +205,8 @@ def export_excel():
     if include_history and asset_id_list:
         ws_history = wb.create_sheet('Histórico Estados')
 
-        # Check if table exists
-        table_exists = bd.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='asset_status_history'"
-        ).fetchone()
-
-        if table_exists:
+        # Check if table exists (using cross-database compatible function)
+        if table_exists(bd, 'asset_status_history'):
             placeholders = ','.join('?' * len(asset_id_list))
             history = bd.execute(f'''
                 SELECT h.*, a.serial_number
@@ -284,12 +280,8 @@ def export_excel():
     if include_updates and asset_id_list:
         ws_updates = wb.create_sheet('Atualizações')
 
-        # Check if audit_log table exists
-        table_exists = bd.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='audit_log'"
-        ).fetchone()
-
-        if table_exists:
+        # Check if audit_log table exists (using cross-database compatible function)
+        if table_exists(bd, 'audit_log'):
             placeholders = ','.join('?' * len(asset_id_list))
             updates = bd.execute(f'''
                 SELECT al.*, a.serial_number, u.nome as user_name
@@ -772,11 +764,17 @@ def import_excel():
                         continue
 
                     # Insert into assets table
-                    cursor = bd.execute('''
+                    bd.execute('''
                         INSERT INTO assets (serial_number, created_at)
                         VALUES (?, CURRENT_TIMESTAMP)
                     ''', (serial_number,))
-                    asset_id = cursor.lastrowid
+
+                    # Get the newly inserted asset_id (PostgreSQL compatible)
+                    new_asset = bd.execute(
+                        'SELECT id FROM assets WHERE serial_number = ?',
+                        (serial_number,)
+                    ).fetchone()
+                    asset_id = new_asset['id'] if new_asset else None
 
                     # Insert dynamic fields into asset_data table
                     for field_name, field_value in dynamic_fields.items():
@@ -1036,12 +1034,8 @@ def export_catalog():
 
     first_sheet = True
     for table_name, sheet_name, headers in catalog_tables:
-        # Check if table exists
-        table_exists = bd.execute(
-            f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'"
-        ).fetchone()
-
-        if not table_exists:
+        # Check if table exists (cross-database compatible)
+        if not table_exists(bd, table_name):
             continue
 
         if first_sheet:

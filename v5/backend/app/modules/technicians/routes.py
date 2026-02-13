@@ -111,7 +111,12 @@ def create_technician():
         ))
         bd.commit()
 
-        new_id = bd.execute('SELECT last_insert_rowid()').fetchone()[0]
+        # Get the newly inserted ID (PostgreSQL compatible)
+        new_tech = bd.execute(
+            'SELECT id FROM technicians WHERE nome = ? AND email = ?',
+            (dados['nome'], dados.get('email', ''))
+        ).fetchone()
+        new_id = new_tech['id'] if new_tech else None
 
         return jsonify({
             'message': 'Técnico criado com sucesso',
