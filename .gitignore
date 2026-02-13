@@ -42,6 +42,8 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+# Keep backend static (compiled frontend)
+!v5/backend/static/
 
 # Node
 node_modules/
