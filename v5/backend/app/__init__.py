@@ -82,6 +82,26 @@ def create_app(config_class=Config):
     def health():
         return {'status': 'ok', 'version': '5.0.0'}
 
+    # Debug static files
+    @app.route('/api/debug/static', methods=['GET'])
+    def debug_static():
+        index_path = os.path.join(app.static_folder, 'index.html')
+        index_content = ''
+        if os.path.exists(index_path):
+            with open(index_path, 'r') as f:
+                index_content = f.read()[:500]
+        assets = []
+        assets_path = os.path.join(app.static_folder, 'assets')
+        if os.path.exists(assets_path):
+            assets = os.listdir(assets_path)[:20]
+        return {
+            'static_folder': app.static_folder,
+            'index_exists': os.path.exists(index_path),
+            'index_preview': index_content,
+            'assets_count': len(assets),
+            'assets_sample': assets
+        }
+
     # Serve frontend (SPA)
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')
