@@ -30,7 +30,11 @@ def find_serial_column(headers):
         'número série', 'numero serie', 'nº série', 'nº serie',
         'serial number', 'serial_number', 'serialnumber',
         'n serie', 'nserie', 'num serie', 'numserie',
-        'serial', 'série', 'serie'
+        'serial', 'série', 'serie',
+        # Catálogo de produtos
+        'referência coluna', 'referencia coluna', 'ref coluna',
+        'referência', 'referencia', 'ref', 'reference',
+        'código', 'codigo', 'code', 'sku', 'part number', 'partnumber'
     ]
     for h in headers:
         if h:
@@ -38,6 +42,27 @@ def find_serial_column(headers):
             if normalized in serial_variants:
                 return h
     return None
+
+
+def detect_header_row(ws):
+    """
+    Detect which row contains the actual headers.
+    Some Excel files have merged cells or title rows before headers.
+    Returns (header_row_num, headers_list)
+    """
+    # Check row 1
+    row1_headers = [cell.value for cell in ws[1]]
+    row1_non_empty = sum(1 for h in row1_headers if h is not None)
+
+    # Check row 2
+    row2_headers = [cell.value for cell in ws[2]] if ws.max_row >= 2 else []
+    row2_non_empty = sum(1 for h in row2_headers if h is not None)
+
+    # If row 2 has significantly more non-empty cells, use row 2 as headers
+    if row2_non_empty > row1_non_empty * 1.5 and row2_non_empty >= 3:
+        return 2, row2_headers
+
+    return 1, row1_headers
 
 
 def find_status_column(headers):
@@ -490,18 +515,21 @@ def import_excel_preview():
         field_map = {f['field_label']: f['field_name'] for f in schema_fields}
         required_fields = [f['field_name'] for f in schema_fields if f.get('is_required')]
 
-        # Get headers from first row and filter None values
-        headers = [cell.value for cell in ws[1]]
+        # Detect header row (some files have headers in row 2)
+        header_row, headers = detect_header_row(ws)
         headers_clean = [h for h in headers if h is not None]
+        data_start_row = header_row + 1
+
+        logger.info(f"Detected headers in row {header_row}, data starts at row {data_start_row}")
 
         if not headers_clean:
-            return jsonify({'error': 'Ficheiro Excel sem cabeçalhos válidos na primeira linha'}), 400
+            return jsonify({'error': 'Ficheiro Excel sem cabeçalhos válidos'}), 400
 
         # Find serial number column (flexible naming)
         serial_col = find_serial_column(headers)
         if not serial_col:
             return jsonify({
-                'error': 'Coluna de número de série não encontrada. Use um destes nomes: "Número Série", "Serial Number", "N Serie", "Serial"'
+                'error': 'Coluna de identificação não encontrada. Use um destes nomes: "Número Série", "Referência Coluna", "Serial Number", "Referência"'
             }), 400
 
         # Find status column (flexible naming)
@@ -516,7 +544,7 @@ def import_excel_preview():
         preview_rows = []
         stats = {'total': 0, 'new': 0, 'update': 0, 'errors': 0}
 
-        for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
+        for row_num, row in enumerate(ws.iter_rows(min_row=data_start_row, values_only=True), data_start_row):
             if not row or all(cell is None for cell in row):
                 continue
 
@@ -586,7 +614,9 @@ def import_excel_preview():
             'has_more': stats['total'] > 100,
             'detected_columns': {
                 'serial': serial_col,
-                'status': status_col
+                'status': status_col,
+                'header_row': header_row,
+                'data_start_row': data_start_row
             }
         }), 200
 
@@ -638,18 +668,21 @@ def import_excel():
         schema_fields = bd.execute('SELECT * FROM schema_fields ORDER BY field_order').fetchall()
         field_map = {f['field_label']: f['field_name'] for f in schema_fields}
 
-        # Get headers from first row
-        headers = [cell.value for cell in ws[1]]
+        # Detect header row (some files have headers in row 2)
+        header_row, headers = detect_header_row(ws)
         headers_clean = [h for h in headers if h is not None]
+        data_start_row = header_row + 1
+
+        logger.info(f"Import: headers in row {header_row}, data starts at row {data_start_row}")
 
         if not headers_clean:
-            return jsonify({'error': 'Ficheiro Excel sem cabeçalhos válidos na primeira linha'}), 400
+            return jsonify({'error': 'Ficheiro Excel sem cabeçalhos válidos'}), 400
 
         # Find serial number column (flexible naming)
         serial_col = find_serial_column(headers)
         if not serial_col:
             return jsonify({
-                'error': 'Coluna de número de série não encontrada. Use um destes nomes: "Número Série", "Serial Number", "N Serie", "Serial"'
+                'error': 'Coluna de identificação não encontrada. Use um destes nomes: "Número Série", "Referência Coluna", "Serial Number", "Referência"'
             }), 400
 
         # Find status column (flexible naming)
@@ -661,7 +694,7 @@ def import_excel():
         skipped = 0
         errors = []
 
-        for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
+        for row_num, row in enumerate(ws.iter_rows(min_row=data_start_row, values_only=True), data_start_row):
             if not row or all(cell is None for cell in row):
                 continue
 
@@ -777,6 +810,8 @@ def import_excel():
             'debug': {
                 'serial_col': serial_col,
                 'status_col': status_col,
+                'header_row': header_row,
+                'data_start_row': data_start_row,
                 'headers': headers_clean[:10],
                 'schema_fields_count': len(schema_fields),
                 'field_map_count': len(field_map)
