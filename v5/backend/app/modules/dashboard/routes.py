@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from flask import Blueprint, jsonify, g
 
-from ...shared.database import obter_bd
+from ...shared.database import obter_bd, extrair_valor
 from ...shared.permissions import requer_autenticacao
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def get_stats():
     bd = obter_bd()
 
     # Total assets
-    total_assets = bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0]
+    total_assets = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0
 
     # Assets by status
     status_counts = bd.execute('''
@@ -38,19 +38,19 @@ def get_stats():
 
     # Recent assets (last 30 days)
     thirty_days_ago = (datetime.now() - timedelta(days=30)).isoformat()
-    recent_assets = bd.execute('''
-        SELECT COUNT(*) FROM assets WHERE created_at > ?
-    ''', (thirty_days_ago,)).fetchone()[0]
+    recent_assets = extrair_valor(bd.execute('''
+        SELECT COUNT(*) as cnt FROM assets WHERE created_at > ?
+    ''', (thirty_days_ago,)).fetchone(), 0) or 0
 
     # Total users
-    total_users = bd.execute('SELECT COUNT(*) FROM users WHERE active = 1').fetchone()[0]
+    total_users = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM users WHERE active = 1').fetchone(), 0) or 0
 
     # Interventions (if table exists)
     try:
-        total_interventions = bd.execute('SELECT COUNT(*) FROM interventions').fetchone()[0]
-        open_interventions = bd.execute('''
-            SELECT COUNT(*) FROM interventions WHERE status = 'em_curso'
-        ''').fetchone()[0]
+        total_interventions = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM interventions').fetchone(), 0) or 0
+        open_interventions = extrair_valor(bd.execute('''
+            SELECT COUNT(*) as cnt FROM interventions WHERE status = 'em_curso'
+        ''').fetchone(), 0) or 0
     except Exception:
         total_interventions = 0
         open_interventions = 0
@@ -88,15 +88,28 @@ def get_assets_timeline():
     """Get assets created over time (last 12 months)."""
     bd = obter_bd()
 
-    # Group by month
-    timeline = bd.execute('''
-        SELECT
-            strftime('%Y-%m', created_at) as month,
-            COUNT(*) as count
-        FROM assets
-        WHERE created_at > date('now', '-12 months')
-        GROUP BY strftime('%Y-%m', created_at)
-        ORDER BY month
-    ''').fetchall()
+    # Group by month - use PostgreSQL-compatible syntax
+    try:
+        # Try PostgreSQL syntax first
+        timeline = bd.execute('''
+            SELECT
+                TO_CHAR(created_at, 'YYYY-MM') as month,
+                COUNT(*) as count
+            FROM assets
+            WHERE created_at > CURRENT_DATE - INTERVAL '12 months'
+            GROUP BY TO_CHAR(created_at, 'YYYY-MM')
+            ORDER BY month
+        ''').fetchall()
+    except Exception:
+        # Fallback to SQLite syntax
+        timeline = bd.execute('''
+            SELECT
+                strftime('%Y-%m', created_at) as month,
+                COUNT(*) as count
+            FROM assets
+            WHERE created_at > date('now', '-12 months')
+            GROUP BY strftime('%Y-%m', created_at)
+            ORDER BY month
+        ''').fetchall()
 
     return jsonify([dict(t) for t in timeline]), 200

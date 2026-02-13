@@ -9,7 +9,7 @@ from datetime import datetime
 
 from flask import Blueprint, request, jsonify, g
 
-from ...shared.database import obter_bd, obter_config, registar_auditoria
+from ...shared.database import obter_bd, obter_config, registar_auditoria, extrair_valor
 from ...shared.permissions import requer_autenticacao, requer_permissao
 from ...shared.plans import TenantPlanService
 
@@ -83,8 +83,8 @@ def list_assets():
         params.append(f'%{search}%')
 
     # Get total count
-    count_query = query.replace('SELECT a.*', 'SELECT COUNT(*)')
-    total = bd.execute(count_query, params).fetchone()[0]
+    count_query = query.replace('SELECT a.*', 'SELECT COUNT(*) as cnt')
+    total = extrair_valor(bd.execute(count_query, params).fetchone(), 0) or 0
 
     # Add pagination
     query += ' ORDER BY a.created_at DESC LIMIT ? OFFSET ?'
@@ -232,7 +232,7 @@ def create_asset():
 
     # Check asset limit
     bd = obter_bd()
-    current_count = bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0]
+    current_count = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0
     within_limit, limit, _ = TenantPlanService.check_tenant_limit(
         g.tenant_id, 'max_assets', current_count
     )
@@ -486,7 +486,7 @@ def add_schema_field():
         return jsonify({'error': 'Já existe um campo com este nome'}), 400
 
     # Get max order
-    max_order = bd.execute('SELECT MAX(field_order) FROM schema_fields').fetchone()[0] or 0
+    max_order = extrair_valor(bd.execute('SELECT MAX(field_order) as max_order FROM schema_fields').fetchone(), 0) or 0
 
     # Process options
     options = dados.get('field_options')
@@ -604,7 +604,7 @@ def duplicate_asset():
     user_id = g.utilizador_atual['user_id']
 
     # Check asset limit
-    current_count = bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0]
+    current_count = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0
     within_limit, limit, _ = TenantPlanService.check_tenant_limit(
         g.tenant_id, 'max_assets', current_count + quantity
     )

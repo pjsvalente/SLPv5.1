@@ -67,6 +67,18 @@ class DatabaseAdapter:
             # Handle AUTOINCREMENT -> SERIAL
             query = query.replace('AUTOINCREMENT', '')
             query = query.replace('INTEGER PRIMARY KEY', 'SERIAL PRIMARY KEY')
+            # Handle INSERT OR REPLACE -> INSERT ON CONFLICT
+            if 'INSERT OR REPLACE' in query:
+                query = query.replace('INSERT OR REPLACE', 'INSERT')
+                # Add ON CONFLICT clause if not present
+                if 'ON CONFLICT' not in query:
+                    # Try to detect unique constraint from table
+                    pass  # Complex - handle case by case
+            # Handle INSERT OR IGNORE -> INSERT ON CONFLICT DO NOTHING
+            if 'INSERT OR IGNORE' in query:
+                query = query.replace('INSERT OR IGNORE', 'INSERT')
+                if 'ON CONFLICT' not in query:
+                    query = query.rstrip().rstrip(';') + ' ON CONFLICT DO NOTHING'
 
         if self.is_postgres and RealDictCursor:
             cursor = self.conn.cursor(cursor_factory=RealDictCursor)
@@ -95,6 +107,24 @@ class DatabaseAdapter:
 
     def close(self):
         self.conn.close()
+
+    @property
+    def lastrowid(self):
+        """Get last inserted row ID (PostgreSQL compatibility)."""
+        if self.is_postgres:
+            # For PostgreSQL, we need to use RETURNING in the INSERT statement
+            # or call currval on the sequence
+            return None  # Caller should use RETURNING instead
+        return None
+
+
+def get_count(bd, query, params=None):
+    """
+    Execute a COUNT query and return the integer result.
+    Works with both SQLite and PostgreSQL.
+    """
+    result = bd.execute(query, params).fetchone() if params else bd.execute(query).fetchone()
+    return extrair_valor(result, 0) or 0
 
 
 def _get_pg_connection(schema_name='public'):
@@ -286,6 +316,43 @@ def obter_config(chave, valor_padrao=None, tenant_id=None):
         return valor_padrao
     except Exception:
         return valor_padrao
+
+
+def extrair_valor(row, key_or_index=0):
+    """
+    Extract a value from a database row, compatible with both SQLite Row and PostgreSQL RealDictRow.
+
+    Args:
+        row: The database row (can be dict, tuple, or sqlite3.Row)
+        key_or_index: Column name (str) or index (int)
+
+    Returns:
+        The extracted value, or None if row is None
+    """
+    if row is None:
+        return None
+
+    if isinstance(row, dict):
+        # PostgreSQL RealDictRow or dict
+        if isinstance(key_or_index, int):
+            # Get value by index - convert to list of values
+            values = list(row.values())
+            return values[key_or_index] if key_or_index < len(values) else None
+        return row.get(key_or_index)
+
+    # SQLite Row or tuple
+    if isinstance(key_or_index, str):
+        # Try to access by name (sqlite3.Row supports this)
+        try:
+            return row[key_or_index]
+        except (KeyError, TypeError):
+            return None
+
+    # Access by index
+    try:
+        return row[key_or_index]
+    except (IndexError, TypeError):
+        return None
 
 
 # =========================================================================

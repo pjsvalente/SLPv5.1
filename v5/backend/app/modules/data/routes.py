@@ -9,7 +9,7 @@ import logging
 from datetime import datetime
 from flask import Blueprint, request, jsonify, send_file, g
 
-from ...shared.database import obter_bd, obter_bd_catalogo
+from ...shared.database import obter_bd, obter_bd_catalogo, extrair_valor
 from ...shared.permissions import requer_admin, requer_autenticacao
 
 logger = logging.getLogger(__name__)
@@ -950,10 +950,10 @@ def get_data_stats():
     bd = obter_bd()
 
     stats = {
-        'assets': bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0],
-        'interventions': bd.execute('SELECT COUNT(*) FROM interventions').fetchone()[0],
-        'technicians': bd.execute('SELECT COUNT(*) FROM technicians').fetchone()[0],
-        'users': bd.execute('SELECT COUNT(*) FROM users').fetchone()[0],
+        'assets': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0,
+        'interventions': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM interventions').fetchone(), 0) or 0,
+        'technicians': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM technicians').fetchone(), 0) or 0,
+        'users': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM users').fetchone(), 0) or 0,
     }
 
     return jsonify(stats), 200
