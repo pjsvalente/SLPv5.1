@@ -412,9 +412,9 @@ const TimeLogEditModal: React.FC<{
   if (!log) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-        <h3 className="text-lg font-semibold mb-4">{t('interventions.editTimeLog')}</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <h3 className="text-base sm:text-lg font-semibold mb-4">{t('interventions.editTimeLog')}</h3>
         <div className="space-y-4">
           <FormField
             label={t('interventions.hours')}
@@ -438,11 +438,11 @@ const TimeLogEditModal: React.FC<{
             onChange={(v) => setDescription(String(v))}
           />
         </div>
-        <div className="mt-6 flex justify-end gap-3">
-          <button onClick={onClose} className="px-4 py-2 text-gray-600 dark:text-gray-400">
+        <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+          <button onClick={onClose} className="px-4 py-2 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
             {t('common.cancel')}
           </button>
-          <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+          <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm sm:text-base">
             {saving ? <IconLoader className="h-4 w-4 animate-spin" /> : t('common.save')}
           </button>
         </div>
@@ -504,9 +504,9 @@ const FileUploadModal: React.FC<{
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg">
-        <h3 className="text-lg font-semibold mb-4">{t('interventions.uploadFiles')}</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <h3 className="text-base sm:text-lg font-semibold mb-4">{t('interventions.uploadFiles')}</h3>
 
         <div className="space-y-4">
           <div
@@ -569,14 +569,14 @@ const FileUploadModal: React.FC<{
           )}
         </div>
 
-        <div className="mt-6 flex justify-end gap-3">
-          <button onClick={onClose} disabled={uploading} className="px-4 py-2 text-gray-600 dark:text-gray-400">
+        <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+          <button onClick={onClose} disabled={uploading} className="px-4 py-2 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
             {t('common.cancel')}
           </button>
           <button
             onClick={handleUpload}
             disabled={uploading || files.length === 0}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
+            className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 text-sm sm:text-base"
           >
             {uploading ? (
               <>
@@ -1156,9 +1156,9 @@ const InterventionDetail: React.FC = () => {
 
       {/* Complete Dialog */}
       {showCompleteDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">{t('interventions.completeIntervention')}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h3 className="text-base sm:text-lg font-semibold mb-4">{t('interventions.completeIntervention')}</h3>
             <div className="space-y-4">
               <FormField
                 label={t('interventions.solutionDescription')}
@@ -1176,9 +1176,9 @@ const InterventionDetail: React.FC = () => {
                 options={['Operacional', 'Manutencao Necessaria', 'Desativado']}
               />
             </div>
-            <div className="mt-6 flex justify-end gap-3">
-              <button onClick={() => setShowCompleteDialog(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400">{t('common.cancel')}</button>
-              <button onClick={handleComplete} disabled={actionLoading} className="px-4 py-2 bg-green-600 text-white rounded-lg">
+            <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
+              <button onClick={() => setShowCompleteDialog(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 text-sm sm:text-base">{t('common.cancel')}</button>
+              <button onClick={handleComplete} disabled={actionLoading} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm sm:text-base">
                 {actionLoading ? <IconLoader className="h-4 w-4 animate-spin" /> : t('interventions.complete')}
               </button>
             </div>

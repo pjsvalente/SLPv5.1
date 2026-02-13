@@ -819,36 +819,38 @@ const Analytics: React.FC = () => {
   if (!kpis && activeTab === 'kpis') return null
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
             {t('analytics.title')}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">
             {t('analytics.description')}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Date Range */}
           {activeTab === 'kpis' && (
           <>
-          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2">
-            <IconCalendar className="h-4 w-4 text-gray-400" />
-            <input
-              type="date"
-              value={dateRange.start}
-              onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-              className="bg-transparent border-none text-sm focus:outline-none"
-            />
-            <span className="text-gray-400">-</span>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 sm:px-3 py-2 w-full sm:w-auto">
+            <div className="flex items-center gap-2">
+              <IconCalendar className="h-4 w-4 text-gray-400 hidden sm:block" />
+              <input
+                type="date"
+                value={dateRange.start}
+                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                className="bg-transparent border-none text-sm focus:outline-none w-full sm:w-auto"
+              />
+            </div>
+            <span className="text-gray-400 hidden sm:block">-</span>
             <input
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-              className="bg-transparent border-none text-sm focus:outline-none"
+              className="bg-transparent border-none text-sm focus:outline-none w-full sm:w-auto"
             />
           </div>
 
@@ -860,11 +862,11 @@ const Analytics: React.FC = () => {
           </button>
 
           <div className="relative group">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+            <button className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm">
               <IconDownload className="h-4 w-4" />
-              {t('common.export')}
+              <span className="hidden sm:inline">{t('common.export')}</span>
             </button>
-            <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg hidden group-hover:block z-10">
+            <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg hidden group-hover:block z-10 min-w-[180px]">
               <button
                 onClick={() => handleExport('interventions')}
                 className="block w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"

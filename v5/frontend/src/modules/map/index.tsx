@@ -320,15 +320,15 @@ function MapView() {
         {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div
-            className="lg:hidden fixed inset-0 bg-black/50 z-40"
+            className="lg:hidden fixed inset-0 bg-black/50 z-[1000]"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
         {/* Sidebar */}
         <div className={`
-          lg:w-72 lg:relative lg:translate-x-0 lg:block
-          fixed top-0 left-0 h-full w-72 z-50 transform transition-transform duration-300
+          lg:w-72 lg:relative lg:translate-x-0 lg:block lg:z-10
+          fixed top-0 left-0 h-full w-72 z-[1001] transform transition-transform duration-300
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           bg-white dark:bg-gray-800 rounded-r-lg lg:rounded-lg shadow-lg lg:shadow p-4 overflow-y-auto
         `}>
@@ -553,7 +553,7 @@ function MapView() {
         </div>
 
         {/* Map Container */}
-        <div className="flex-1 rounded-lg overflow-hidden shadow">
+        <div className="flex-1 rounded-lg overflow-hidden shadow relative z-0">
           {loading ? (
             <div className="h-full flex items-center justify-center bg-gray-100 dark:bg-gray-700">
               <div className="text-center">
@@ -566,7 +566,7 @@ function MapView() {
               center={defaultCenter}
               zoom={defaultZoom}
               className="h-full w-full"
-              style={{ minHeight: '400px' }}
+              style={{ minHeight: '300px' }}
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
