@@ -25,6 +25,39 @@ logger = logging.getLogger(__name__)
 catalog_bp = Blueprint('catalog', __name__)
 
 
+@catalog_bp.route('/test-packs', methods=['GET'])
+def test_packs():
+    """Test endpoint to verify packs data without auth."""
+    try:
+        bd = obter_bd_catalogo()
+        packs = bd.execute('''
+            SELECT * FROM catalog_packs WHERE active = 1 ORDER BY pack_name
+        ''').fetchall()
+
+        result = []
+        for pack in packs:
+            pack_dict = dict(pack)
+            # Count columns per pack
+            count = extrair_valor(bd.execute(
+                'SELECT COUNT(*) as cnt FROM catalog_columns WHERE pack = ? AND active = 1',
+                (pack['pack_name'],)
+            ).fetchone(), 0) or 0
+            pack_dict['column_count'] = count
+            result.append(pack_dict)
+
+        return jsonify({
+            'packs': result,
+            'count': len(result),
+            'message': 'Test endpoint working'
+        }), 200
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
+
 @catalog_bp.route('/debug', methods=['GET'])
 def debug_catalog():
     """Debug endpoint to check catalog database status."""
