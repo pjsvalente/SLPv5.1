@@ -704,11 +704,33 @@ def import_excel():
                         skipped += 1
                         continue
 
-                    # Update
+                    # Update - get the asset_id first
+                    asset_row = bd.execute(
+                        'SELECT id FROM assets WHERE serial_number = ?',
+                        (serial_number,)
+                    ).fetchone()
+                    asset_id = asset_row['id']
+
+                    # Update the asset record
                     bd.execute('''
-                        UPDATE assets SET status = ?, dynamic_fields = ?, updated_at = CURRENT_TIMESTAMP
+                        UPDATE assets SET updated_at = CURRENT_TIMESTAMP
                         WHERE serial_number = ?
-                    ''', (status, json.dumps(dynamic_fields), serial_number))
+                    ''', (serial_number,))
+
+                    # Update dynamic fields in asset_data table
+                    for field_name, field_value in dynamic_fields.items():
+                        bd.execute('''
+                            INSERT OR REPLACE INTO asset_data (asset_id, field_name, field_value)
+                            VALUES (?, ?, ?)
+                        ''', (asset_id, field_name, str(field_value) if field_value is not None else None))
+
+                    # Store status as condition_status
+                    if status:
+                        bd.execute('''
+                            INSERT OR REPLACE INTO asset_data (asset_id, field_name, field_value)
+                            VALUES (?, 'condition_status', ?)
+                        ''', (asset_id, status))
+
                     updated += 1
                 else:
                     # Handle new record
@@ -716,11 +738,27 @@ def import_excel():
                         skipped += 1
                         continue
 
-                    # Insert
-                    bd.execute('''
-                        INSERT INTO assets (serial_number, status, dynamic_fields)
-                        VALUES (?, ?, ?)
-                    ''', (serial_number, status, json.dumps(dynamic_fields)))
+                    # Insert into assets table
+                    cursor = bd.execute('''
+                        INSERT INTO assets (serial_number, created_at)
+                        VALUES (?, CURRENT_TIMESTAMP)
+                    ''', (serial_number,))
+                    asset_id = cursor.lastrowid
+
+                    # Insert dynamic fields into asset_data table
+                    for field_name, field_value in dynamic_fields.items():
+                        bd.execute('''
+                            INSERT OR REPLACE INTO asset_data (asset_id, field_name, field_value)
+                            VALUES (?, ?, ?)
+                        ''', (asset_id, field_name, str(field_value) if field_value is not None else None))
+
+                    # Store status as condition_status
+                    if status:
+                        bd.execute('''
+                            INSERT OR REPLACE INTO asset_data (asset_id, field_name, field_value)
+                            VALUES (?, 'condition_status', ?)
+                        ''', (asset_id, status))
+
                     imported += 1
             except Exception as e:
                 errors.append(f'Linha {row_num}: {str(e)}')
