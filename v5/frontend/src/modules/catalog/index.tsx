@@ -56,25 +56,29 @@ import {
 // =========================================================================
 
 interface CatalogStats {
-  total_columns: number
-  total_luminaires: number
-  total_electrical_panels: number
-  total_fuse_boxes: number
-  total_telemetry: number
-  total_ev_chargers: number
-  total_mupi: number
-  total_lateral: number
-  total_antennas: number
-  by_pack: Array<{ pack: string; count: number }>
-  by_height: Array<{ height: number; count: number }>
+  // Backend returns without "total_" prefix
+  packs: number
+  columns: number
+  luminaires: number
+  electrical_panels: number
+  fuse_boxes: number
+  telemetry_panels: number
+  ev_chargers: number
+  mupi: number
+  lateral: number
+  antennas: number
+  total_references: number
+  by_pack?: Array<{ pack: string; count: number }>
+  by_height?: Array<{ height: number; count: number }>
 }
 
 interface CatalogPack {
   id: number
-  name: string
-  description: string
-  color: string
+  pack_name: string
+  pack_description: string
+  color?: string
   active: number
+  column_count?: number
 }
 
 interface CatalogColumn {
@@ -302,15 +306,15 @@ function StatsTab({ stats, onRefresh }: { stats: CatalogStats | null; onRefresh:
   }
 
   const statCards = [
-    { label: t('catalog.columns'), value: stats.total_columns, icon: IconColumns, color: 'blue' },
-    { label: t('catalog.luminaires'), value: stats.total_luminaires, icon: IconLightbulb, color: 'yellow' },
-    { label: t('catalog.electricalPanels'), value: stats.total_electrical_panels, icon: IconZap, color: 'red' },
-    { label: t('catalog.fuseBoxes'), value: stats.total_fuse_boxes, icon: IconBox, color: 'orange' },
-    { label: t('catalog.telemetry'), value: stats.total_telemetry, icon: IconRadio, color: 'purple' },
-    { label: t('catalog.evChargers'), value: stats.total_ev_chargers, icon: IconCar, color: 'green' },
-    { label: t('catalog.mupiModules'), value: stats.total_mupi, icon: IconMonitor, color: 'pink' },
-    { label: t('catalog.lateralModules'), value: stats.total_lateral, icon: IconPanelLeft, color: 'indigo' },
-    { label: t('catalog.antennas'), value: stats.total_antennas, icon: IconAntenna, color: 'cyan' }
+    { label: t('catalog.columns'), value: stats.columns || 0, icon: IconColumns, color: 'blue' },
+    { label: t('catalog.luminaires'), value: stats.luminaires || 0, icon: IconLightbulb, color: 'yellow' },
+    { label: t('catalog.electricalPanels'), value: stats.electrical_panels || 0, icon: IconZap, color: 'red' },
+    { label: t('catalog.fuseBoxes'), value: stats.fuse_boxes || 0, icon: IconBox, color: 'orange' },
+    { label: t('catalog.telemetry'), value: stats.telemetry_panels || 0, icon: IconRadio, color: 'purple' },
+    { label: t('catalog.evChargers'), value: stats.ev_chargers || 0, icon: IconCar, color: 'green' },
+    { label: t('catalog.mupiModules'), value: stats.mupi || 0, icon: IconMonitor, color: 'pink' },
+    { label: t('catalog.lateralModules'), value: stats.lateral || 0, icon: IconPanelLeft, color: 'indigo' },
+    { label: t('catalog.antennas'), value: stats.antennas || 0, icon: IconAntenna, color: 'cyan' }
   ]
 
   const colorClasses: Record<string, string> = {
@@ -390,7 +394,7 @@ function StatsTab({ stats, onRefresh }: { stats: CatalogStats | null; onRefresh:
           <h3 className="text-lg font-semibold mb-4">{t('catalog.byHeight')}</h3>
           <div className="space-y-2">
             {stats.by_height.map((h) => {
-              const total = stats.total_columns || 1
+              const total = stats.columns || 1
               const pct = (h.count / total) * 100
               return (
                 <div key={h.height} className="flex items-center gap-4">
@@ -463,7 +467,24 @@ function CrudTable<T extends { id: number; active?: number }>({
     try {
       const params = search ? `?search=${encodeURIComponent(search)}` : ''
       const data = await api.get(`${endpoint}${params}`)
-      setItems(data.items || [])
+
+      // Map response keys to items array
+      // Backend returns: { packs: [...] }, { columns: [...] }, { luminaires: [...] }, etc.
+      const keyMap: Record<string, string> = {
+        '/catalog/packs': 'packs',
+        '/catalog/columns': 'columns',
+        '/catalog/luminaires': 'luminaires',
+        '/catalog/electrical-panels': 'electrical_panels',
+        '/catalog/fuse-boxes': 'fuse_boxes',
+        '/catalog/telemetry-panels': 'telemetry_panels',
+        '/catalog/modules/ev': 'ev_chargers',
+        '/catalog/modules/mupi': 'mupi',
+        '/catalog/modules/lateral': 'lateral',
+        '/catalog/modules/antenna': 'antennas',
+      }
+
+      const responseKey = keyMap[endpoint] || 'items'
+      setItems(data[responseKey] || data.items || [])
     } catch (error) {
       console.error(`Error loading ${endpoint}:`, error)
     } finally {
@@ -713,20 +734,21 @@ function PacksTab() {
       itemName={t('catalogModule.pack')}
       searchPlaceholder={t('catalog.searchPlaceholder')}
       columns={[
-        { key: 'name', label: t('common.name'), render: (item) => (
+        { key: 'pack_name', label: t('common.name'), render: (item) => (
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color || '#6B7280' }} />
-            <span className="font-medium">{item.name}</span>
+            <span className="font-medium">{item.pack_name}</span>
           </div>
         )},
-        { key: 'description', label: t('common.description') },
+        { key: 'pack_description', label: t('common.description') },
+        { key: 'column_count', label: t('catalog.columns'), width: '100px' },
         { key: 'active', label: t('common.status'), width: '100px', render: (item) => (
           <StatusBadge status={item.active ? 'active' : 'inactive'} colorMap={{ active: 'green', inactive: 'gray' }} />
         )}
       ]}
       formFields={[
-        { name: 'name', label: t('common.name'), type: 'text', required: true },
-        { name: 'description', label: t('common.description'), type: 'textarea' },
+        { name: 'pack_name', label: t('common.name'), type: 'text', required: true },
+        { name: 'pack_description', label: t('common.description'), type: 'textarea' },
         { name: 'color', label: t('catalog.color'), type: 'text', placeholder: '#3B82F6' },
         { name: 'active', label: t('common.active'), type: 'checkbox' }
       ]}
@@ -949,7 +971,7 @@ function TelemetryTab() {
 
   return (
     <CrudTable<CatalogTelemetryPanel>
-      endpoint="/catalog/telemetry"
+      endpoint="/catalog/telemetry-panels"
       title={t('catalog.telemetry')}
       itemName={t('catalog.telemetryPanel')}
       searchPlaceholder={t('catalog.searchPlaceholder')}
@@ -992,7 +1014,7 @@ function EVChargersTab() {
 
   return (
     <CrudTable<CatalogEVCharger>
-      endpoint="/catalog/ev-chargers"
+      endpoint="/catalog/modules/ev"
       title={t('catalog.evChargers')}
       itemName={t('catalog.evCharger')}
       searchPlaceholder={t('catalog.searchPlaceholder')}
@@ -1042,7 +1064,7 @@ function MUPITab() {
 
   return (
     <CrudTable<CatalogMUPI>
-      endpoint="/catalog/mupi"
+      endpoint="/catalog/modules/mupi"
       title={t('catalog.mupiModules')}
       itemName={t('catalog.mupiModule')}
       searchPlaceholder={t('catalog.searchPlaceholder')}
@@ -1082,7 +1104,7 @@ function LateralTab() {
 
   return (
     <CrudTable<CatalogLateral>
-      endpoint="/catalog/lateral"
+      endpoint="/catalog/modules/lateral"
       title={t('catalog.lateralModules')}
       itemName={t('catalog.lateralModule')}
       searchPlaceholder={t('catalog.searchPlaceholder')}
@@ -1124,7 +1146,7 @@ function AntennasTab() {
 
   return (
     <CrudTable<CatalogAntenna>
-      endpoint="/catalog/antennas"
+      endpoint="/catalog/modules/antenna"
       title={t('catalog.antennas')}
       itemName={t('catalog.antenna')}
       searchPlaceholder={t('catalog.searchPlaceholder')}
