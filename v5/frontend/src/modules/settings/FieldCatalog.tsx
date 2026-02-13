@@ -48,9 +48,11 @@ const FieldCatalog: React.FC = () => {
   const loadCatalog = async () => {
     try {
       const data = await api.get('/settings/field-catalog')
+      console.log('Field catalog data:', data)
       setFields(data.fields || [])
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message })
+      console.error('Field catalog error:', err)
+      setMessage({ type: 'error', text: err.message || 'Erro ao carregar catálogo' })
     } finally {
       setLoading(false)
     }
@@ -159,7 +161,7 @@ const FieldCatalog: React.FC = () => {
     return (field[key] as string) || field.field_label_pt
   }
 
-  if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center p-8"><Loader2 size={32} className="animate-spin" /></div>
 
   return (
     <div className="space-y-6">

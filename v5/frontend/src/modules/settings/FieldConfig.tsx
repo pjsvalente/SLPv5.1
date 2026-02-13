@@ -108,7 +108,7 @@ const FieldConfig: React.FC = () => {
   const activeCount = fields.filter(f => f.is_active).length
   const totalCount = fields.length
 
-  if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center p-8"><Loader2 size={32} className="animate-spin" /></div>
 
   return (
     <div className="space-y-6">

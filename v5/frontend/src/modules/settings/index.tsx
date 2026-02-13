@@ -567,7 +567,7 @@ const Settings: React.FC = () => {
     { id: 'favorites', label: t('settings.favorites') || 'Favoritos', icon: <IconStar className="h-4 w-4" /> },
     { id: 'colors', label: t('settings.colors'), icon: <IconPalette className="h-4 w-4" /> },
     { id: 'counters', label: t('settings.counters'), icon: <IconDatabase className="h-4 w-4" /> },
-    { id: 'fields', label: t('settings.fieldConfig') || 'Campos', icon: <IconLayout className="h-4 w-4" /> },
+    { id: 'fields', label: t('settings.fieldConfig') || 'Campos', icon: <IconLayout size={16} /> },
     { id: 'notifications', label: t('notifications.title') || 'Notificações', icon: <IconBell className="h-4 w-4" /> },
     { id: 'privacy', label: t('privacy.title') || 'Privacidade', icon: <IconShield className="h-4 w-4" /> },
     { id: 'backup', label: t('backup.title') || 'Backup', icon: <IconHardDrive className="h-4 w-4" /> },
@@ -577,7 +577,7 @@ const Settings: React.FC = () => {
 
   // Add field catalog tab for superadmin only
   if (isSuperadmin) {
-    tabs.splice(5, 0, { id: 'catalog', label: t('settings.fieldCatalog') || 'Catálogo', icon: <IconBookOpen className="h-4 w-4" /> })
+    tabs.splice(5, 0, { id: 'catalog', label: t('settings.fieldCatalog') || 'Catálogo', icon: <IconBookOpen size={16} /> })
   }
 
   return (
