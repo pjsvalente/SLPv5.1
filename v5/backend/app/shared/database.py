@@ -21,11 +21,14 @@ USE_POSTGRES = DATABASE_URL is not None and DATABASE_URL.startswith('postgres')
 # PostgreSQL connection pool (only if using Postgres)
 _pg_pool = None
 
+RealDictCursor = None
+
 if USE_POSTGRES:
     try:
         import psycopg2
         from psycopg2 import pool
-        from psycopg2.extras import RealDictCursor
+        from psycopg2.extras import RealDictCursor as _RealDictCursor
+        RealDictCursor = _RealDictCursor
         logger.info("PostgreSQL mode enabled")
     except ImportError:
         logger.warning("psycopg2 not installed, falling back to SQLite")
@@ -65,7 +68,11 @@ class DatabaseAdapter:
             query = query.replace('AUTOINCREMENT', '')
             query = query.replace('INTEGER PRIMARY KEY', 'SERIAL PRIMARY KEY')
 
-        cursor = self.conn.cursor()
+        if self.is_postgres and RealDictCursor:
+            cursor = self.conn.cursor(cursor_factory=RealDictCursor)
+        else:
+            cursor = self.conn.cursor()
+
         if params:
             cursor.execute(query, params)
         else:
@@ -173,7 +180,8 @@ def obter_bd(tenant_id=None):
             # PostgreSQL: use schema per tenant
             schema_name = f"tenant_{tenant_id.replace('-', '_')}"
             conn = _get_pg_connection(schema_name)
-            conn.cursor_factory = RealDictCursor if 'RealDictCursor' in dir() else None
+            if RealDictCursor:
+                conn.cursor_factory = RealDictCursor
             bd = DatabaseAdapter(conn, is_postgres=True)
         else:
             # SQLite: file per tenant
