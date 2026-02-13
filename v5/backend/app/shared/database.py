@@ -80,6 +80,34 @@ class DatabaseAdapter:
                 if 'ON CONFLICT' not in query:
                     query = query.rstrip().rstrip(';') + ' ON CONFLICT DO NOTHING'
 
+            # Handle SQLite strftime -> PostgreSQL TO_CHAR
+            import re
+            # strftime('%Y-%m', col) -> TO_CHAR(col, 'YYYY-MM')
+            query = re.sub(r"strftime\s*\(\s*'%Y-%m'\s*,\s*(\w+)\s*\)", r"TO_CHAR(\1::timestamp, 'YYYY-MM')", query)
+            # strftime('%Y-%m', col) for expressions like i.created_at
+            query = re.sub(r"strftime\s*\(\s*'%Y-%m'\s*,\s*([a-zA-Z_][a-zA-Z0-9_.]*)\s*\)", r"TO_CHAR(\1::timestamp, 'YYYY-MM')", query)
+            # strftime('%m', col) -> TO_CHAR(col, 'MM')
+            query = re.sub(r"strftime\s*\(\s*'%m'\s*,\s*([a-zA-Z_][a-zA-Z0-9_.]*)\s*\)", r"TO_CHAR(\1::timestamp, 'MM')", query)
+            # strftime('%w', col) -> EXTRACT(DOW FROM col)
+            query = re.sub(r"strftime\s*\(\s*'%w'\s*,\s*([a-zA-Z_][a-zA-Z0-9_.]*)\s*\)", r"EXTRACT(DOW FROM \1::timestamp)::text", query)
+
+            # Handle SQLite date functions -> PostgreSQL
+            # DATE('now') -> CURRENT_DATE
+            query = query.replace("DATE('now')", "CURRENT_DATE")
+            # DATE('now', '-X days') -> CURRENT_DATE - INTERVAL 'X days'
+            query = re.sub(r"DATE\s*\(\s*'now'\s*,\s*'(-?\d+)\s+days?'\s*\)", r"CURRENT_DATE + INTERVAL '\1 days'", query)
+            query = re.sub(r"DATE\s*\(\s*'now'\s*,\s*'\+(\d+)\s+days?'\s*\)", r"CURRENT_DATE + INTERVAL '\1 days'", query)
+            # date('now', '-X months')
+            query = re.sub(r"date\s*\(\s*'now'\s*,\s*'(-?\d+)\s+months?'\s*\)", r"CURRENT_DATE + INTERVAL '\1 months'", query, flags=re.IGNORECASE)
+            query = re.sub(r"DATE\s*\(\s*'now'\s*,\s*'(-?\d+)\s+years?'\s*\)", r"CURRENT_DATE + INTERVAL '\1 years'", query)
+
+            # julianday('now') - julianday(col) -> EXTRACT(EPOCH FROM NOW() - col) / 86400
+            query = re.sub(r"julianday\s*\(\s*'now'\s*\)\s*-\s*julianday\s*\(\s*([a-zA-Z_][a-zA-Z0-9_.]*)\s*\)",
+                          r"EXTRACT(EPOCH FROM NOW() - \1::timestamp) / 86400", query)
+            # julianday(col2) - julianday(col1)
+            query = re.sub(r"julianday\s*\(\s*([a-zA-Z_][a-zA-Z0-9_.]*)\s*\)\s*-\s*julianday\s*\(\s*([a-zA-Z_][a-zA-Z0-9_.]*)\s*\)",
+                          r"EXTRACT(EPOCH FROM \1::timestamp - \2::timestamp) / 86400", query)
+
         if self.is_postgres and RealDictCursor:
             cursor = self.conn.cursor(cursor_factory=RealDictCursor)
         else:
