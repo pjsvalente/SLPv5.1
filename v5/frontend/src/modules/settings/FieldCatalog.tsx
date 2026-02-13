@@ -131,6 +131,7 @@ const FieldCatalog: React.FC = () => {
     warranty: t('settings.categories.warranty'),
     maintenance: t('settings.categories.maintenance'),
     equipment: t('settings.categories.equipment'),
+    electrical: t('settings.categories.electrical') || 'Elétrico',
     other: t('settings.categories.other')
   }
 
@@ -150,7 +151,7 @@ const FieldCatalog: React.FC = () => {
     groupedFields[cat].push(field)
   })
 
-  const categoryOrder = ['identification', 'specifications', 'installation', 'warranty', 'maintenance', 'equipment', 'other']
+  const categoryOrder = ['identification', 'specifications', 'installation', 'electrical', 'warranty', 'maintenance', 'equipment', 'other']
 
   const getFieldLabel = (field: CatalogField) => {
     const lang = i18n.language

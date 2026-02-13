@@ -90,6 +90,7 @@ const FieldConfig: React.FC = () => {
     warranty: t('settings.categories.warranty'),
     maintenance: t('settings.categories.maintenance'),
     equipment: t('settings.categories.equipment'),
+    electrical: t('settings.categories.electrical') || 'Elétrico',
     other: t('settings.categories.other')
   }
 
@@ -101,7 +102,7 @@ const FieldConfig: React.FC = () => {
     groupedFields[cat].push(field)
   })
 
-  const categoryOrder = ['identification', 'specifications', 'installation', 'warranty', 'maintenance', 'equipment', 'other']
+  const categoryOrder = ['identification', 'specifications', 'installation', 'electrical', 'warranty', 'maintenance', 'equipment', 'other']
 
   // Count active and total
   const activeCount = fields.filter(f => f.is_active).length
