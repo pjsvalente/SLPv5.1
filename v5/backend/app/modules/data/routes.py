@@ -21,6 +21,39 @@ data_bp = Blueprint('data', __name__)
 # HELPER FUNCTIONS
 # =========================================================================
 
+def find_serial_column(headers):
+    """
+    Find the serial number column in Excel headers.
+    Supports multiple naming conventions (PT, EN, variations).
+    """
+    serial_variants = [
+        'número série', 'numero serie', 'nº série', 'nº serie',
+        'serial number', 'serial_number', 'serialnumber',
+        'n serie', 'nserie', 'num serie', 'numserie',
+        'serial', 'série', 'serie'
+    ]
+    for h in headers:
+        if h:
+            normalized = str(h).lower().strip().replace('º', 'o').replace('_', ' ').replace('-', ' ')
+            if normalized in serial_variants:
+                return h
+    return None
+
+
+def find_status_column(headers):
+    """
+    Find the status column in Excel headers.
+    Supports multiple naming conventions.
+    """
+    status_variants = ['status', 'estado', 'state', 'condition', 'situação', 'situacao']
+    for h in headers:
+        if h:
+            normalized = str(h).lower().strip()
+            if normalized in status_variants:
+                return h
+    return None
+
+
 def style_header_row(ws, headers, row=1):
     """Apply consistent header styling."""
     try:
@@ -448,91 +481,119 @@ def import_excel_preview():
     except Exception as e:
         return jsonify({'error': f'Erro ao ler ficheiro: {str(e)}'}), 400
 
-    bd = obter_bd()
+    # Wrap entire processing in try/except to ensure JSON response
+    try:
+        bd = obter_bd()
 
-    # Get schema fields
-    schema_fields = bd.execute('SELECT * FROM schema_fields ORDER BY field_order').fetchall()
-    field_map = {f['field_label']: f['field_name'] for f in schema_fields}
-    required_fields = [f['field_name'] for f in schema_fields if f.get('is_required')]
+        # Get schema fields
+        schema_fields = bd.execute('SELECT * FROM schema_fields ORDER BY field_order').fetchall()
+        field_map = {f['field_label']: f['field_name'] for f in schema_fields}
+        required_fields = [f['field_name'] for f in schema_fields if f.get('is_required')]
 
-    # Get headers from first row
-    headers = [cell.value for cell in ws[1]]
+        # Get headers from first row and filter None values
+        headers = [cell.value for cell in ws[1]]
+        headers_clean = [h for h in headers if h is not None]
 
-    # Get existing serial numbers
-    existing_serials = set()
-    for row in bd.execute('SELECT serial_number FROM assets').fetchall():
-        existing_serials.add(row['serial_number'])
+        if not headers_clean:
+            return jsonify({'error': 'Ficheiro Excel sem cabeçalhos válidos na primeira linha'}), 400
 
-    # Process rows for preview
-    preview_rows = []
-    stats = {'total': 0, 'new': 0, 'update': 0, 'errors': 0}
+        # Find serial number column (flexible naming)
+        serial_col = find_serial_column(headers)
+        if not serial_col:
+            return jsonify({
+                'error': 'Coluna de número de série não encontrada. Use um destes nomes: "Número Série", "Serial Number", "N Serie", "Serial"'
+            }), 400
 
-    for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
-        if not row or not row[0]:
-            continue
+        # Find status column (flexible naming)
+        status_col = find_status_column(headers)
 
-        stats['total'] += 1
-        row_data = dict(zip(headers, row))
+        # Get existing serial numbers
+        existing_serials = set()
+        for row in bd.execute('SELECT serial_number FROM assets').fetchall():
+            existing_serials.add(row['serial_number'])
 
-        serial_number = str(row_data.get('Número Série', '')).strip()
-        status = row_data.get('Status', 'ativo')
+        # Process rows for preview
+        preview_rows = []
+        stats = {'total': 0, 'new': 0, 'update': 0, 'errors': 0}
 
-        # Validate row
-        errors = []
-        warnings = []
+        for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
+            if not row or all(cell is None for cell in row):
+                continue
 
-        if not serial_number:
-            errors.append('Número de série vazio')
+            stats['total'] += 1
+            row_data = dict(zip(headers, row))
 
-        if status and status not in ['ativo', 'inativo', 'manutencao', 'abatido', 'suspenso']:
-            warnings.append(f'Status "{status}" inválido, será convertido para "ativo"')
+            # Use detected column names
+            serial_number = str(row_data.get(serial_col, '') or '').strip()
+            status = row_data.get(status_col, 'ativo') if status_col else 'ativo'
+            if status is None:
+                status = 'ativo'
 
-        # Check required fields
-        for field in schema_fields:
-            if field.get('is_required'):
-                label = field['field_label']
-                if label not in row_data or not row_data[label]:
-                    errors.append(f'Campo obrigatório "{label}" vazio')
+            # Validate row
+            errors = []
+            warnings = []
 
-        # Build dynamic fields
-        dynamic_fields = {}
-        for label, field_name in field_map.items():
-            if label in row_data and row_data[label] is not None:
-                dynamic_fields[field_name] = str(row_data[label])
+            if not serial_number:
+                errors.append('Número de série vazio')
 
-        # Check if exists
-        is_existing = serial_number in existing_serials
-        action = 'update' if is_existing else 'create'
+            if status and status not in ['ativo', 'inativo', 'manutencao', 'abatido', 'suspenso']:
+                warnings.append(f'Status "{status}" inválido, será convertido para "ativo"')
 
-        if errors:
-            stats['errors'] += 1
-        elif is_existing:
-            stats['update'] += 1
-        else:
-            stats['new'] += 1
+            # Check required fields
+            for field in schema_fields:
+                if field.get('is_required'):
+                    label = field['field_label']
+                    if label not in row_data or not row_data[label]:
+                        errors.append(f'Campo obrigatório "{label}" vazio')
 
-        preview_rows.append({
-            'row_num': row_num,
-            'serial_number': serial_number,
-            'status': status,
-            'action': action,
-            'is_valid': len(errors) == 0,
-            'errors': errors,
-            'warnings': warnings,
-            'data': dynamic_fields
-        })
+            # Build dynamic fields
+            dynamic_fields = {}
+            for label, field_name in field_map.items():
+                if label in row_data and row_data[label] is not None:
+                    dynamic_fields[field_name] = str(row_data[label])
 
-        # Limit preview to first 100 rows
-        if len(preview_rows) >= 100:
-            break
+            # Check if exists
+            is_existing = serial_number in existing_serials
+            action = 'update' if is_existing else 'create'
 
-    return jsonify({
-        'headers': headers,
-        'rows': preview_rows,
-        'stats': stats,
-        'total_rows': stats['total'],
-        'has_more': stats['total'] > 100
-    }), 200
+            if errors:
+                stats['errors'] += 1
+            elif is_existing:
+                stats['update'] += 1
+            else:
+                stats['new'] += 1
+
+            preview_rows.append({
+                'row_num': row_num,
+                'serial_number': serial_number,
+                'status': status,
+                'action': action,
+                'is_valid': len(errors) == 0,
+                'errors': errors,
+                'warnings': warnings,
+                'data': dynamic_fields
+            })
+
+            # Limit preview to first 100 rows
+            if len(preview_rows) >= 100:
+                break
+
+        return jsonify({
+            'headers': headers_clean,
+            'rows': preview_rows,
+            'stats': stats,
+            'total_rows': stats['total'],
+            'has_more': stats['total'] > 100,
+            'detected_columns': {
+                'serial': serial_col,
+                'status': status_col
+            }
+        }), 200
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Erro ao processar ficheiro: {str(e)}'}), 500
 
 
 @data_bp.route('/import/excel', methods=['POST'])
@@ -569,92 +630,116 @@ def import_excel():
     except Exception as e:
         return jsonify({'error': f'Erro ao ler ficheiro: {str(e)}'}), 400
 
-    bd = obter_bd()
+    # Wrap entire processing in try/except to ensure JSON response
+    try:
+        bd = obter_bd()
 
-    # Get schema fields
-    schema_fields = bd.execute('SELECT * FROM schema_fields ORDER BY field_order').fetchall()
-    field_map = {f['field_label']: f['field_name'] for f in schema_fields}
+        # Get schema fields
+        schema_fields = bd.execute('SELECT * FROM schema_fields ORDER BY field_order').fetchall()
+        field_map = {f['field_label']: f['field_name'] for f in schema_fields}
 
-    # Get headers from first row
-    headers = [cell.value for cell in ws[1]]
+        # Get headers from first row
+        headers = [cell.value for cell in ws[1]]
+        headers_clean = [h for h in headers if h is not None]
 
-    # Process rows
-    imported = 0
-    updated = 0
-    skipped = 0
-    errors = []
+        if not headers_clean:
+            return jsonify({'error': 'Ficheiro Excel sem cabeçalhos válidos na primeira linha'}), 400
 
-    for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
-        if not row or not row[0]:
-            continue
+        # Find serial number column (flexible naming)
+        serial_col = find_serial_column(headers)
+        if not serial_col:
+            return jsonify({
+                'error': 'Coluna de número de série não encontrada. Use um destes nomes: "Número Série", "Serial Number", "N Serie", "Serial"'
+            }), 400
 
-        row_data = dict(zip(headers, row))
+        # Find status column (flexible naming)
+        status_col = find_status_column(headers)
 
-        serial_number = str(row_data.get('Número Série', '')).strip()
-        if not serial_number:
-            errors.append(f'Linha {row_num}: Número de série vazio')
-            continue
+        # Process rows
+        imported = 0
+        updated = 0
+        skipped = 0
+        errors = []
 
-        status = row_data.get('Status', 'ativo')
+        for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
+            if not row or all(cell is None for cell in row):
+                continue
 
-        # Convert invalid/suspended status to 'ativo'
-        valid_statuses = ['ativo', 'inativo', 'manutencao', 'abatido']
-        if status not in valid_statuses:
-            if convert_suspended and status == 'suspenso':
-                status = 'ativo'  # Convert suspended to active as per RFID v3 spec
-            else:
+            row_data = dict(zip(headers, row))
+
+            # Use detected column names
+            serial_number = str(row_data.get(serial_col, '') or '').strip()
+            if not serial_number:
+                errors.append(f'Linha {row_num}: Número de série vazio')
+                continue
+
+            status = row_data.get(status_col, 'ativo') if status_col else 'ativo'
+            if status is None:
                 status = 'ativo'
 
-        # Build dynamic fields
-        dynamic_fields = {}
-        for label, field_name in field_map.items():
-            if label in row_data and row_data[label] is not None:
-                dynamic_fields[field_name] = str(row_data[label])
+            # Convert invalid/suspended status to 'ativo'
+            valid_statuses = ['ativo', 'inativo', 'manutencao', 'abatido']
+            if status not in valid_statuses:
+                if convert_suspended and status == 'suspenso':
+                    status = 'ativo'  # Convert suspended to active as per RFID v3 spec
+                else:
+                    status = 'ativo'
 
-        # Check if exists
-        existing = bd.execute(
-            'SELECT id FROM assets WHERE serial_number = ?',
-            (serial_number,)
-        ).fetchone()
+            # Build dynamic fields
+            dynamic_fields = {}
+            for label, field_name in field_map.items():
+                if label in row_data and row_data[label] is not None:
+                    dynamic_fields[field_name] = str(row_data[label])
 
-        try:
-            if existing:
-                # Handle existing record
-                if mode == 'create_only':
-                    skipped += 1
-                    continue
+            # Check if exists
+            existing = bd.execute(
+                'SELECT id FROM assets WHERE serial_number = ?',
+                (serial_number,)
+            ).fetchone()
 
-                # Update
-                bd.execute('''
-                    UPDATE assets SET status = ?, dynamic_fields = ?, updated_at = CURRENT_TIMESTAMP
-                    WHERE serial_number = ?
-                ''', (status, json.dumps(dynamic_fields), serial_number))
-                updated += 1
-            else:
-                # Handle new record
-                if mode == 'update_only':
-                    skipped += 1
-                    continue
+            try:
+                if existing:
+                    # Handle existing record
+                    if mode == 'create_only':
+                        skipped += 1
+                        continue
 
-                # Insert
-                bd.execute('''
-                    INSERT INTO assets (serial_number, status, dynamic_fields)
-                    VALUES (?, ?, ?)
-                ''', (serial_number, status, json.dumps(dynamic_fields)))
-                imported += 1
-        except Exception as e:
-            errors.append(f'Linha {row_num}: {str(e)}')
+                    # Update
+                    bd.execute('''
+                        UPDATE assets SET status = ?, dynamic_fields = ?, updated_at = CURRENT_TIMESTAMP
+                        WHERE serial_number = ?
+                    ''', (status, json.dumps(dynamic_fields), serial_number))
+                    updated += 1
+                else:
+                    # Handle new record
+                    if mode == 'update_only':
+                        skipped += 1
+                        continue
 
-    bd.commit()
+                    # Insert
+                    bd.execute('''
+                        INSERT INTO assets (serial_number, status, dynamic_fields)
+                        VALUES (?, ?, ?)
+                    ''', (serial_number, status, json.dumps(dynamic_fields)))
+                    imported += 1
+            except Exception as e:
+                errors.append(f'Linha {row_num}: {str(e)}')
 
-    return jsonify({
-        'message': 'Importação concluída',
-        'mode': mode,
-        'imported': imported,
-        'updated': updated,
-        'skipped': skipped,
-        'errors': errors[:20]  # Limit errors shown
-    }), 200
+        bd.commit()
+
+        return jsonify({
+            'message': 'Importação concluída',
+            'mode': mode,
+            'imported': imported,
+            'updated': updated,
+            'skipped': skipped,
+            'errors': errors[:20]  # Limit errors shown
+        }), 200
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Erro ao processar importação: {str(e)}'}), 500
 
 
 @data_bp.route('/export/json', methods=['POST'])
