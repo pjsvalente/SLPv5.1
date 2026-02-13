@@ -6,7 +6,7 @@ Technician management for interventions.
 import logging
 from flask import Blueprint, request, jsonify
 
-from ...shared.database import obter_bd
+from ...shared.database import obter_bd, extrair_valor
 from ...shared.permissions import requer_login, requer_permissao
 
 logger = logging.getLogger(__name__)
@@ -256,10 +256,10 @@ def get_technicians_stats():
     stats = {}
 
     # Total counts by type
-    stats['total'] = bd.execute('SELECT COUNT(*) FROM technicians').fetchone()[0]
-    stats['internos'] = bd.execute("SELECT COUNT(*) FROM technicians WHERE tipo = 'interno'").fetchone()[0]
-    stats['externos'] = bd.execute("SELECT COUNT(*) FROM technicians WHERE tipo = 'externo'").fetchone()[0]
-    stats['ativos'] = bd.execute('SELECT COUNT(*) FROM technicians WHERE ativo = 1').fetchone()[0]
+    stats['total'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM technicians').fetchone(), 0) or 0
+    stats['internos'] = extrair_valor(bd.execute("SELECT COUNT(*) as cnt FROM technicians WHERE tipo = 'interno'").fetchone(), 0) or 0
+    stats['externos'] = extrair_valor(bd.execute("SELECT COUNT(*) as cnt FROM technicians WHERE tipo = 'externo'").fetchone(), 0) or 0
+    stats['ativos'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM technicians WHERE ativo = 1').fetchone(), 0) or 0
 
     # Top technicians by interventions
     top = bd.execute('''

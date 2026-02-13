@@ -11,7 +11,7 @@ from datetime import datetime
 
 from flask import Blueprint, request, jsonify, g
 
-from ...shared.database import obter_bd
+from ...shared.database import obter_bd, extrair_valor
 from ...shared.permissions import requer_autenticacao, requer_permissao
 
 logger = logging.getLogger(__name__)
@@ -319,9 +319,9 @@ def get_map_statistics():
             statuses[status] = statuses.get(status, 0) + 1
 
     # Get open interventions count
-    open_interventions = bd.execute('''
-        SELECT COUNT(*) FROM interventions WHERE status = 'em_curso'
-    ''').fetchone()[0]
+    open_interventions = extrair_valor(bd.execute('''
+        SELECT COUNT(*) as cnt FROM interventions WHERE status = 'em_curso'
+    ''').fetchone(), 0) or 0
 
     return jsonify({
         'total_assets': len(assets),

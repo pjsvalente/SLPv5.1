@@ -11,7 +11,7 @@ from flask import Blueprint, request, jsonify, g, send_file, make_response
 
 from ...shared.database import (
     obter_bd, carregar_tenants, guardar_tenants, obter_tenant,
-    tenant_existe, inicializar_bd_tenant, MASTER_TENANT_ID
+    tenant_existe, inicializar_bd_tenant, MASTER_TENANT_ID, extrair_valor
 )
 from ...shared.security import hash_password
 from ...shared.permissions import requer_superadmin, requer_autenticacao
@@ -162,8 +162,8 @@ def list_tenants():
         # Get user and asset counts
         try:
             bd = obter_bd(tenant['id'])
-            user_count = bd.execute('SELECT COUNT(*) FROM users').fetchone()[0]
-            asset_count = bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0]
+            user_count = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM users').fetchone(), 0) or 0
+            asset_count = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0
             tenant_info['user_count'] = user_count
             tenant_info['asset_count'] = asset_count
         except Exception:
@@ -206,8 +206,8 @@ def get_tenant(tenant_id):
     # Add usage stats
     try:
         bd = obter_bd(tenant_id)
-        tenant_info['user_count'] = bd.execute('SELECT COUNT(*) FROM users').fetchone()[0]
-        tenant_info['asset_count'] = bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0]
+        tenant_info['user_count'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM users').fetchone(), 0) or 0
+        tenant_info['asset_count'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0
     except Exception:
         tenant_info['user_count'] = 0
         tenant_info['asset_count'] = 0

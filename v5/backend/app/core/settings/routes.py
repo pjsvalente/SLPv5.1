@@ -12,7 +12,7 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify, send_file
 
 from flask import g
-from ...shared.database import obter_bd, obter_bd_catalogo
+from ...shared.database import obter_bd, obter_bd_catalogo, extrair_valor
 from ...shared.permissions import requer_admin, requer_superadmin, requer_autenticacao
 from ...shared.config import Config
 
@@ -1624,8 +1624,8 @@ def get_catalog_columns():
         params.append(pack)
 
     # Get total count
-    count_query = query.replace('SELECT *', 'SELECT COUNT(*)')
-    total = bd.execute(count_query, params).fetchone()[0]
+    count_query = query.replace('SELECT *', 'SELECT COUNT(*) as cnt')
+    total = extrair_valor(bd.execute(count_query, params).fetchone(), 0) or 0
 
     # Add pagination
     query += ' ORDER BY reference LIMIT ? OFFSET ?'
@@ -1669,7 +1669,7 @@ def get_catalog_stats():
     stats = {}
 
     # Total columns
-    stats['total'] = bd.execute('SELECT COUNT(*) FROM catalog_columns').fetchone()[0]
+    stats['total'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_columns').fetchone(), 0) or 0
 
     # By pack
     packs = bd.execute('''

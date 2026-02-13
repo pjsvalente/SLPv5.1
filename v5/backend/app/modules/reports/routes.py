@@ -8,7 +8,7 @@ import logging
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 
-from ...shared.database import obter_bd
+from ...shared.database import obter_bd, extrair_valor
 from ...shared.permissions import requer_autenticacao
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ def get_general_stats():
     stats = {}
 
     # Total assets
-    stats['total_assets'] = bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0]
+    stats['total_assets'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0
 
     # Asset counts by condition_status (from asset_data)
     asset_status = bd.execute('''
@@ -51,24 +51,24 @@ def get_general_stats():
 
     # Technician counts - check if table exists
     try:
-        stats['total_technicians'] = bd.execute('SELECT COUNT(*) FROM external_technicians').fetchone()[0]
-        stats['active_technicians'] = bd.execute('SELECT COUNT(*) FROM external_technicians WHERE active = 1').fetchone()[0]
+        stats['total_technicians'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM external_technicians').fetchone(), 0) or 0
+        stats['active_technicians'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM external_technicians WHERE active = 1').fetchone(), 0) or 0
     except:
         stats['total_technicians'] = 0
         stats['active_technicians'] = 0
 
     # User counts
-    stats['total_users'] = bd.execute('SELECT COUNT(*) FROM users').fetchone()[0]
-    stats['active_users'] = bd.execute('SELECT COUNT(*) FROM users WHERE active = 1').fetchone()[0]
+    stats['total_users'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM users').fetchone(), 0) or 0
+    stats['active_users'] = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM users WHERE active = 1').fetchone(), 0) or 0
 
     # Recent activity
-    stats['recent_interventions'] = bd.execute('''
-        SELECT COUNT(*) FROM interventions WHERE created_at >= date('now', '-30 days')
-    ''').fetchone()[0]
+    stats['recent_interventions'] = extrair_valor(bd.execute('''
+        SELECT COUNT(*) as cnt FROM interventions WHERE created_at >= date('now', '-30 days')
+    ''').fetchone(), 0) or 0
 
-    stats['recent_assets'] = bd.execute('''
-        SELECT COUNT(*) FROM assets WHERE created_at >= date('now', '-30 days')
-    ''').fetchone()[0]
+    stats['recent_assets'] = extrair_valor(bd.execute('''
+        SELECT COUNT(*) as cnt FROM assets WHERE created_at >= date('now', '-30 days')
+    ''').fetchone(), 0) or 0
 
     return jsonify(stats), 200
 

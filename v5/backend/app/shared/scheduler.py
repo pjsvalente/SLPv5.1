@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from .config import Config
-from .database import obter_bd_para_tenant, obter_lista_tenants
+from .database import obter_bd_para_tenant, obter_lista_tenants, extrair_valor
 
 logger = logging.getLogger(__name__)
 
@@ -202,23 +202,23 @@ def enviar_relatorio_diario_tenant(tenant_id: str):
 
         # Gather statistics
         stats = {
-            'total_assets': bd.execute('SELECT COUNT(*) FROM assets').fetchone()[0],
-            'interventions_today': bd.execute('''
-                SELECT COUNT(*) FROM interventions WHERE DATE(created_at) = DATE('now')
-            ''').fetchone()[0],
-            'open_interventions': bd.execute('''
-                SELECT COUNT(*) FROM interventions WHERE status IN ('pendente', 'em_curso')
-            ''').fetchone()[0],
+            'total_assets': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM assets').fetchone(), 0) or 0,
+            'interventions_today': extrair_valor(bd.execute('''
+                SELECT COUNT(*) as cnt FROM interventions WHERE DATE(created_at) = DATE('now')
+            ''').fetchone(), 0) or 0,
+            'open_interventions': extrair_valor(bd.execute('''
+                SELECT COUNT(*) as cnt FROM interventions WHERE status IN ('pendente', 'em_curso')
+            ''').fetchone(), 0) or 0,
             'maintenance_due': 0  # Calculated below
         }
 
         # Count maintenance due in next 7 days
         limite = (datetime.now() + timedelta(days=7)).date().isoformat()
-        manut_proxima = bd.execute('''
-            SELECT COUNT(*) FROM asset_data
+        manut_proxima = extrair_valor(bd.execute('''
+            SELECT COUNT(*) as cnt FROM asset_data
             WHERE field_name IN ('next_maintenance_date', 'next_inspection_date')
               AND DATE(field_value) BETWEEN DATE('now') AND ?
-        ''', (limite,)).fetchone()[0]
+        ''', (limite,)).fetchone(), 0) or 0
         stats['maintenance_due'] = manut_proxima
 
         # Get pending alerts

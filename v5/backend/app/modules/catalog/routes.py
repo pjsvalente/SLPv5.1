@@ -17,7 +17,7 @@ import json
 import logging
 from flask import Blueprint, request, jsonify
 
-from ...shared.database import obter_bd_catalogo
+from ...shared.database import obter_bd_catalogo, extrair_valor
 from ...shared.permissions import requer_autenticacao, requer_admin
 
 logger = logging.getLogger(__name__)
@@ -36,16 +36,16 @@ def get_catalog_stats():
     bd = obter_bd_catalogo()
 
     stats = {
-        'packs': bd.execute('SELECT COUNT(*) FROM catalog_packs WHERE active = 1').fetchone()[0],
-        'columns': bd.execute('SELECT COUNT(*) FROM catalog_columns WHERE active = 1').fetchone()[0],
-        'luminaires': bd.execute('SELECT COUNT(*) FROM catalog_luminaires WHERE active = 1').fetchone()[0],
-        'electrical_panels': bd.execute('SELECT COUNT(*) FROM catalog_electrical_panels WHERE active = 1').fetchone()[0],
-        'fuse_boxes': bd.execute('SELECT COUNT(*) FROM catalog_fuse_boxes WHERE active = 1').fetchone()[0],
-        'telemetry_panels': bd.execute('SELECT COUNT(*) FROM catalog_telemetry_panels WHERE active = 1').fetchone()[0],
-        'ev_chargers': bd.execute('SELECT COUNT(*) FROM catalog_module_ev WHERE active = 1').fetchone()[0],
-        'mupi': bd.execute('SELECT COUNT(*) FROM catalog_module_mupi WHERE active = 1').fetchone()[0],
-        'lateral': bd.execute('SELECT COUNT(*) FROM catalog_module_lateral WHERE active = 1').fetchone()[0],
-        'antennas': bd.execute('SELECT COUNT(*) FROM catalog_module_antenna WHERE active = 1').fetchone()[0],
+        'packs': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_packs WHERE active = 1').fetchone(), 0) or 0,
+        'columns': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_columns WHERE active = 1').fetchone(), 0) or 0,
+        'luminaires': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_luminaires WHERE active = 1').fetchone(), 0) or 0,
+        'electrical_panels': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_electrical_panels WHERE active = 1').fetchone(), 0) or 0,
+        'fuse_boxes': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_fuse_boxes WHERE active = 1').fetchone(), 0) or 0,
+        'telemetry_panels': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_telemetry_panels WHERE active = 1').fetchone(), 0) or 0,
+        'ev_chargers': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_ev WHERE active = 1').fetchone(), 0) or 0,
+        'mupi': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_mupi WHERE active = 1').fetchone(), 0) or 0,
+        'lateral': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_lateral WHERE active = 1').fetchone(), 0) or 0,
+        'antennas': extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_module_antenna WHERE active = 1').fetchone(), 0) or 0,
     }
 
     stats['total_references'] = sum([
@@ -75,10 +75,10 @@ def get_packs():
     for pack in packs:
         pack_dict = dict(pack)
         # Count columns per pack
-        count = bd.execute(
-            'SELECT COUNT(*) FROM catalog_columns WHERE pack = ? AND active = 1',
+        count = extrair_valor(bd.execute(
+            'SELECT COUNT(*) as cnt FROM catalog_columns WHERE pack = ? AND active = 1',
             (pack['pack_name'],)
-        ).fetchone()[0]
+        ).fetchone(), 0) or 0
         pack_dict['column_count'] = count
         result.append(pack_dict)
 

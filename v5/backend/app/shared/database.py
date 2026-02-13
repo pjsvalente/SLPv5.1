@@ -1196,7 +1196,7 @@ def inicializar_bd_tenant(tenant_id):
     ''')
 
     # --- Default schema fields (RFID v3 migration - complete set) ---
-    campos_existentes = bd.execute('SELECT COUNT(*) FROM schema_fields').fetchone()[0]
+    campos_existentes = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM schema_fields').fetchone(), 0) or 0
     if campos_existentes == 0:
         campos_predefinidos = [
             # Identification
@@ -1337,8 +1337,8 @@ def _inserir_dados_iniciais_postgres(conn):
     cursor = conn.cursor()
 
     # Check if schema_fields has data
-    cursor.execute('SELECT COUNT(*) FROM schema_fields')
-    count = cursor.fetchone()[0]
+    cursor.execute('SELECT COUNT(*) as cnt FROM schema_fields')
+    count = extrair_valor(cursor.fetchone(), 0) or 0
 
     if count == 0:
         campos = [
@@ -1605,7 +1605,7 @@ def inicializar_catalogo():
     ])
 
     # Insert default field catalog
-    campos_existentes = bd.execute('SELECT COUNT(*) FROM field_catalog').fetchone()[0]
+    campos_existentes = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM field_catalog').fetchone(), 0) or 0
     if campos_existentes == 0:
         campos_catalogo = [
             ('rfid_tag', 'text', 'RFID Tag', 'RFID Tag', 'Tag RFID', 'RFID-Tag', 'identification', None, 1, 1, 1),
@@ -1625,7 +1625,7 @@ def inicializar_catalogo():
             ''', campo)
 
     # Default packs
-    packs_existentes = bd.execute('SELECT COUNT(*) FROM catalog_packs').fetchone()[0]
+    packs_existentes = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM catalog_packs').fetchone(), 0) or 0
     if packs_existentes == 0:
         packs = [('Standard', 'Pack padrão'), ('Premium', 'Pack premium'), ('Industrial', 'Pack industrial')]
         for p in packs:

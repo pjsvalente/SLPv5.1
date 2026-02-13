@@ -8,7 +8,7 @@ from datetime import datetime
 
 from flask import Blueprint, request, jsonify, g
 
-from ...shared.database import obter_bd, registar_auditoria
+from ...shared.database import obter_bd, registar_auditoria, extrair_valor
 from ...shared.security import hash_password
 from ...shared.permissions import (
     requer_autenticacao, requer_admin,
@@ -61,7 +61,7 @@ def create_user():
 
     # Check user limit
     bd = obter_bd()
-    current_count = bd.execute('SELECT COUNT(*) FROM users').fetchone()[0]
+    current_count = extrair_valor(bd.execute('SELECT COUNT(*) as cnt FROM users').fetchone(), 0) or 0
     within_limit, limit, remaining = TenantPlanService.check_tenant_limit(
         g.tenant_id, 'max_users', current_count
     )
