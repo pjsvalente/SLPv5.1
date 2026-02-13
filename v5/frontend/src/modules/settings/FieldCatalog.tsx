@@ -233,7 +233,7 @@ const FieldCatalog: React.FC = () => {
                       className="p-2 text-gray-400 hover:text-blue-500"
                       title={t('common.edit')}
                     >
-                      <Edit2 className="h-4 w-4" />
+                      <Edit className="h-4 w-4" />
                     </button>
                     {!field.is_system && (
                       <button
