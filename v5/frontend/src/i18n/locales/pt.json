@@ -752,6 +752,7 @@
       "equipment": "Equipamento",
       "other": "Outros"
     },
+    "favorites": "Favoritos",
     "menuOrder": "Ordem dos Menus",
     "menuOrderDescription": "Arraste e solte os itens para reorganizar os menus da barra lateral. A nova ordem será aplicada após guardar.",
     "menuItems": "Itens do Menu",

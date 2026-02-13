@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
-import { IconSave, IconLoader, IconShield, IconTag, IconCheck, IconX, IconLock } from '@/components/icons'
+import { IconSave as Save, IconLoader as Loader2, IconShield as Shield, IconTag as Tag, IconCheck as Check, IconX as X, IconLock as Lock } from '@/components/icons'
 
 interface TenantField {
   id: number

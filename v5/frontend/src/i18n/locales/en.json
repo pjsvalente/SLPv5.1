@@ -752,6 +752,7 @@
       "equipment": "Equipment",
       "other": "Other"
     },
+    "favorites": "Favorites",
     "menuOrder": "Menu Order",
     "menuOrderDescription": "Drag and drop items to reorder the sidebar menus. The new order will be applied after saving.",
     "menuItems": "Menu Items",

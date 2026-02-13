@@ -752,6 +752,7 @@
       "equipment": "Ausrüstung",
       "other": "Sonstiges"
     },
+    "favorites": "Favoriten",
     "menuOrder": "Menüreihenfolge",
     "menuOrderDescription": "Ziehen Sie Elemente per Drag & Drop, um die Seitenleistenmenüs neu anzuordnen. Die neue Reihenfolge wird nach dem Speichern angewendet.",
     "menuItems": "Menüelemente",

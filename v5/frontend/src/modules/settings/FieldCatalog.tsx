@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { api } from '@/services/api'
 import { FormField } from '@/components/ui/FormField'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { IconSave, IconLoader, IconPlus, IconTrash2, IconShield, IconTag, IconEdit, IconX } from '@/components/icons'
+import { IconSave as Save, IconLoader as Loader2, IconPlus as Plus, IconTrash2 as Trash2, IconShield as Shield, IconTag as Tag, IconEdit as Edit, IconX as X } from '@/components/icons'
 
 interface CatalogField {
   id: number
