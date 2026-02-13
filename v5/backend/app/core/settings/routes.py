@@ -578,6 +578,19 @@ def delete_catalog_field(field_name):
 # TENANT FIELD CONFIGURATION (admin only)
 # =========================================================================
 
+@settings_bp.route('/fields/reinit', methods=['POST'])
+@requer_superadmin
+def reinit_field_catalog():
+    """Reinitialize the field catalog with default values."""
+    from ...shared.database import inicializar_bd_catalogo
+    try:
+        inicializar_bd_catalogo()
+        return jsonify({'message': 'Catálogo de campos reinicializado com sucesso'}), 200
+    except Exception as e:
+        logger.error(f"Error reinitializing field catalog: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 @settings_bp.route('/fields', methods=['GET'])
 @requer_admin
 def get_tenant_fields():
